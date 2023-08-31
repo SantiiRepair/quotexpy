@@ -13,8 +13,9 @@ if requirements_path.is_file():
         requirements = requirements_file.read().splitlines()
 
 # -----------------------------------------------------------------------------
+
 setup(
-    name="pyquotex",
+    name="quotex-cli",
     version='1.0.0',
     packages=find_packages(),
     install_requires=requirements,
