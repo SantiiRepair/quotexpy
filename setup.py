@@ -15,8 +15,8 @@ if requirements_path.is_file():
 # -----------------------------------------------------------------------------
 
 setup(
-    name="quotex-cli",
-    version='1.0.0',
+    name="quotex-api",
+    version="1.0.0",
     packages=find_packages(),
     install_requires=requirements,
     include_package_data=True,

@@ -18,15 +18,34 @@ def nested_dict(n, type):
 
 
 def truncate(f, n):
-    return math.floor(f * 10 ** n) / 10 ** n
+    return math.floor(f * 10**n) / 10**n
 
 
 class Quotex(object):
     __version__ = "1.0"
 
     def __init__(self, email, password, browser=False):
-        self.size = [1, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800,
-                     3600, 7200, 14400, 28800, 43200, 86400, 604800, 2592000]
+        self.size = [
+            1,
+            5,
+            10,
+            15,
+            30,
+            60,
+            120,
+            300,
+            600,
+            900,
+            1800,
+            3600,
+            7200,
+            14400,
+            28800,
+            43200,
+            86400,
+            604800,
+            2592000,
+        ]
         self.email = email
         self.password = password
         self.browser = browser
@@ -81,16 +100,21 @@ class Quotex(object):
             try:
                 self.api.get_instruments()
                 start = time.time()
-                while self.api.instruments is None and time.time() - start < 10:
+                while (
+                    self.api.instruments is None and time.time() - start < 10
+                ):
                     pass
             except:
-                logging.error('**error** api.get_instruments need reconnect')
+                logging.error("**error** api.get_instruments need reconnect")
                 self.connect()
         return self.api.instruments
 
     def get_all_asset_name(self):
         if self.api.instruments:
-            return [instrument[2].replace("\n", "") for instrument in self.api.instruments]
+            return [
+                instrument[2].replace("\n", "")
+                for instrument in self.api.instruments
+            ]
 
     def check_asset_open(self, instrument):
         if self.api.instruments:
@@ -110,12 +134,15 @@ class Quotex(object):
         while True:
             try:
                 self.api.getcandles(codes_asset[asset], offset, period, index)
-                while self.check_connect and self.api.candles.candles_data is None:
+                while (
+                    self.check_connect
+                    and self.api.candles.candles_data is None
+                ):
                     pass
                 if self.api.candles.candles_data is not None:
                     break
             except:
-                logging.error('**error** get_candles need reconnect')
+                logging.error("**error** get_candles need reconnect")
                 self.connect()
         return self.api.candles.candles_data
 
@@ -145,7 +172,10 @@ class Quotex(object):
             if global_value.check_accepted_connection == 0:
                 check, reason = await self.connect()
                 if not check:
-                    check, reason = False, "Acesso negado, sessão não existe!!!"
+                    check, reason = (
+                        False,
+                        "Acesso negado, sessão não existe!!!",
+                    )
         return check, reason
 
     def change_account(self, balance_mode="PRACTICE"):
@@ -169,8 +199,11 @@ class Quotex(object):
     def get_balance(self):
         while not self.api.account_balance:
             time.sleep(0.1)
-        balance = self.api.account_balance.get("demoBalance") \
-            if self.api.account_type > 0 else self.api.account_balance.get("liveBalance")
+        balance = (
+            self.api.account_balance.get("demoBalance")
+            if self.api.account_type > 0
+            else self.api.account_balance.get("liveBalance")
+        )
         # return float(f"{truncate(balance + self.get_profit(), 2):.2f}")
         return round(balance, 2)
 
@@ -208,7 +241,7 @@ class Quotex(object):
             assets_data[i[2]] = {
                 "turbo_payment": i[18],
                 "payment": i[5],
-                "open": i[14]
+                "open": i[14],
             }
         return assets_data
 
@@ -257,7 +290,8 @@ class Quotex(object):
         while True:
             if time.time() - start > 20:
                 logging.error(
-                    '**error** start_candles_one_stream late for 20 sec')
+                    "**error** start_candles_one_stream late for 20 sec"
+                )
                 return False
             try:
                 if self.api.candle_generated_check[str(asset)][int(size)]:
@@ -267,7 +301,7 @@ class Quotex(object):
             try:
                 self.api.subscribe(codes_asset[asset], size)
             except:
-                logging.error('**error** start_candles_stream reconnect')
+                logging.error("**error** start_candles_stream reconnect")
                 self.connect()
             time.sleep(1)
 
@@ -278,7 +312,9 @@ class Quotex(object):
         start = time.time()
         while True:
             if time.time() - start > 20:
-                logging.error(f'**error** fail {asset} start_candles_all_size_stream late for 10 sec')
+                logging.error(
+                    f"**error** fail {asset} start_candles_all_size_stream late for 10 sec"
+                )
                 return False
             try:
                 if self.api.candle_generated_all_size_check[str(asset)]:
@@ -289,7 +325,8 @@ class Quotex(object):
                 self.api.subscribe_all_size(codes_asset[asset])
             except:
                 logging.error(
-                    '**error** start_candles_all_size_stream reconnect')
+                    "**error** start_candles_all_size_stream reconnect"
+                )
                 self.connect()
             time.sleep(1)
 
@@ -297,8 +334,7 @@ class Quotex(object):
         if asset not in self.subscribe_mood:
             self.subscribe_mood.append(asset)
         while True:
-            self.api.subscribe_Traders_mood(
-                asset[asset], instrument)
+            self.api.subscribe_Traders_mood(asset[asset], instrument)
             try:
                 self.api.traders_mood[codes_asset[asset]] = codes_asset[asset]
                 break

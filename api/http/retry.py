@@ -2,6 +2,7 @@ import time
 from functools import wraps
 from pyquotex.logger import logger
 
+
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
 
@@ -23,7 +24,6 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """
 
     def deco_retry(f):
-
         @wraps(f)
         def f_retry(*args, **kwargs):
             mtries, mdelay = tries, delay

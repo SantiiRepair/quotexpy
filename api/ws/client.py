@@ -24,7 +24,8 @@ class WebsocketClient(object):
         """
         self.api = api
         self.headers = {
-            "User-Agent": self.api.user_agent if not None
+            "User-Agent": self.api.user_agent
+            if not None
             else user_agent_list[random.randint(0, len(user_agent_list) - 1)],
         }
         websocket.enableTrace(self.api.trace_ws)
@@ -36,7 +37,7 @@ class WebsocketClient(object):
             on_open=self.on_open,
             on_pong=self.on_pong,
             header=self.headers,
-            cookie=self.api.cookies
+            cookie=self.api.cookies,
         )
 
     def on_message(self, wss, message):
@@ -58,22 +59,28 @@ class WebsocketClient(object):
                 logger.debug(message)
                 message = json.loads(str(message))
                 self.api.profile.msg = message
-                if "call" in str(message) or 'put' in str(message):
+                if "call" in str(message) or "put" in str(message):
                     self.api.instruments = message
                     # logger.info(message)
                 elif "signals" in str(message):
                     for i in message["signals"]:
-                        self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
-                        self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
+                        self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0][
+                            "signal"
+                        ]
+                        self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0][
+                            "timeFrame"
+                        ]
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
                     # logger.info(message)
                     self.api.candles.candles_data = message
                 elif message.get("id"):
-                    self.api.buy_successful[message['asset']] = message
-                    self.api.buy_id[message['asset']] = message['id']
-                    self.api.timesync.server_timestamp = message["closeTimestamp"]
+                    self.api.buy_successful[message["asset"]] = message
+                    self.api.buy_id[message["asset"]] = message["id"]
+                    self.api.timesync.server_timestamp = message[
+                        "closeTimestamp"
+                    ]
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
@@ -82,7 +89,10 @@ class WebsocketClient(object):
                         get_m["win"] = True if get_m["profit"] > 0 else False
                         get_m["game_state"] = 1
                         self.api.listinfodata.set(
-                            get_m["win"], get_m["game_state"], get_m["profit"], get_m["id"]
+                            get_m["win"],
+                            get_m["game_state"],
+                            get_m["profit"],
+                            get_m["id"],
                         )
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
@@ -93,10 +103,16 @@ class WebsocketClient(object):
                 pass
             if "51-" in str(message):
                 self.api._temp_status = str(message)
-            elif self.api._temp_status == """51-["settings/list",{"_placeholder":true,"num":0}]""":
+            elif (
+                self.api._temp_status
+                == """51-["settings/list",{"_placeholder":true,"num":0}]"""
+            ):
                 self.api.settings_list = message
                 self.api._temp_status = ""
-            elif self.api._temp_status == """51-["history/list/v2",{"_placeholder":true,"num":0}]""":
+            elif (
+                self.api._temp_status
+                == """51-["history/list/v2",{"_placeholder":true,"num":0}]"""
+            ):
                 self.api.candle_v2_data[message["asset"]] = message["history"]
             elif len(message[0]) == 4:
                 ans = {"time": message[0][1], "price": message[0][2]}

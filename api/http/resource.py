@@ -3,6 +3,7 @@
 
 class Resource(object):
     """Class for base Quotex API http resource."""
+
     # pylint: disable=too-few-public-methods
 
     def __init__(self, api):
@@ -20,4 +21,6 @@ class Resource(object):
         :param dict headers: (optional) The http request headers.
         :returns: The instance of :class:`requests.Response`.
         """
-        return self.api.send_http_request(self, method, data=data, params=params, headers=headers)
+        return self.api.send_http_request(
+            self, method, data=data, params=params, headers=headers
+        )

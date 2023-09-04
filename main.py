@@ -4,7 +4,11 @@ from pyquotex.quotexapi.stable_api import Quotex
 import asyncio
 
 # browser=True enable playwright
-client = Quotex(email="diego.christ@outlook.com", password="@D1i2e3g4o5@Quotex", browser=False)
+client = Quotex(
+    email="diego.christ@outlook.com",
+    password="@D1i2e3g4o5@Quotex",
+    browser=False,
+)
 client.debug_ws_enable = False
 
 
@@ -82,9 +86,13 @@ async def buy_and_check_win():
         if status:
             print("Aguardando resultado...")
             if client.check_win(buy_info["id"]):
-                print(f"\nWin!!! \nVencemos moleque!!!\nLucro: R$ {client.get_profit()}")
+                print(
+                    f"\nWin!!! \nVencemos moleque!!!\nLucro: R$ {client.get_profit()}"
+                )
             else:
-                print(f"\nLoss!!! \nPerdemos moleque!!!\nPrejuízo: R$ {client.get_profit()}")
+                print(
+                    f"\nLoss!!! \nPerdemos moleque!!!\nPrejuízo: R$ {client.get_profit()}"
+                )
         else:
             print("Falha na operação!!!")
         print("Saldo Atual: ", client.get_balance())

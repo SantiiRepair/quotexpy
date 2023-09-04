@@ -23,6 +23,7 @@ from pyquotex.quotexapi.ws.client import WebsocketClient
 from collections import defaultdict
 from pyquotex.logger import logger
 
+
 def nested_dict(n, type):
     if n == 1:
         return defaultdict(type)
@@ -34,13 +35,14 @@ urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
 cert_path = certifi.where()
-os.environ['SSL_CERT_FILE'] = cert_path
-os.environ['WEBSOCKET_CLIENT_CA_BUNDLE'] = cert_path
-cacert = os.environ.get('WEBSOCKET_CLIENT_CA_BUNDLE')
+os.environ["SSL_CERT_FILE"] = cert_path
+os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
+cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
 
 
 class QuotexAPI(object):
     """Class for communication with Quotex API."""
+
     socket_option_opened = {}
     buy_id = {}
     trace_ws = False
@@ -94,19 +96,13 @@ class QuotexAPI(object):
         return self.websocket_client.wss
 
     def get_candle_v2(self):
-        payload = {
-            "_placeholder": True,
-            "num": 0
-        }
+        payload = {"_placeholder": True, "num": 0}
         data = f'451-["history/list/v2", {json.dumps(payload)}]'
         return self.send_websocket_request(data)
 
     def subscribe_realtime_candle(self, asset, size, period):
         self.realtime_price[asset] = collections.deque([], size)
-        payload = {
-            "asset": asset,
-            "period": period
-        }
+        payload = {"asset": asset, "period": period}
         data = f'42["instruments/update", {json.dumps(payload)}]'
         return self.send_websocket_request(data)
 
@@ -219,16 +215,16 @@ class QuotexAPI(object):
         self.websocket_thread = threading.Thread(
             target=self.websocket.run_forever,
             kwargs={
-                'ping_interval': 2,
-                'ping_payload': "2",
-                'origin': 'https://qxbroker.com',
-                'host': 'ws2.qxbroker.com',
-                'sslopt': {
+                "ping_interval": 2,
+                "ping_payload": "2",
+                "origin": "https://qxbroker.com",
+                "host": "ws2.qxbroker.com",
+                "sslopt": {
                     "check_hostname": False,
                     "cert_reqs": ssl.CERT_NONE,
                     "ca_certs": cacert,
-                }
-            }
+                },
+            },
         )
         self.websocket_thread.daemon = True
         self.websocket_thread.start()
@@ -254,8 +250,10 @@ class QuotexAPI(object):
         while not self.profile.msg:
             time.sleep(0.1)
             count += 1
-            if count == 50: 
-                raise Exception(f"O envio de authorization com o SSID {global_value.SSID} demorou muito pra responder")
+            if count == 50:
+                raise Exception(
+                    f"O envio de authorization com o SSID {global_value.SSID} demorou muito pra responder"
+                )
         if not self.profile.msg:
             return False
         return True
