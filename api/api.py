@@ -9,8 +9,6 @@ import collections
 import urllib3
 import certifi
 from pyquotex.quotexapi import global_value
-from pyquotex.quotexapi.http.login import Login
-from pyquotex.quotexapi.http.logout import Logout
 from pyquotex.quotexapi.ws.channels.ssid import Ssid
 from pyquotex.quotexapi.ws.channels.buy import Buy
 from pyquotex.quotexapi.ws.channels.candles import GetCandles
@@ -32,7 +30,7 @@ def nested_dict(n, type):
 
 
 urllib3.disable_warnings()
-logger = logging.getLogger(__name__)
+logger += logging.getLogger(__name__)
 
 cert_path = certifi.where()
 os.environ["SSL_CERT_FILE"] = cert_path
@@ -109,22 +107,6 @@ class QuotexAPI(object):
     def unsubscribe_realtime_candle(self, asset):
         data = f'42["subfor", {json.dumps(asset)}]'
         return self.send_websocket_request(data)
-
-    @property
-    def logout(self):
-        """Property for get Quotex http login resource.
-        :returns: The instance of :class:`Login
-            <quotexapi.http.login.Login>`.
-        """
-        return Logout(self)
-
-    @property
-    def login(self):
-        """Property for get Quotex http login resource.
-        :returns: The instance of :class:`Login
-            <quotexapi.http.login.Login>`.
-        """
-        return Login(self)
 
     @property
     def ssid(self):
