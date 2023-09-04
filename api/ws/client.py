@@ -3,12 +3,10 @@ import os
 import json
 import random
 import logging
-import time
 
 import websocket
 from pyquotex.quotexapi import global_value
 from pyquotex.quotexapi.http.user_agents import agents
-from pyquotex.logger import logger
 
 user_agent_list = agents.split("\n")
 
