@@ -1,6 +1,5 @@
 """The python wrapper for IQ Option API package setup."""
 from pathlib import Path
-
 from setuptools import find_packages, setup
 
 this_dir = Path(__file__).parent
