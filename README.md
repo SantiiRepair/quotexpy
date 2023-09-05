@@ -4,25 +4,13 @@
 ## <img src="https://github.com/SantiiRepair/quotexpy/blob/main/.github/images/quotex-logo.png?raw=true" height="56"/>
 
 
-**QuotexPy is a library for interact with qxbroker easily.**
+**📈 QuotexPy is a library for interact with qxbroker easily.**
 
 ______________________________________________________________________
 
-[![License](<https://img.shields.io/badge/License-BSL%1.0-brightgreen.svg>)](https://opensource.org/licenses/MPL-2.0)
+[![License](<https://img.shields.io/badge/License-Boost_1.0-magenta.svg)](https://www.boost.org/LICENSE_1_0.txt>)
 [![PyPI version](https://badge.fury.io/py/quotexpy.svg)](https://badge.fury.io/py/quotexpy)
-[![DOI](https://zenodo.org/badge/265612440.svg)](https://zenodo.org/badge/latestdoi/265612440)
-
 ![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/pylint.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/data_tests.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/docker.yaml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/inference_tests.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/style_check.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/text_tests.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/tts_tests.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/vocoder_tests.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/zoo_tests0.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/zoo_tests1.yml/badge.svg)
-![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/zoo_tests2.yml/badge.svg)
 
 </div>
 
@@ -30,7 +18,7 @@ ______________________________________________________________________
 
 ## Installing
 
-🐸TTS is tested on Ubuntu 18.04 with **python >= 3.10, <= 3.11.**.
+📈 QuotexPy is tested on Ubuntu 18.04 and Windows 10 with **python >= 3.10, <= 3.11.**.
 ```bash
 pip install quotex-py
 ```
