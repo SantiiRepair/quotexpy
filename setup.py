@@ -13,7 +13,7 @@ if requirements_path.is_file():
 # -----------------------------------------------------------------------------
 
 setup(
-    name="quotex-py",
+    name="quotexpy",
     version="1.0.0",
     packages=find_packages(),
     install_requires=requirements,
