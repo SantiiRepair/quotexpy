@@ -1,3 +1,4 @@
 *.pyc
+.pypirc
 .vscode/launch.json
 .codesandbox
