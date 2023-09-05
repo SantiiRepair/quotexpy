@@ -1,4 +1,4 @@
-"""The python wrapper for IQ Option API package setup."""
+"""The python wrapper for Quotex API package setup."""
 from pathlib import Path
 from setuptools import find_packages, setup
 
@@ -18,4 +18,5 @@ setup(
     packages=find_packages(),
     install_requires=requirements,
     include_package_data=True,
+    python_requires="=>3.10",
 )
