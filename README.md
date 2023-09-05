@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://static.scarf.sh/a.png?x-pxid=cf317fe7-2188-4721-bc01-124bb5d5dbb2" />
 
-## <img src="https://qxbroker.com/profile/images/auth-logo.png" height="56"/>
+## <img src="https://github.com/SantiiRepair/quotexpy/blob/main/.github/images/quotex-logo.png?raw=true" height="56"/>
 
 
 **QuotexPy is a library for interact with qxbroker easily.**
