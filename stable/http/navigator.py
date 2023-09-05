@@ -1,11 +1,10 @@
 import random
 import requests
 import cloudscraper
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
-from pyquotex.quotexapi.http.user_agents import agents
-import os
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+from quotexpy.stable.http.user_agents import agents
 
 retry_strategy = Retry(
     total=3,

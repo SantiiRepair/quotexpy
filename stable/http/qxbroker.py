@@ -1,13 +1,11 @@
 import re
 import json
-import asyncio
 import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
-from pyquotex.quotexapi.utils.playwright_install import install
-from playwright.async_api import Playwright, async_playwright, expect
-import os
+from quotexpy.stable.utils.playwright_install import install
+from playwright.async_api import Playwright, async_playwright
 
 
 async def run(username, password, playwright: Playwright) -> Tuple[Any, str]:

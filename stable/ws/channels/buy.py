@@ -1,7 +1,5 @@
 import json
-from pyquotex.quotexapi.ws.channels.base import Base
-from pyquotex.quotexapi.expiration import get_expiration_time
-from pyquotex.logger import logger
+from quotexpy.stable.ws.channels.base import Base
 
 
 class Buy(Base):

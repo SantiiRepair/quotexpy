@@ -3,12 +3,10 @@ import os
 import json
 import random
 import logging
-import time
 
 import websocket
-from pyquotex.quotexapi import global_value
-from pyquotex.quotexapi.http.user_agents import agents
-from pyquotex.logger import logger
+from quotexpy.stable import global_value
+from quotexpy.stable.http.user_agents import agents
 
 user_agent_list = agents.split("\n")
 
@@ -61,7 +59,6 @@ class WebsocketClient(object):
                 self.api.profile.msg = message
                 if "call" in str(message) or "put" in str(message):
                     self.api.instruments = message
-                    # logger.info(message)
                 elif "signals" in str(message):
                     for i in message["signals"]:
                         self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0][

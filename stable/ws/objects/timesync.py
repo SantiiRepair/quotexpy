@@ -1,6 +1,6 @@
 import time
 import datetime
-from pyquotex.quotexapi.ws.objects.base import Base
+from quotexpy.stable.ws.objects.base import Base
 
 
 class TimeSync(Base):

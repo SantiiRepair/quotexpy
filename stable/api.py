@@ -8,18 +8,18 @@ import threading
 import collections
 import urllib3
 import certifi
-from pyquotex.quotexapi import global_value
-from pyquotex.quotexapi.http.login import Login
-from pyquotex.quotexapi.http.logout import Logout
-from pyquotex.quotexapi.ws.channels.ssid import Ssid
-from pyquotex.quotexapi.ws.channels.buy import Buy
-from pyquotex.quotexapi.ws.channels.candles import GetCandles
-from pyquotex.quotexapi.ws.channels.sell_option import SellOption
-from pyquotex.quotexapi.ws.objects.timesync import TimeSync
-from pyquotex.quotexapi.ws.objects.candles import Candles
-from pyquotex.quotexapi.ws.objects.profile import Profile
-from pyquotex.quotexapi.ws.objects.listinfodata import ListInfoData
-from pyquotex.quotexapi.ws.client import WebsocketClient
+from quotexpy.stable import global_value
+from quotexpy.stable.http.login import Login
+from quotexpy.stable.http.logout import Logout
+from quotexpy.stable.ws.channels.ssid import Ssid
+from quotexpy.stable.ws.channels.buy import Buy
+from quotexpy.stable.ws.channels.candles import GetCandles
+from quotexpy.stable.ws.channels.sell_option import SellOption
+from quotexpy.stable.ws.objects.timesync import TimeSync
+from quotexpy.stable.ws.objects.candles import Candles
+from quotexpy.stable.ws.objects.profile import Profile
+from quotexpy.stable.ws.objects.listinfodata import ListInfoData
+from quotexpy.stable.ws.client import WebsocketClient
 from collections import defaultdict
 from pyquotex.logger import logger
 
@@ -32,7 +32,7 @@ def nested_dict(n, type):
 
 
 urllib3.disable_warnings()
-logger = logging.getLogger(__name__)
+logger += logging.getLogger(__name__)
 
 cert_path = certifi.where()
 os.environ["SSL_CERT_FILE"] = cert_path
