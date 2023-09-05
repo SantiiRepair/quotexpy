@@ -20,7 +20,7 @@ ______________________________________________________________________
 
 📈 QuotexPy is tested on Ubuntu 18.04 and Windows 10 with **python >= 3.10, <= 3.11.**.
 ```bash
-pip install quotex-py
+pip install quotexpy
 ```
 
 If you plan to code and make changes, clone and install it locally.
@@ -36,13 +36,12 @@ from quotexpy.stable.new import Quotex
 ```
 
 ### Login by email and password
-if connect sucess return True,None  
-
-if connect fail return False,None  
 ```python
 from quotexpy.stable.new import Quotex
 
 client = Quotex(email="user@gmail.com", password="pwd")
+# if connect success return True or None 
+# if connect fail return False or None 
 client.debug_ws_enable = False
 check_connect, message = client.connect()
 print(check_connect, message)
