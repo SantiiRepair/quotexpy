@@ -4,7 +4,6 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 this_dir = Path(__file__).parent
-module_dir = this_dir / "vault_decryptor"
 
 requirements = []
 requirements_path = this_dir / "requirements.txt"
