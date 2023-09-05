@@ -1,7 +1,9 @@
 import os
 import time
-from pyquotex.quotexapi.stable_api import Quotex
 import asyncio
+import colored
+from quotexpy.stable.new import Quotex
+
 
 # browser=True enable playwright
 client = Quotex(
@@ -14,17 +16,17 @@ client.debug_ws_enable = False
 
 async def login(attempts=2):
     check, reason = await client.connect()
-    print("Start your robot")
+    print(f"{colored('[INFO]: Connecting', 'blue')}")
     attempt = 1
     while attempt < attempts:
         if not client.check_connect():
-            print(f"Tentando reconectar, tentativa {attempt} de {attempts}")
+            print(f"Trying to reconnect, try {attempt} for {attempts}")
             check, reason = await client.connect()
             if check:
-                print("Reconectado com sucesso!!!")
+                print("Successfully reconnected!!!")
                 break
             else:
-                print("Erro ao reconectar.")
+                print("Error reconnecting.")
                 attempt += 1
                 if os.path.isfile("session.json"):
                     os.remove("session.json")
@@ -41,8 +43,8 @@ def get_balance():
     print(check_connect, message)
     if check_connect:
         client.change_account("practice")
-        print("Saldo corrente: ", client.get_balance())
-        print("Saindo...")
+        print("Balance: ", client.get_balance())
+        print("Exiting...")
     client.close()
 
 
@@ -66,8 +68,8 @@ def buy():
         duration = 10  # in seconds
         status, buy_info = client.buy(amount, asset, direction, duration)
         print(status, buy_info)
-        print("Saldo corrente: ", client.get_balance())
-        print("Saindo...")
+        print("Balance: ", client.get_balance())
+        print("Exiting...")
     client.close()
 
 
@@ -76,7 +78,7 @@ async def buy_and_check_win():
     print(check_connect, message)
     if check_connect:
         client.change_account("PRACTICE")
-        print("Saldo corrente: ", client.get_balance())
+        print("Balance: ", client.get_balance())
         amount = 10
         asset = "USDBRL_otc"  # "EURUSD_otc"
         direction = "call"
@@ -84,19 +86,19 @@ async def buy_and_check_win():
         status, buy_info = client.buy(amount, asset, direction, duration)
         # print(status, buy_info)
         if status:
-            print("Aguardando resultado...")
+            print("Awaiting result...")
             if client.check_win(buy_info["id"]):
                 print(
-                    f"\nWin!!! \nVencemos moleque!!!\nLucro: R$ {client.get_profit()}"
+                    f"\nWin!!! \nWe won kid!!!\nProfit: BRL {client.get_profit()}"
                 )
             else:
                 print(
-                    f"\nLoss!!! \nPerdemos moleque!!!\nPrejuízo: R$ {client.get_profit()}"
+                    f"\nLoss!!! \nWe lost kid!!!\nLoss: R$ {client.get_profit()}"
                 )
         else:
-            print("Falha na operação!!!")
-        print("Saldo Atual: ", client.get_balance())
-        print("Saindo...")
+            print("Operation failed!!!")
+        print("Balance: ", client.get_balance())
+        print("Exiting...")
     client.close()
 
 
@@ -112,8 +114,8 @@ def sell_option():
         status, buy_info = client.buy(amount, asset, direction, duration)
         print(status, buy_info)
         client.sell_option(buy_info["id"])
-        print("Saldo corrente: ", client.get_balance())
-        print("Saindo...")
+        print("Balance: ", client.get_balance())
+        print("Exiting...")
     client.close()
 
 
