@@ -1,7 +1,7 @@
 import os
 import time
 import asyncio
-import colored
+from colored import colored
 from quotexpy.stable.new import Quotex
 
 
@@ -16,7 +16,7 @@ client.debug_ws_enable = False
 
 async def login(attempts=2):
     check, reason = await client.connect()
-    print(f"{colored('[INFO]: Connecting', 'blue')}")
+    print(f"{colored('[INFO]: Connecting...', 'blue')}")
     attempt = 1
     while attempt < attempts:
         if not client.check_connect():
