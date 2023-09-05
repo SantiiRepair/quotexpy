@@ -1,13 +1,11 @@
-import os
-import time
 import math
+import time
 import logging
-from datetime import datetime
-from pyquotex.quotexapi import expiration
-from pyquotex.quotexapi import global_value
-from pyquotex.quotexapi.api import QuotexAPI
-from pyquotex.quotexapi.constants import codes_asset
 from collections import defaultdict
+from quotexpy.stable import expiration
+from quotexpy.stable import global_value
+from quotexpy.stable.api import QuotexAPI
+from quotexpy.stable.constants import codes_asset
 
 
 def nested_dict(n, type):

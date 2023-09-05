@@ -21,7 +21,7 @@ from quotexpy.stable.ws.objects.profile import Profile
 from quotexpy.stable.ws.objects.listinfodata import ListInfoData
 from quotexpy.stable.ws.client import WebsocketClient
 from collections import defaultdict
-from pyquotex.logger import logger
+from quotexpy.logger import logger
 
 
 def nested_dict(n, type):
