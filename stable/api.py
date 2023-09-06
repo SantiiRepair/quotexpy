@@ -266,9 +266,8 @@ class QuotexAPI(object):
         check_websocket, websocket_reason = self.start_websocket()
         if not check_websocket:
             return check_websocket, websocket_reason
-        else:
-            if not global_value.SSID:
-                global_value.SSID = ssid
+        if not global_value.SSID:
+            global_value.SSID = ssid
         return check_websocket, websocket_reason
 
     def close(self):

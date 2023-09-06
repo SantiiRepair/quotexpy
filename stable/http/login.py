@@ -29,9 +29,7 @@ class Login(Browser):
         self.headers["Content-Type"] = "application/x-www-form-urlencoded"
         data["keep_code"] = 1
         data["code"] = int(
-            input(
-                "Enter the PIN code we just sent to your email: "
-            )
+            input("Enter the PIN code we just sent to your email: ")
         )
         self.send_request(
             method="POST", url=f"{self.https_base_url}/pt/sign-in/", data=data

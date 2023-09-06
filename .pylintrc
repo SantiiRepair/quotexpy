@@ -111,6 +111,9 @@ disable=missing-docstring,
         logging-fstring-interpolation,
         logging-not-lazy,
         anomalous-backslash-in-string,
+        inconsistent-return-statements,
+        not-an-iterable,
+        unused-variable,
         subprocess-run-check,
         super-with-arguments
 

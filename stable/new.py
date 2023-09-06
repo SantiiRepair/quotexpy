@@ -70,8 +70,7 @@ class Quotex(object):
     def check_connect():
         if global_value.check_websocket_if_connect == 0:
             return False
-        else:
-            return True
+        return True
 
     def re_subscribe_stream(self):
         try:
