@@ -24,11 +24,10 @@ from collections import defaultdict
 from quotexpy.logger import logger
 
 
-def nested_dict(n, type):
+def nested_dict(n, typeof):
     if n == 1:
-        return defaultdict(type)
-    else:
-        return defaultdict(lambda: nested_dict(n - 1, type))
+        return defaultdict(typeof)
+    return defaultdict(lambda: nested_dict(n - 1, typeof))
 
 
 urllib3.disable_warnings()
@@ -114,7 +113,7 @@ class QuotexAPI(object):
     def logout(self):
         """Property for get Quotex http login resource.
         :returns: The instance of :class:`Login
-            <quotexapi.http.login.Login>`.
+            <stable.http.login.Login>`.
         """
         return Logout(self)
 
@@ -122,7 +121,7 @@ class QuotexAPI(object):
     def login(self):
         """Property for get Quotex http login resource.
         :returns: The instance of :class:`Login
-            <quotexapi.http.login.Login>`.
+            <stable.http.login.Login>`.
         """
         return Login(self)
 
@@ -130,7 +129,7 @@ class QuotexAPI(object):
     def ssid(self):
         """Property for get Quotex websocket ssid channel.
         :returns: The instance of :class:`Ssid
-            <Quotex.ws.channels.ssid.Ssid>`.
+            <stable.ws.channels.ssid.Ssid>`.
         """
         return Ssid(self)
 
@@ -138,7 +137,7 @@ class QuotexAPI(object):
     def buy(self):
         """Property for get Quotex websocket ssid channel.
         :returns: The instance of :class:`Buy
-            <Quotex.ws.channels.buy.Buy>`.
+            <stable.ws.channels.buy.Buy>`.
         """
         return Buy(self)
 
@@ -151,7 +150,7 @@ class QuotexAPI(object):
         """Property for get Quotex websocket candles channel.
 
         :returns: The instance of :class:`GetCandles
-            <quotexapi.ws.channels.candles.GetCandles>`.
+            <stable.ws.channels.candles.GetCandles>`.
         """
         return GetCandles(self)
 
@@ -194,17 +193,17 @@ class QuotexAPI(object):
         ssid, cookies = self.check_session()
         if not ssid:
             # try:
-            logger.info("Autenticando usuário...")
+            logger.info("Authenticating user...")
             ssid, cookies = await self.login(
                 self.username,
                 self.password,
                 self.browser,
             )
-            logger.info("Login realizado com sucesso!!!")
-            """except Exception as e:
-                logger = logging.getLogger(__name__)
-                logger.error(e)
-                return e"""
+            logger.info("Login successful!!!")
+            # except Exception as e:
+            # logger = logging.getLogger(__name__)
+            # logger.error(e)
+            # return e
         return ssid, cookies
 
     def start_websocket(self):
@@ -232,16 +231,15 @@ class QuotexAPI(object):
             try:
                 if global_value.check_websocket_if_error:
                     return False, global_value.websocket_error_reason
-                elif global_value.check_websocket_if_connect == 0:
-                    logger.info("Websocket conexão fechada.")
-                    logger.debug("Websocket conexão fechada.")
-                    return False, "Websocket conexão fechada."
-                elif global_value.check_websocket_if_connect == 1:
-                    logger.debug("Websocket conectado com sucesso!!!")
-                    return True, "Websocket conectado com sucesso!!!"
+                if global_value.check_websocket_if_connect == 0:
+                    logger.info("Websocket connection closed.")
+                    logger.debug("Websocket connection closed.")
+                    return False, "Websocket connection closed."
+                if global_value.check_websocket_if_connect == 1:
+                    logger.debug("Websocket successfully connected!!!")
+                    return True, "Websocket successfully connected!!!"
             except:
                 pass
-            pass
 
     def send_ssid(self):
         self.profile.msg = None
@@ -252,7 +250,7 @@ class QuotexAPI(object):
             count += 1
             if count == 50:
                 raise Exception(
-                    f"O envio de authorization com o SSID {global_value.SSID} demorou muito pra responder"
+                    f"Sending authorization with SSID {global_value.SSID} took too long to respond"
                 )
         if not self.profile.msg:
             return False

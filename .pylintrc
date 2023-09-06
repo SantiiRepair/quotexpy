@@ -109,7 +109,10 @@ disable=missing-docstring,
         not-callable,
         import-outside-toplevel,
         logging-fstring-interpolation,
-        logging-not-lazy
+        logging-not-lazy,
+        anomalous-backslash-in-string,
+        subprocess-run-check,
+        super-with-arguments
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

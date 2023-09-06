@@ -25,11 +25,10 @@ async def login(attempts=2):
             if check:
                 print("Successfully reconnected!!!")
                 break
-            else:
-                print("Error reconnecting.")
-                attempt += 1
-                if os.path.isfile("session.json"):
-                    os.remove("session.json")
+            print("Error reconnecting.")
+            attempt += 1
+            if os.path.isfile("session.json"):
+                os.remove("session.json")
         elif not check:
             attempt += 1
         else:
@@ -164,6 +163,7 @@ def get_candle_v2():
 
 def get_realtime_candle():
     check_connect, message = login()
+    print(check_connect, message)
     if check_connect:
         list_size = 10
         client.start_candles_stream("USDJPY_otc", list_size)
@@ -176,6 +176,7 @@ def get_realtime_candle():
 
 def get_signal_data():
     check_connect, message = login()
+    print(check_connect, message)
     if check_connect:
         while True:
             print(client.get_signal_data())

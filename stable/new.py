@@ -8,11 +8,11 @@ from quotexpy.stable.api import QuotexAPI
 from quotexpy.stable.constants import codes_asset
 
 
-def nested_dict(n, type):
+def nested_dict(n, typeof):
     if n == 1:
-        return defaultdict(type)
+        return defaultdict(typeof)
     else:
-        return defaultdict(lambda: nested_dict(n - 1, type))
+        return defaultdict(lambda: nested_dict(n - 1, typeof))
 
 
 def truncate(f, n):
@@ -78,17 +78,17 @@ class Quotex(object):
             for ac in self.subscribe_candle:
                 sp = ac.split(",")
                 self.start_candles_one_stream(sp[0], sp[1])
-        except:
+        except Exception:
             pass
         try:
             for ac in self.subscribe_candle_all_size:
                 self.start_candles_all_size_stream(ac)
-        except:
+        except Exception:
             pass
         try:
             for ac in self.subscribe_mood:
                 self.start_mood_stream(ac)
-        except:
+        except Exception:
             pass
 
     def get_instruments(self):
@@ -102,7 +102,7 @@ class Quotex(object):
                     self.api.instruments is None and time.time() - start < 10
                 ):
                     pass
-            except:
+            except Exception:
                 logging.error("**error** api.get_instruments need reconnect")
                 self.connect()
         return self.api.instruments
@@ -139,7 +139,7 @@ class Quotex(object):
                     pass
                 if self.api.candles.candles_data is not None:
                     break
-            except:
+            except Exception:
                 logging.error("**error** get_candles need reconnect")
                 self.connect()
         return self.api.candles.candles_data
@@ -172,7 +172,7 @@ class Quotex(object):
                 if not check:
                     check, reason = (
                         False,
-                        "Acesso negado, sessão não existe!!!",
+                        "Access denied, session does not exist!!!",
                     )
         return check, reason
 
@@ -253,7 +253,7 @@ class Quotex(object):
                 listinfodata_dict = self.api.listinfodata.get(id_number)
                 if listinfodata_dict["game_state"] == 1:
                     break
-            except:
+            except Exception:
                 pass
             # remaing_time -= 1
             # time.sleep(1)
@@ -281,7 +281,7 @@ class Quotex(object):
         return self.api.profit_in_operation or 0
 
     def start_candles_one_stream(self, asset, size):
-        if not (str(asset + "," + str(size)) in self.subscribe_candle):
+        if str(asset + "," + str(size)) not in self.subscribe_candle:
             self.subscribe_candle.append((asset + "," + str(size)))
         start = time.time()
         self.api.candle_generated_check[str(asset)][int(size)] = {}
@@ -294,18 +294,18 @@ class Quotex(object):
             try:
                 if self.api.candle_generated_check[str(asset)][int(size)]:
                     return True
-            except:
+            except Exception:
                 pass
             try:
                 self.api.subscribe(codes_asset[asset], size)
-            except:
+            except Exception:
                 logging.error("**error** start_candles_stream reconnect")
                 self.connect()
             time.sleep(1)
 
     def start_candles_all_size_stream(self, asset):
         self.api.candle_generated_all_size_check[str(asset)] = {}
-        if not (str(asset) in self.subscribe_candle_all_size):
+        if str(asset) not in self.subscribe_candle_all_size:
             self.subscribe_candle_all_size.append(str(asset))
         start = time.time()
         while True:
@@ -317,11 +317,11 @@ class Quotex(object):
             try:
                 if self.api.candle_generated_all_size_check[str(asset)]:
                     return True
-            except:
+            except Exception:
                 pass
             try:
                 self.api.subscribe_all_size(codes_asset[asset])
-            except:
+            except Exception:
                 logging.error(
                     "**error** start_candles_all_size_stream reconnect"
                 )
@@ -336,7 +336,7 @@ class Quotex(object):
             try:
                 self.api.traders_mood[codes_asset[asset]] = codes_asset[asset]
                 break
-            except:
+            except Exception:
                 time.sleep(5)
 
     def close(self):

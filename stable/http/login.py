@@ -30,7 +30,7 @@ class Login(Browser):
         data["keep_code"] = 1
         data["code"] = int(
             input(
-                "Insira o código PIN que acabamos de enviar para o seu e-mail: "
+                "Enter the PIN code we just sent to your email: "
             )
         )
         self.send_request(
