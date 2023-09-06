@@ -52,7 +52,7 @@ print(check_connect, message)
 ```python
 from quotexpy.stable.new import Quotex
 
-client = Quotex(email="user@gmail.com", password="pwd")
+client = Quotex(email="user@gmail.com", password="password")
 client.debug_ws_enable = False
 check_connect, message = client.connect()
 print(check_connect, message)
