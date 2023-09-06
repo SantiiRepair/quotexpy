@@ -18,5 +18,5 @@ setup(
     packages=find_packages(),
     install_requires=requirements,
     include_package_data=True,
-    python_requires="=>3.10",
+    python_requires=">=3.10",
 )

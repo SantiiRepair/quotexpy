@@ -1,4 +1,6 @@
+dist
 *.pyc
 .pypirc
-.vscode/launch.json
+*.egg-info/
 .codesandbox
+.vscode/launch.json
