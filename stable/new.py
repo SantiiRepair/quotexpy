@@ -1,3 +1,4 @@
+import sys
 import math
 import time
 import logging
@@ -11,8 +12,7 @@ from quotexpy.stable.constants import codes_asset
 def nested_dict(n, typeof):
     if n == 1:
         return defaultdict(typeof)
-    else:
-        return defaultdict(lambda: nested_dict(n - 1, typeof))
+    return defaultdict(lambda: nested_dict(n - 1, typeof))
 
 
 def truncate(f, n):
@@ -149,7 +149,6 @@ class Quotex(object):
         self.stop_candles_stream(asset)
         self.api.subscribe_realtime_candle(asset, size, period)
         while self.api.candle_v2_data[asset] is None:
-            pass
             time.sleep(1)
         return self.api.candle_v2_data[asset]
 
@@ -183,7 +182,7 @@ class Quotex(object):
             self.api.account_type = 1
         else:
             logging.error("ERROR doesn't have this mode")
-            exit(1)
+            sys.exit(1)
         self.api.send_ssid()
 
     def edit_practice_balance(self, amount=None):

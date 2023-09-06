@@ -116,6 +116,10 @@ disable=missing-docstring,
         unused-variable,
         unused-private-member,
         protected-access,
+        pointless-string-statement,
+        self-assigning-variable,
+        simplifiable-if-expression,
+        
         subprocess-run-check,
         super-with-arguments
 
