@@ -119,7 +119,7 @@ disable=missing-docstring,
         pointless-string-statement,
         self-assigning-variable,
         simplifiable-if-expression,
-        
+        consider-using-dict-items,
         subprocess-run-check,
         super-with-arguments
 
