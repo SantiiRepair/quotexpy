@@ -114,6 +114,8 @@ disable=missing-docstring,
         inconsistent-return-statements,
         not-an-iterable,
         unused-variable,
+        unused-private-member,
+        protected-access,
         subprocess-run-check,
         super-with-arguments
 
