@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quotexpy"
-version = "1.0.0"
+version = "1.0.1"
 description = "QuotexPy is a library for interact with qxbroker easily!"
 authors = ["Santiago Ramirez <miguelsantiago1940@gmail.com>"]
 license = "BSL"
