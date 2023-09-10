@@ -20,10 +20,6 @@ class Browser(object):
     session = requests.Session()
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    # session.proxies.update({
-    #     "http": os.environ['QUOTAGUARDSTATIC_URL'],
-    #     "https": os.environ['QUOTAGUARDSTATIC_URL']
-    # })
 
     def __init__(self, api):
         self.api = api

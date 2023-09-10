@@ -3,5 +3,6 @@ dist
 .pypirc
 *.egg-info/
 .gitpod.yml
+session.json
 .codesandbox
 .vscode/launch.json

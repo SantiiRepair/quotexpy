@@ -1,15 +1,14 @@
 import os
 import time
 import asyncio
-import colored
+from termcolor import colored
 from quotexpy.new import Quotex
 
 
-# browser=True enable playwright
 client = Quotex(
     email="diego.christ@outlook.com",
     password="@D1i2e3g4o5@Quotex",
-    browser=False,
+    browser=True,
 )
 client.debug_ws_enable = False
 

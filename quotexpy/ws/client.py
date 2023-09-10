@@ -3,7 +3,6 @@ import os
 import json
 import random
 import logging
-
 import websocket
 from quotexpy import global_value
 from quotexpy.http.user_agents import agents

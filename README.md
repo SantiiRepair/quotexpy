@@ -39,7 +39,7 @@ from quotexpy.new import Quotex
 ```python
 from quotexpy.new import Quotex
 
-client = Quotex(email="user@email.com", password="password")
+client = Quotex(email="user@email.com", password="password", browser=True)
 # if connect success return True or None 
 # if connect fail return False or None 
 client.debug_ws_enable = False
@@ -52,7 +52,7 @@ print(check_connect, message)
 ```python
 from quotexpy .new import Quotex
 
-client = Quotex(email="user@email.com", password="password")
+client = Quotex(email="user@email.com", password="password", browser=True)
 client.debug_ws_enable = False
 check_connect, message = client.connect()
 print(check_connect, message)
@@ -68,3 +68,5 @@ if check_connect:
     print("Exiting...")
 client.close()
 ```
+### ⚠️ Atention 
+Because cloudfare blocks requests you should enable `browser=True` to avoid `HTTP 403` errors.

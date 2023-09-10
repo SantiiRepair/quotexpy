@@ -15,7 +15,10 @@ class Login(Browser):
     https_base_url = f"https://{base_url}"
 
     def get_token(self):
+        # self.browser = playwright.firefox.launch(headless=True)
+        # self.context = self.browser.new_context()
         self.response = self.send_request("GET", "https://qxbroker.com/")
+        print(self.response)
         self.headers["referer"] = f"{self.https_base_url}/"
         self.response = self.send_request("GET", f"{self.https_base_url}/pt/sign-in/")
         self.cookies = "; ".join(["%s=%s" % (i.name, i.value) for i in self.session.cookies])
