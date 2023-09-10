@@ -3,7 +3,6 @@ import os
 import time
 import json
 import ssl
-import logging
 import threading
 import collections
 import urllib3
