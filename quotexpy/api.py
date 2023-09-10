@@ -9,17 +9,17 @@ import collections
 import urllib3
 import certifi
 from quotexpy.stable import global_value
-from quotexpy.stable.http.login import Login
-from quotexpy.stable.http.logout import Logout
-from quotexpy.stable.ws.channels.ssid import Ssid
-from quotexpy.stable.ws.channels.buy import Buy
-from quotexpy.stable.ws.channels.candles import GetCandles
-from quotexpy.stable.ws.channels.sell_option import SellOption
-from quotexpy.stable.ws.objects.timesync import TimeSync
-from quotexpy.stable.ws.objects.candles import Candles
-from quotexpy.stable.ws.objects.profile import Profile
-from quotexpy.stable.ws.objects.listinfodata import ListInfoData
-from quotexpy.stable.ws.client import WebsocketClient
+from quotexpy.quotexpy.http.login import Login
+from quotexpy.quotexpy.http.logout import Logout
+from quotexpy.quotexpy.ws.channels.ssid import Ssid
+from quotexpy.quotexpy.ws.channels.buy import Buy
+from quotexpy.quotexpy.ws.channels.candles import GetCandles
+from quotexpy.quotexpy.ws.channels.sell_option import SellOption
+from quotexpy.quotexpy.ws.objects.timesync import TimeSync
+from quotexpy.quotexpy.ws.objects.candles import Candles
+from quotexpy.quotexpy.ws.objects.profile import Profile
+from quotexpy.quotexpy.ws.objects.listinfodata import ListInfoData
+from quotexpy.quotexpy.ws.client import WebsocketClient
 from collections import defaultdict
 from quotexpy.logger import logger
 
@@ -113,7 +113,7 @@ class QuotexAPI(object):
     def logout(self):
         """Property for get Quotex http login resource.
         :returns: The instance of :class:`Login
-            <stable.http.login.Login>`.
+            <quotexpy.http.login.Login>`.
         """
         return Logout(self)
 
@@ -121,7 +121,7 @@ class QuotexAPI(object):
     def login(self):
         """Property for get Quotex http login resource.
         :returns: The instance of :class:`Login
-            <stable.http.login.Login>`.
+            <quotexpy.http.login.Login>`.
         """
         return Login(self)
 
@@ -129,7 +129,7 @@ class QuotexAPI(object):
     def ssid(self):
         """Property for get Quotex websocket ssid channel.
         :returns: The instance of :class:`Ssid
-            <stable.ws.channels.ssid.Ssid>`.
+            <quotexpy.ws.channels.ssid.Ssid>`.
         """
         return Ssid(self)
 
@@ -137,7 +137,7 @@ class QuotexAPI(object):
     def buy(self):
         """Property for get Quotex websocket ssid channel.
         :returns: The instance of :class:`Buy
-            <stable.ws.channels.buy.Buy>`.
+            <quotexpy.ws.channels.buy.Buy>`.
         """
         return Buy(self)
 
@@ -150,7 +150,7 @@ class QuotexAPI(object):
         """Property for get Quotex websocket candles channel.
 
         :returns: The instance of :class:`GetCandles
-            <stable.ws.channels.candles.GetCandles>`.
+            <quotexpy.ws.channels.candles.GetCandles>`.
         """
         return GetCandles(self)
 
@@ -249,9 +249,7 @@ class QuotexAPI(object):
             time.sleep(0.1)
             count += 1
             if count == 50:
-                raise Exception(
-                    f"Sending authorization with SSID {global_value.SSID} took too long to respond"
-                )
+                raise Exception(f"Sending authorization with SSID {global_value.SSID} took too long to respond")
         if not self.profile.msg:
             return False
         return True

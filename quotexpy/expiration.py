@@ -28,9 +28,7 @@ def get_period_time(duration):
 def get_remaning_time(timestamp):
     now_date = datetime.fromtimestamp(timestamp)
     exp_date = now_date.replace(second=0, microsecond=0)
-    if (
-        int(date_to_timestamp(exp_date + timedelta(minutes=1))) - timestamp
-    ) > 30:
+    if (int(date_to_timestamp(exp_date + timedelta(minutes=1))) - timestamp) > 30:
         exp_date = exp_date + timedelta(minutes=1)
     else:
         exp_date = exp_date + timedelta(minutes=2)
@@ -43,10 +41,7 @@ def get_remaning_time(timestamp):
     now_date = datetime.fromtimestamp(timestamp)
     exp_date = now_date.replace(second=0, microsecond=0)
     while index < idx:
-        if (
-            int(exp_date.strftime("%M")) % 15 == 0
-            and (int(date_to_timestamp(exp_date)) - int(timestamp)) > 60 * 5
-        ):
+        if int(exp_date.strftime("%M")) % 15 == 0 and (int(date_to_timestamp(exp_date)) - int(timestamp)) > 60 * 5:
             exp.append(date_to_timestamp(exp_date))
             index = index + 1
         exp_date = exp_date + timedelta(minutes=1)

@@ -1,6 +1,6 @@
 import time
 import datetime
-from quotexpy.stable.ws.objects.base import Base
+from quotexpy.quotexpy.ws.objects.base import Base
 
 
 class TimeSync(Base):
@@ -58,9 +58,7 @@ class TimeSync(Base):
 
         :returns: The expiration datetime.
         """
-        return self.server_datetime + datetime.timedelta(
-            minutes=self.expiration_time
-        )
+        return self.server_datetime + datetime.timedelta(minutes=self.expiration_time)
 
     @property
     def expiration_timestamp(self):

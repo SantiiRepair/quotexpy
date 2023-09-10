@@ -1,4 +1,4 @@
-from quotexpy.stable.ws.objects.base import Base
+from quotexpy.quotexpy.ws.objects.base import Base
 
 
 class Candle(object):

@@ -1,5 +1,5 @@
 import json
-from quotexpy.stable.ws.channels.base import Base
+from quotexpy.quotexpy.ws.channels.base import Base
 
 
 class GetCandles(Base):

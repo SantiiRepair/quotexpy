@@ -4,7 +4,7 @@ import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
-from quotexpy.stable.utils.playwright_install import install
+from quotexpy.quotexpy.utils.playwright_install import install
 from playwright.async_api import Playwright, async_playwright
 
 
@@ -28,9 +28,7 @@ async def run(username, password, playwright: Playwright) -> Tuple[Any, str]:
     ssid = json.loads(match).get("token")
     output_file = Path("session.json")
     output_file.parent.mkdir(exist_ok=True, parents=True)
-    cookiejar = requests.utils.cookiejar_from_dict(
-        {c["name"]: c["value"] for c in cookies}
-    )
+    cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
     cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
     output_file.write_text(
         json.dumps(

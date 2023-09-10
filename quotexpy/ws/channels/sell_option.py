@@ -1,5 +1,5 @@
 import json
-from quotexpy.stable.ws.channels.base import Base
+from quotexpy.quotexpy.ws.channels.base import Base
 
 
 class SellOption(Base):
@@ -13,12 +13,8 @@ class SellOption(Base):
         """
         if not isinstance(options_ids, list):
             payload = {"ticket": options_ids}
-            self.send_websocket_request(
-                f'42["orders/cancel",{json.dumps(payload)}]'
-            )
+            self.send_websocket_request(f'42["orders/cancel",{json.dumps(payload)}]')
         else:
             for ids in options_ids:
                 payload = {"ticket": ids}
-                self.send_websocket_request(
-                    f'42["orders/cancel",{json.dumps(payload)}]'
-                )
+                self.send_websocket_request(f'42["orders/cancel",{json.dumps(payload)}]')

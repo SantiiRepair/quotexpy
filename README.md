@@ -32,12 +32,12 @@ pip install -e .
 
 ### Import
 ```python
-from quotexpy.stable.new import Quotex
+from quotexpy.new import Quotex
 ```
 
 ### Login by email and password
 ```python
-from quotexpy.stable.new import Quotex
+from quotexpy.new import Quotex
 
 client = Quotex(email="user@email.com", password="password")
 # if connect success return True or None 
@@ -50,7 +50,7 @@ print(check_connect, message)
 ### Check_win & buy sample
 
 ```python
-from quotexpy.stable.new import Quotex
+from quotexpy.quotexpy.new import Quotex
 
 client = Quotex(email="user@email.com", password="password")
 client.debug_ws_enable = False

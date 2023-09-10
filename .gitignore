@@ -2,5 +2,6 @@ dist
 *.pyc
 .pypirc
 *.egg-info/
+.gitpod.yml
 .codesandbox
 .vscode/launch.json

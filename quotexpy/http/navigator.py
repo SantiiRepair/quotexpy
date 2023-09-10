@@ -4,7 +4,7 @@ import cloudscraper
 from bs4 import BeautifulSoup
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from quotexpy.stable.http.user_agents import agents
+from quotexpy.quotexpy.http.user_agents import agents
 
 retry_strategy = Retry(
     total=3,
@@ -33,9 +33,7 @@ class Browser(object):
 
     def get_headers(self):
         self.headers = {
-            "User-Agent": user_agent_list[
-                random.randint(0, len(user_agent_list) - 1)
-            ],
+            "User-Agent": user_agent_list[random.randint(0, len(user_agent_list) - 1)],
         }
         return self.headers
 
@@ -43,13 +41,9 @@ class Browser(object):
         return BeautifulSoup(self.response.content, "html.parser")
 
     def send_request(self, method, url, **kwargs):
-        self.response = self.session.request(
-            method, url, headers=self.headers, **kwargs
-        )
+        self.response = self.session.request(method, url, headers=self.headers, **kwargs)
         if not self.response:
             self.session = cloudscraper.create_scraper()
-            self.response = self.session.request(
-                method, url, headers=self.headers, **kwargs
-            )
+            self.response = self.session.request(method, url, headers=self.headers, **kwargs)
 
         return self.response

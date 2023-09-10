@@ -5,8 +5,8 @@ import logging
 from collections import defaultdict
 from quotexpy.stable import expiration
 from quotexpy.stable import global_value
-from quotexpy.stable.api import QuotexAPI
-from quotexpy.stable.constants import codes_asset
+from quotexpy.quotexpy.api import QuotexAPI
+from quotexpy.quotexpy.constants import codes_asset
 
 
 def nested_dict(n, typeof):
@@ -97,9 +97,7 @@ class Quotex(object):
             try:
                 self.api.get_instruments()
                 start = time.time()
-                while (
-                    self.api.instruments is None and time.time() - start < 10
-                ):
+                while self.api.instruments is None and time.time() - start < 10:
                     pass
             except Exception:
                 logging.error("**error** api.get_instruments need reconnect")
@@ -108,10 +106,7 @@ class Quotex(object):
 
     def get_all_asset_name(self):
         if self.api.instruments:
-            return [
-                instrument[2].replace("\n", "")
-                for instrument in self.api.instruments
-            ]
+            return [instrument[2].replace("\n", "") for instrument in self.api.instruments]
 
     def check_asset_open(self, instrument):
         if self.api.instruments:
@@ -131,10 +126,7 @@ class Quotex(object):
         while True:
             try:
                 self.api.getcandles(codes_asset[asset], offset, period, index)
-                while (
-                    self.check_connect
-                    and self.api.candles.candles_data is None
-                ):
+                while self.check_connect and self.api.candles.candles_data is None:
                     pass
                 if self.api.candles.candles_data is not None:
                     break
@@ -285,9 +277,7 @@ class Quotex(object):
         self.api.candle_generated_check[str(asset)][int(size)] = {}
         while True:
             if time.time() - start > 20:
-                logging.error(
-                    "**error** start_candles_one_stream late for 20 sec"
-                )
+                logging.error("**error** start_candles_one_stream late for 20 sec")
                 return False
             try:
                 if self.api.candle_generated_check[str(asset)][int(size)]:
@@ -308,9 +298,7 @@ class Quotex(object):
         start = time.time()
         while True:
             if time.time() - start > 20:
-                logging.error(
-                    f"**error** fail {asset} start_candles_all_size_stream late for 10 sec"
-                )
+                logging.error(f"**error** fail {asset} start_candles_all_size_stream late for 10 sec")
                 return False
             try:
                 if self.api.candle_generated_all_size_check[str(asset)]:
@@ -320,9 +308,7 @@ class Quotex(object):
             try:
                 self.api.subscribe_all_size(codes_asset[asset])
             except Exception:
-                logging.error(
-                    "**error** start_candles_all_size_stream reconnect"
-                )
+                logging.error("**error** start_candles_all_size_stream reconnect")
                 self.connect()
             time.sleep(1)
 

@@ -2,7 +2,7 @@ import os
 import time
 import asyncio
 from colored import colored
-from quotexpy.stable.new import Quotex
+from quotexpy.new import Quotex
 
 
 # browser=True enable playwright
@@ -87,13 +87,9 @@ async def buy_and_check_win():
         if status:
             print("Awaiting result...")
             if client.check_win(buy_info["id"]):
-                print(
-                    f"\nWin!!! \nWe won kid!!!\nProfit: BRL {client.get_profit()}"
-                )
+                print(f"\nWin!!! \nWe won kid!!!\nProfit: BRL {client.get_profit()}")
             else:
-                print(
-                    f"\nLoss!!! \nWe lost kid!!!\nLoss: R$ {client.get_profit()}"
-                )
+                print(f"\nLoss!!! \nWe lost kid!!!\nLoss: R$ {client.get_profit()}")
         else:
             print("Operation failed!!!")
         print("Balance: ", client.get_balance())

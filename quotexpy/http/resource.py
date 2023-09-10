@@ -21,6 +21,4 @@ class Resource(object):
         :param dict headers: (optional) The http request headers.
         :returns: The instance of :class:`requests.Response`.
         """
-        return self.api.send_http_request(
-            self, method, data=data, params=params, headers=headers
-        )
+        return self.api.send_http_request(self, method, data=data, params=params, headers=headers)

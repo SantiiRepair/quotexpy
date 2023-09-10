@@ -6,7 +6,7 @@ import logging
 
 import websocket
 from quotexpy.stable import global_value
-from quotexpy.stable.http.user_agents import agents
+from quotexpy.quotexpy.http.user_agents import agents
 
 user_agent_list = agents.split("\n")
 
@@ -61,12 +61,8 @@ class WebsocketClient(object):
                     self.api.instruments = message
                 elif "signals" in str(message):
                     for i in message["signals"]:
-                        self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0][
-                            "signal"
-                        ]
-                        self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0][
-                            "timeFrame"
-                        ]
+                        self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
+                        self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
@@ -75,9 +71,7 @@ class WebsocketClient(object):
                 elif message.get("id"):
                     self.api.buy_successful[message["asset"]] = message
                     self.api.buy_id[message["asset"]] = message["id"]
-                    self.api.timesync.server_timestamp = message[
-                        "closeTimestamp"
-                    ]
+                    self.api.timesync.server_timestamp = message["closeTimestamp"]
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
@@ -100,16 +94,10 @@ class WebsocketClient(object):
                 pass
             if "51-" in str(message):
                 self.api._temp_status = str(message)
-            elif (
-                self.api._temp_status
-                == """51-["settings/list",{"_placeholder":true,"num":0}]"""
-            ):
+            elif self.api._temp_status == """51-["settings/list",{"_placeholder":true,"num":0}]""":
                 self.api.settings_list = message
                 self.api._temp_status = ""
-            elif (
-                self.api._temp_status
-                == """51-["history/list/v2",{"_placeholder":true,"num":0}]"""
-            ):
+            elif self.api._temp_status == """51-["history/list/v2",{"_placeholder":true,"num":0}]""":
                 self.api.candle_v2_data[message["asset"]] = message["history"]
             elif len(message[0]) == 4:
                 ans = {"time": message[0][1], "price": message[0][2]}
