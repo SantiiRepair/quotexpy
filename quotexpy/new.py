@@ -3,10 +3,10 @@ import math
 import time
 import logging
 from collections import defaultdict
-from quotexpy.stable import expiration
-from quotexpy.stable import global_value
-from quotexpy.quotexpy.api import QuotexAPI
-from quotexpy.quotexpy.constants import codes_asset
+from quotexpy import expiration
+from quotexpy import global_value
+from quotexpy.api import QuotexAPI
+from quotexpy.constants import codes_asset
 
 
 def nested_dict(n, typeof):

@@ -1,8 +1,8 @@
 import re
 import json
 from pathlib import Path
-from quotexpy.quotexpy.http.navigator import Browser
-from quotexpy.quotexpy.http.qxbroker import authorize
+from quotexpy.http.navigator import Browser
+from quotexpy.http.qxbroker import authorize
 
 
 class Login(Browser):

@@ -1,7 +1,7 @@
 import os
 import time
 import asyncio
-from colored import colored
+import colored
 from quotexpy.new import Quotex
 
 

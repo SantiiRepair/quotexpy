@@ -1,6 +1,9 @@
 """The python wrapper for Quotex API package setup."""
+import shutup
 from pathlib import Path
 from setuptools import find_packages, setup
+
+shutup.please()
 
 this_dir = Path(__file__).parent
 

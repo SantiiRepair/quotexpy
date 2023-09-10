@@ -1,4 +1,4 @@
-from quotexpy.quotexpy.ws.objects.base import Base
+from quotexpy.ws.objects.base import Base
 
 
 class Profile(Base):

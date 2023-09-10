@@ -1,5 +1,5 @@
 import json
-from quotexpy.quotexpy.ws.channels.base import Base
+from quotexpy.ws.channels.base import Base
 
 
 class SellOption(Base):

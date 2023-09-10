@@ -4,7 +4,7 @@ import cloudscraper
 from bs4 import BeautifulSoup
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-from quotexpy.quotexpy.http.user_agents import agents
+from quotexpy.http.user_agents import agents
 
 retry_strategy = Retry(
     total=3,

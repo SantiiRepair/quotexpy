@@ -5,8 +5,8 @@ import random
 import logging
 
 import websocket
-from quotexpy.stable import global_value
-from quotexpy.quotexpy.http.user_agents import agents
+from quotexpy import global_value
+from quotexpy.http.user_agents import agents
 
 user_agent_list = agents.split("\n")
 

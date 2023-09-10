@@ -8,18 +8,18 @@ import threading
 import collections
 import urllib3
 import certifi
-from quotexpy.stable import global_value
-from quotexpy.quotexpy.http.login import Login
-from quotexpy.quotexpy.http.logout import Logout
-from quotexpy.quotexpy.ws.channels.ssid import Ssid
-from quotexpy.quotexpy.ws.channels.buy import Buy
-from quotexpy.quotexpy.ws.channels.candles import GetCandles
-from quotexpy.quotexpy.ws.channels.sell_option import SellOption
-from quotexpy.quotexpy.ws.objects.timesync import TimeSync
-from quotexpy.quotexpy.ws.objects.candles import Candles
-from quotexpy.quotexpy.ws.objects.profile import Profile
-from quotexpy.quotexpy.ws.objects.listinfodata import ListInfoData
-from quotexpy.quotexpy.ws.client import WebsocketClient
+from quotexpy import global_value
+from quotexpy.http.login import Login
+from quotexpy.http.logout import Logout
+from quotexpy.ws.channels.ssid import Ssid
+from quotexpy.ws.channels.buy import Buy
+from quotexpy.ws.channels.candles import GetCandles
+from quotexpy.ws.channels.sell_option import SellOption
+from quotexpy.ws.objects.timesync import TimeSync
+from quotexpy.ws.objects.candles import Candles
+from quotexpy.ws.objects.profile import Profile
+from quotexpy.ws.objects.listinfodata import ListInfoData
+from quotexpy.ws.client import WebsocketClient
 from collections import defaultdict
 from quotexpy.logger import logger
 
@@ -31,7 +31,6 @@ def nested_dict(n, typeof):
 
 
 urllib3.disable_warnings()
-logger += logging.getLogger(__name__)
 
 cert_path = certifi.where()
 os.environ["SSL_CERT_FILE"] = cert_path

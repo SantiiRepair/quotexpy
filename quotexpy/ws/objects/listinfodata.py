@@ -1,6 +1,6 @@
 """Module for Quotex Candles websocket object."""
 
-from quotexpy.quotexpy.ws.objects.base import Base
+from quotexpy.ws.objects.base import Base
 
 
 class ListInfoData(Base):

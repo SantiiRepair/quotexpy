@@ -4,7 +4,7 @@ import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
-from quotexpy.quotexpy.utils.playwright_install import install
+from quotexpy.utils.playwright_install import install
 from playwright.async_api import Playwright, async_playwright
 
 
