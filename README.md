@@ -50,7 +50,7 @@ print(check_connect, message)
 ### Check_win & buy sample
 
 ```python
-from quotexpy .new import Quotex
+from quotexpy.new import Quotex
 
 client = Quotex(email="user@email.com", password="password", browser=True)
 client.debug_ws_enable = False
