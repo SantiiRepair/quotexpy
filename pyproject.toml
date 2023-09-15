@@ -3,10 +3,11 @@ name = "quotexpy"
 version = "1.0.1"
 description = "📈 QuotexPy is a library for interact with qxbroker easily."
 authors = ["Santiago Ramirez <santiirepair@gmail.com>"]
+readme = ["README.md", "LICENSE"]
 license = "BSL"
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = ">=3.10"
 
 [tool.black]
 line-length = 120
