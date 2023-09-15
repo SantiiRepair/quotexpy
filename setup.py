@@ -17,7 +17,7 @@ if requirements_path.is_file():
 
 setup(
     name="quotexpy",
-    version="1.0.1",
+    version="1.0.2",
     author="Santiago Ramirez",
     author_email="santiirepair@gmail.com",
     description="📈 QuotexPy is a library for interact with qxbroker easily.",
