@@ -19,13 +19,13 @@ with open("README.md", "r", encoding="utf-8") as md:
 
 setup(
     name="quotexpy",
-    version="1.0.3",
+    version="1.0.4",
     author="Santiago Ramirez",
     author_email="santiirepair@gmail.com",
     description="📈 QuotexPy is a library for interact with qxbroker easily.",
     long_description=readme,
     long_description_content_type="text/markdown",
-    packages=find_packages(),
+    packages=find_packages("quotexpy"),
     install_requires=requirements,
     include_package_data=True,
     python_requires=">=3.10",

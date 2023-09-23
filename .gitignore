@@ -1,8 +1,19 @@
+# Pypi's
 dist
 *.pyc
-.pypirc
 *.egg-info/
+
+# Gitpod
 .gitpod.yml
+
+# Credentials
 session.json
-.codesandbox
+
+# Codesandbox
+.codesandbox/
+
+# vscode
 .vscode/launch.json
+
+# Poetry Tool
+poetry.lock
