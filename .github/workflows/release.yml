@@ -11,13 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - name: Extract tag name
+        id: set_tag
+        run: echo "tag=$(git describe --tags | sed 's/v//')"
       - name: Create Archive Release
         uses: thedoctor0/zip-release@master
         with:
-          filename: "QuotexPy Release ${{ github.ref }}.zip"
+          filename: "QuotexPy Release ${{ steps.set_tag.outputs.tag }}.zip"
           exclusions: "*.git*"
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "QuotexPy Release ${{ github.ref }}.zip"
+          artifacts: "QuotexPy Release ${{ steps.set_tag.outputs.tag }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
