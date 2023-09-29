@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
  
 ## [Unreleased]
 
+- Wiki
+
 ## [1.0.7] - 2023-09-29
 
 ### Fixed
