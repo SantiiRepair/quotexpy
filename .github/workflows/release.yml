@@ -13,14 +13,14 @@ jobs:
       - uses: actions/checkout@master
       - name: Extract tag name
         id: set_tag
-        run: echo "tag=$(git describe --tags | sed 's/v//')"
+        run: echo "TAG_NAME=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
       - name: Create Archive Release
         uses: thedoctor0/zip-release@master
         with:
-          filename: "QuotexPy Release ${{ steps.set_tag.outputs.tag }}.zip"
+          filename: "QuotexPy Release ${{ env.TAG_NAME }}.zip"
           exclusions: "*.git*"
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "QuotexPy Release ${{ steps.set_tag.outputs.tag }}.zip"
+          artifacts: "QuotexPy Release ${{ env.TAG_NAME }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
