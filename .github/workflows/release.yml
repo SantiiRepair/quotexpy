@@ -3,9 +3,10 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*'
+      - "*"
 jobs:
   release:
+    name: Packaging & Release
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
@@ -13,10 +14,10 @@ jobs:
       - name: Create Archive Release
         uses: thedoctor0/zip-release@master
         with:
-          filename: 'QuotexPy Release ${{ github.ref }}.zip'
-          exclusions: '*.git*'
+          filename: "QuotexPy Release ${{ github.ref }}.zip"
+          exclusions: "*.git*"
       - name: Upload Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: 'QuotexPy Release ${{ github.ref }}.zip'
+          artifacts: "QuotexPy Release ${{ github.ref }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
