@@ -4,10 +4,11 @@ on:
   workflow_dispatch:
   push:
     tags:
-     - '*'
+     - "*"
 
 jobs:
   build-publish:
+    permissions: write-all
     name: Build and Publish
     runs-on: ubuntu-latest
     steps:
@@ -15,13 +16,13 @@ jobs:
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: "3.11"
     - name: Install workflow deps
       run: >-
         python -m pip install poetry poetry2setup wheel
     - name: Extract tag name
       id: tag
-      run: echo ::set-output name=TAG_NAME::${{ env.TAG_NAME:1 }}
+      run: "echo ::set-output name=TAG_NAME::${{ env.TAG_NAME:1 }}"
       env:
         TAG_NAME: ${{ github.ref_name }}
     - name: Update version in pyproject.toml and generate new setup.py
@@ -31,7 +32,7 @@ jobs:
         poetry2setup > setup.py
     - name: Publish distribution 📦 to PyPI
       env:
-        PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
       run: |
         poetry config pypi-token.pypi $PYPI_API_TOKEN
         poetry publish --build
