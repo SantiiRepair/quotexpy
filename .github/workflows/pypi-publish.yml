@@ -16,10 +16,10 @@ jobs:
     - name: Setup Git
       run: |
         git config --global user.name "${{github.actor}}" 
-        git config --global user.email "${{github.actor}}@users.noreply.github.com" 
-        git remote set-head origin --auto
+        git config --global user.email "${{github.actor}}@users.noreply.github.com"
+        git fetch && git reset --hard origin/main
     - name: Extract Tag Name
-      run: echo "TAG_NAME=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
+      run: echo "TAG_NUMBER=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
@@ -29,10 +29,10 @@ jobs:
         python -m pip install poetry poetry2setup wheel
     - name: Update version in pyproject.toml and generate new setup.py
       run: |
-        poetry version $TAG_NAME 
+        poetry version $TAG_NUMBER
         poetry2setup > setup.py 
         git add .
-        git commit -m "chore: bump up $TAG_NAME version from workflow" 
+        git commit -m "chore: bump up $TAG_NUMBER version from workflow" 
         git push
     - name: Publish Distribution to PyPI
       env:
