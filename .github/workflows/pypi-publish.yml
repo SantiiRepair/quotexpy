@@ -9,7 +9,7 @@ on:
 jobs:
   build-publish:
     permissions: write-all
-    name: Build and Publish
+    name: Build & Publish
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -22,11 +22,13 @@ jobs:
         python -m pip install poetry poetry2setup wheel
     - name: Extract tag name
       id: set_tag
-      run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/v//')"
+      run: echo "::setOutput name=tag::$(echo ${{ github.ref }} | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
       run: >-
         poetry version ${{ steps.set_tag.outputs.tag }}
         poetry2setup > setup.py
+        git commit -m "chore: bump up ${{ steps.set_tag.outputs.tag }} version from workflow"
+        git push
     - name: Publish distribution 📦 to PyPI
       env:
         PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
