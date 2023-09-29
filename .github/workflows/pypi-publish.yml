@@ -12,12 +12,12 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@master
     - name: Setup HEAD
       run: >- 
-        git checkout "$(echo ${{ github.head_ref }} | sed -E 's|refs/[a-zA-Z]+/||')" &&
-        git config --global user.name "${{ github.repository_owner }}" &&
-        git config --global user.email "${{github.actor}}@users.noreply.github.com"
+        git config --global user.name "${{github.actor}}" &&
+        git config --global user.email "${{github.actor}}@users.noreply.github.com" &&
+        git checkout "${GITHUB_REF##*/}"
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
@@ -27,7 +27,7 @@ jobs:
         python -m pip install poetry poetry2setup wheel
     - name: Extract tag name
       id: set_tag
-      run: echo "::setOutput name=tag::$(echo ${{ github.ref }} | sed 's/v//')"
+      run: echo "tag=$(echo ${{ github.ref }} | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
       run: >-
         poetry version ${{ steps.set_tag.outputs.tag }} &&
