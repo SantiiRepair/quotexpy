@@ -27,9 +27,11 @@ jobs:
       run: >-
         poetry version ${{ steps.set_tag.outputs.tag }} &&
         poetry2setup > setup.py &&
+        git config --global user.name "${{ github.repository_owner }}" &&
+        git config --global user.email "${{github.actor}}@users.noreply.github.com" &&
         git commit -m "chore: bump up ${{ steps.set_tag.outputs.tag }} version from workflow" &&
         git push
-    - name: Publish distribution 📦 to PyPI
+    - name: Publish distribution to PyPI
       env:
         PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
       run: |
