@@ -27,7 +27,7 @@ jobs:
         python -m pip install poetry poetry2setup wheel
     - name: Extract tag name
       id: set_tag
-      run: echo "tag=$(echo ${{ github.ref }} | sed 's/v//')"
+      run: echo "tag=$(git describe --tags | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
       run: >-
         poetry version ${{ steps.set_tag.outputs.tag }} &&
