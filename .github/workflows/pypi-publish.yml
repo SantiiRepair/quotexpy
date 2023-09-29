@@ -17,7 +17,7 @@ jobs:
       run: |
         git config --global user.name "${{github.actor}}" 
         git config --global user.email "${{github.actor}}@users.noreply.github.com" 
-        git checkout origin/main
+        git checkout main
     - name: Extract Tag Name
       run: echo "TAG_NAME=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
     - name: Set up Python 3.11
