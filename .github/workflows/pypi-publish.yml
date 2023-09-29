@@ -32,8 +32,8 @@ jobs:
         poetry2setup > setup.py 
         git add .
         git commit -m "chore: bump up $TAG_NAME version from workflow" 
-        git push ${GITHUB_REF##*/}
-    - name: Publish distribution to PyPI
+        git push HEAD:${GITHUB_REF##*/}
+    - name: Publish Distribution to PyPI
       env:
         PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
       run: |
