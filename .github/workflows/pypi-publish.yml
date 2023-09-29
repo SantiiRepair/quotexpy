@@ -25,8 +25,8 @@ jobs:
     - name: Install workflow deps
       run: >-
         python -m pip install poetry poetry2setup wheel
-    - name: Extract tag name
-      id: set_tag
+    - id: set_tag
+      name: Extract tag name
       run: echo "tag=$(git describe --tags | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
       run: >-
