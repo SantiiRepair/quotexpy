@@ -21,14 +21,12 @@ jobs:
       run: >-
         python -m pip install poetry poetry2setup wheel
     - name: Extract tag name
-      id: tag
-      run: "echo ::set-output name=TAG_NAME::${{ env.TAG_NAME:1 }}"
-      env:
-        TAG_NAME: ${{ github.ref_name }}
+      id: set_tag
+      run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
       needs: tag
       run: >-
-        poetry version ${{ needs.tag.outputs.tag }}
+        poetry version ${{ steps.set_tag.outputs.tag }}
         poetry2setup > setup.py
     - name: Publish distribution 📦 to PyPI
       env:
