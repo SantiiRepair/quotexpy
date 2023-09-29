@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Setup HEAD
+      run: >- 
+        git checkout "$(echo ${{ github.head_ref }} | sed -E 's|refs/[a-zA-Z]+/||')" &&
+        git config --global user.name "${{ github.repository_owner }}" &&
+        git config --global user.email "${{github.actor}}@users.noreply.github.com"
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
@@ -27,8 +32,6 @@ jobs:
       run: >-
         poetry version ${{ steps.set_tag.outputs.tag }} &&
         poetry2setup > setup.py &&
-        git config --global user.name "${{ github.repository_owner }}" &&
-        git config --global user.email "${{github.actor}}@users.noreply.github.com" &&
         git commit -m "chore: bump up ${{ steps.set_tag.outputs.tag }} version from workflow" &&
         git push
     - name: Publish distribution to PyPI
