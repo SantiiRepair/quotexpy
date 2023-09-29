@@ -24,7 +24,6 @@ jobs:
       id: set_tag
       run: echo "::set-output name=tag::$(echo ${{ github.ref }} | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
-      needs: tag
       run: >-
         poetry version ${{ steps.set_tag.outputs.tag }}
         poetry2setup > setup.py
