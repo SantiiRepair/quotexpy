@@ -17,3 +17,6 @@ session.json
 
 # Poetry Tool
 poetry.lock
+
+# Misc
+*.mp4
