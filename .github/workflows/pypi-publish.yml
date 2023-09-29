@@ -30,7 +30,7 @@ jobs:
       run: echo "tag=$(git describe --tags | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
       run: >-
-        poetry version ${{ steps.set_tag.outputs.tag }} &&
+        poetry version "${{ steps.set_tag.outputs.tag }}" &&
         poetry2setup > setup.py &&
         git commit -m "chore: bump up ${{ steps.set_tag.outputs.tag }} version from workflow" &&
         git push
