@@ -31,6 +31,7 @@ jobs:
       run: |
         poetry version $TAG_NAME 
         poetry2setup > setup.py 
+        git add .
         git commit -m "chore: bump up $TAG_NAME version from workflow" 
         git push
     - name: Publish distribution to PyPI
