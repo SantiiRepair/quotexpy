@@ -29,10 +29,12 @@ jobs:
       name: Extract tag name
       run: echo "tag=$(git describe --tags | sed 's/v//')"
     - name: Update version in pyproject.toml and generate new setup.py
+      env:
+        TAG_NAME: ${{ steps.set_tag.outputs.tag }}
       run: >-
-        poetry version "${{ steps.set_tag.outputs.tag }}" &&
+        poetry version $TAG_NAME &&
         poetry2setup > setup.py &&
-        git commit -m "chore: bump up ${{ steps.set_tag.outputs.tag }} version from workflow" &&
+        git commit -m "chore: bump up $TAG_NAME version from workflow" &&
         git push
     - name: Publish distribution to PyPI
       env:
