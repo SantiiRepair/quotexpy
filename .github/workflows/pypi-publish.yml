@@ -13,11 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      run: |
+        echo "TAG_NAME=$(git describe --tags)" >> $GITHUB_ENV
+        echo "BRANCH=$(git branch -a --contains $TAG_NAME | grep -v HEAD | cut -d '/' -f3)" | tee -a $GITHUB_ENV
       with:
         fetch-depth: 0
-        ref: ${{ github.ref_name }}
+        ref: $BRANCH
     - name: Extract Tag Name
-      run: echo "TAG_NUMBER=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
+      run: echo "TAG_NUMBER=$($TAG_NAME | sed 's/v//')" >> $GITHUB_ENV
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
