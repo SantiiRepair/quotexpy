@@ -1,9 +1,9 @@
 name: Release 📦
 
 on:
-  workflow_run:
-    workflows: ["Commit & Push 🚀"]
-    types: [completed]
+  push:
+    tags:
+     - "*"
 
 jobs:
   release:

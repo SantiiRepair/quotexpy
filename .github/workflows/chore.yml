@@ -1,10 +1,5 @@
 name: Commit & Push 🚀
 
-on:
-  workflow_run:
-    workflows: ["Publish 📝"]
-    types: [completed]
-
 jobs:
   commit-push:
     name: Commit Changes & Push
