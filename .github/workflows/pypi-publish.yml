@@ -12,10 +12,10 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v3
       with:
-        ref: ${{ github.ref_name }}
         fetch-depth: 0
+        ref: ${{ github.ref_name }}
     - name: Extract Tag Name
       run: echo "TAG_NUMBER=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
     - name: Set up Python 3.11

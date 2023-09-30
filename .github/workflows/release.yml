@@ -9,7 +9,7 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Extract Tag Name
         id: set_tag
         run: echo "TAG_NAME=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
