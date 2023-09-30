@@ -13,11 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Setup Git
-      run: |
-        git config --global user.name "${{github.actor}}" 
-        git config --global user.email "${{github.actor}}@users.noreply.github.com"
-        git fetch && git reset --hard origin/main
+      with:
+        fetch-depth: 0
     - name: Extract Tag Name
       run: echo "TAG_NUMBER=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
     - name: Set up Python 3.11
@@ -25,15 +22,24 @@ jobs:
       with:
         python-version: "3.11"
     - name: Install Workflow Deps
-      run: >-
-        python -m pip install poetry poetry2setup wheel
-    - name: Update version in pyproject.toml and generate new setup.py
+      run: python -m pip install poetry poetry2setup wheel
+    - name: Bump Version
       run: |
         poetry version $TAG_NUMBER
         poetry2setup > setup.py 
-        git add .
-        git commit -m "chore: bump up $TAG_NUMBER version from workflow" 
-        git push
+    - name: Commit Changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        author_name: "GitHub Actions"
+        author_email: "actions@github.com"
+        default_author: github_actions
+        fetch: true
+        message: "chore: bump up $TAG_NUMBER version from workflow" 
+        pathspec_error_handling: ignore
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish Distribution to PyPI
       env:
         PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
