@@ -1,8 +1,10 @@
 name: Release 📦
+
 on:
-  push:
-    tags:
-      - "*"
+  workflow_run:
+    workflows: ["Commit & Push 🚀"]
+    types: [completed]
+
 jobs:
   release:
     name: Packaging & Release

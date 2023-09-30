@@ -1,9 +1,9 @@
 name: Commit & Push 🚀
 
 on:
-  push:
-    tags:
-     - "*"
+  workflow_run:
+    workflows: ["Publish 📝"]
+    types: [completed]
 
 jobs:
   commit-push:
