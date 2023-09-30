@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 - Wiki
 
+
+## [1.0.38] - 2023-09-30
+
+### Added
+
+- Github Actions (CI).
+
 ## [1.0.7] - 2023-09-29
 
 ### Fixed
