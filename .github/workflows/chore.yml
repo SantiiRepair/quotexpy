@@ -1,4 +1,4 @@
-name: Publish 📝
+name: Commit & Push 🚀
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
      - "*"
 
 jobs:
-  build-publish:
-    name: Build & Publish
+  commit-push:
+    name: Commit Changes & Push
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
