@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Extract tag name
+      - name: Extract Tag Name
         id: set_tag
         run: echo "TAG_NAME=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
       - name: Create Archive Release
