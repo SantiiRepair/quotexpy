@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Extract Tag Name
-      run: echo "TAG_NUMBER=$(git describe --tags) | sed 's/v//')" >> $GITHUB_ENV
+      run: echo "TAG_NUMBER=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
     - name: Commit Changes
       uses: EndBug/add-and-commit@v9
       with:
