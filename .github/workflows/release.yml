@@ -13,8 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Extract Tag Name
-        id: set_tag
-        run: echo "TAG_NAME=$(git describe --tags | sed 's/v//')" >> $GITHUB_ENV
+        run: echo "TAG_NAME=$(git describe --tags)" >> $GITHUB_ENV
       - name: Create Archive Release
         uses: thedoctor0/zip-release@master
         with:
