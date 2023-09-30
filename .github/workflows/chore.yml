@@ -1,0 +1,29 @@
+name: Publish 📝
+
+on:
+  push:
+    tags:
+     - "*"
+
+jobs:
+  build-publish:
+    name: Build & Publish
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Extract Tag Name
+      run: echo "TAG_NUMBER=$(git describe --tags) | sed 's/v//')" >> $GITHUB_ENV
+    - name: Commit Changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        author_name: "GitHub Actions"
+        author_email: "actions@github.com"
+        default_author: github_actions
+        fetch: true
+        message: "chore: bump up $TAG_NUMBER version from workflow" 
+        pathspec_error_handling: ignore
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}

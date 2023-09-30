@@ -1,7 +1,6 @@
 name: Publish 📝
 
 on:
-  workflow_dispatch:
   push:
     tags:
      - "*"
@@ -13,14 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      run: |
-        echo "TAG_NAME=$(git describe --tags)" >> $GITHUB_ENV
-        echo "BRANCH=$(git branch -a --contains $TAG_NAME | grep -v HEAD | cut -d '/' -f3)" | tee -a $GITHUB_ENV
-      with:
-        fetch-depth: 0
-        ref: $BRANCH
     - name: Extract Tag Name
-      run: echo "TAG_NUMBER=$($TAG_NAME | sed 's/v//')" >> $GITHUB_ENV
+      run: echo "TAG_NUMBER=$(git describe --tags) | sed 's/v//')" >> $GITHUB_ENV
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
@@ -29,22 +22,8 @@ jobs:
       run: python -m pip install poetry poetry2setup wheel
     - name: Bump Version
       run: |
-        echo "$GITHUB_REF"
         poetry version $TAG_NUMBER
         poetry2setup > setup.py 
-    - name: Commit Changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        author_name: "GitHub Actions"
-        author_email: "actions@github.com"
-        default_author: github_actions
-        fetch: true
-        message: "chore: bump up $TAG_NUMBER version from workflow" 
-        pathspec_error_handling: ignore
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish Distribution to PyPI
       env:
         PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
