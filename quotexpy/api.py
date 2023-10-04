@@ -12,6 +12,7 @@ from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
 from quotexpy.ws.channels.buy import Buy
+from quotexpy.exceptions import QuotexTimeout
 from quotexpy.ws.channels.candles import GetCandles
 from quotexpy.ws.channels.sell_option import SellOption
 from quotexpy.ws.objects.timesync import TimeSync
@@ -154,8 +155,8 @@ class QuotexAPI(object):
 
     def check_session(self):
         data = {}
-        if os.path.isfile("session.json"):
-            with open("session.json") as file:
+        if os.path.isfile(".session.json"):
+            with open(".session.json") as file:
                 data = json.loads(file.read())
             self.user_agent = data.get("user_agent")
         return data.get("ssid"), data.get("cookies")
@@ -247,7 +248,7 @@ class QuotexAPI(object):
             time.sleep(0.1)
             count += 1
             if count == 50:
-                raise Exception(f"Sending authorization with SSID {global_value.SSID} took too long to respond")
+                raise QuotexTimeout(f"Sending authorization with SSID {global_value.SSID} took too long to respond")
         if not self.profile.msg:
             return False
         return True

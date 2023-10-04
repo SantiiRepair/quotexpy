@@ -7,7 +7,7 @@ dist
 .gitpod.yml
 
 # Credentials
-session.json
+.session.json
 
 # Codesandbox
 .codesandbox/

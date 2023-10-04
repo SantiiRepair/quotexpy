@@ -33,7 +33,7 @@ class Login(Browser):
             script = self.get_soup().find_all("script", {"type": "text/javascript"})[1].get_text()
             match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
             self.ssid = json.loads(match).get("token")
-            output_file = Path("session.json")
+            output_file = Path(".session.json")
             output_file.parent.mkdir(exist_ok=True, parents=True)
             output_file.write_text(
                 json.dumps(

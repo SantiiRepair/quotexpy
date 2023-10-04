@@ -4,6 +4,7 @@ import asyncio
 from termcolor import colored
 from quotexpy.new import Quotex
 
+ay = asyncio.get_event_loop()
 
 client = Quotex(
     email="diego.christ@outlook.com",
@@ -15,19 +16,19 @@ client.debug_ws_enable = False
 
 async def login(attempts=2):
     check, reason = await client.connect()
-    print(f"{colored('[INFO]: Connecting...', 'blue')}")
+    print(colored("[INFO]: Connecting...", "blue"))
     attempt = 1
     while attempt < attempts:
         if not client.check_connect():
-            print(f"Trying to reconnect, try {attempt} for {attempts}")
+            print(colored(f"[INFO]: Trying to reconnect, try {attempt} for {attempts}", "blue"))
             check, reason = await client.connect()
             if check:
-                print("Successfully reconnected!!!")
+                print(colored("[INFO]: Successfully reconnected!!!", "blue"))
                 break
-            print("Error reconnecting.")
+            print(colored("[INFO]: Error reconnecting", "blue"))
             attempt += 1
-            if os.path.isfile("session.json"):
-                os.remove("session.json")
+            if os.path.isfile(".session.json"):
+                os.remove(".session.json")
         elif not check:
             attempt += 1
         else:
@@ -36,9 +37,8 @@ async def login(attempts=2):
     return check, reason
 
 
-def get_balance():
-    check_connect, message = login()
-    print(check_connect, message)
+async def get_balance():
+    check_connect, message = await login()
     if check_connect:
         client.change_account("practice")
         print("Balance: ", client.get_balance())
@@ -46,8 +46,8 @@ def get_balance():
     client.close()
 
 
-def balance_refill():
-    check_connect, message = login()
+async def balance_refill():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         result = client.edit_practice_balance(50000)
@@ -55,8 +55,8 @@ def balance_refill():
     client.close()
 
 
-def buy():
-    check_connect, message = login()
+async def buy():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         client.change_account("PRACTICE")
@@ -96,8 +96,8 @@ async def buy_and_check_win():
     client.close()
 
 
-def sell_option():
-    check_connect, message = login()
+async def sell_option():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         client.change_account("PRACTICE")
@@ -113,8 +113,8 @@ def sell_option():
     client.close()
 
 
-def asset_open():
-    check_connect, message = login()
+async def asset_open():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         print("Check Asset Open")
@@ -123,8 +123,8 @@ def asset_open():
     client.close()
 
 
-def get_candle():
-    check_connect, message = login()
+async def get_candle():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         asset = "AUDCAD_otc"
@@ -136,8 +136,8 @@ def get_candle():
     client.close()
 
 
-def get_payment():
-    check_connect, message = login()
+async def get_payment():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         all_data = client.get_payment()
@@ -147,8 +147,8 @@ def get_payment():
     client.close()
 
 
-def get_candle_v2():
-    check_connect, message = login()
+async def get_candle_v2():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         a = client.get_candle_v2("USDJPY_otc", 10)
@@ -156,8 +156,8 @@ def get_candle_v2():
     client.close()
 
 
-def get_realtime_candle():
-    check_connect, message = login()
+async def get_realtime_candle():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         list_size = 10
@@ -169,8 +169,8 @@ def get_realtime_candle():
     client.close()
 
 
-def get_signal_data():
-    check_connect, message = login()
+async def get_signal_data():
+    check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
         while True:
@@ -179,12 +179,12 @@ def get_signal_data():
     client.close()
 
 
-# get_signal_data()
-# get_balance()
-# get_payment()
-# get_candle()
-# get_candle_v2()
-# get_realtime_candle()
-# asset_open()
-asyncio.run(buy_and_check_win())
-# balance_refill()
+# ay.run_until_complete(get_signal_data())
+ay.run_until_complete(get_balance())
+# ay.run_until_complete(get_payment())
+# ay.run_until_complete(get_candle())
+# ay.run_until_complete(get_candle_v2())
+# ay.run_until_complete(get_realtime_candle())
+# ay.run_until_complete(asset_open())
+# ay.run_until_complete(buy_and_check_win())
+# ay.run_until_complete(balance_refill())
