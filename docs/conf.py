@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
-import sys
-import os
 import time
+import quotexpy
+import subprocess
 
-# Use the matching bottle version, not a globally installed one.
-bottle_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-sys.path.insert(0, bottle_dir)
-import bottle
-
+latest_tag = subprocess.run(["git", "describe", "--tags", "--abbrev=0"], stdout=subprocess.PIPE)
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx", "sphinx.ext.viewcode"]
 master_doc = "index"
 project = "QuotexPy"
-copyright = "2023-%s, %s" % (time.strftime("%Y"), bottle.__author__)
-version = ".".join(bottle.__version__.split(".")[:2])
-release = bottle.__version__
+copyright = "2023-%s, %s" % (time.strftime("%Y"), quotexpy.__author__)
+version = latest_tag.stdout.decode("utf-8")[1:]
+release = latest_tag.stdout.decode("utf-8")
 add_function_parentheses = True
 add_module_names = False
 autodoc_member_order = "bysource"
