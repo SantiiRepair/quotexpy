@@ -1,7 +1,10 @@
-.PHONY: install html clean get-deps
+.PHONY: clean get-deps
 
 html: clean
 	sphinx-build -b html -d build/docs/doctrees docs build/docs/html/
+
+server: clean
+	python server.py 8080
 
 install: get-deps
 	pip install -e .
