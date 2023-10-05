@@ -3,8 +3,8 @@ import bottle
 
 app = application = bottle.Bottle()
 
-docs_path = os.path.join(os.path.dirname(__file__), "docs/")
-static_path = os.path.join(os.path.dirname(__file__), "static/")
+docs_path = os.path.join(os.path.dirname(__file__), "build/docs/")
+static_path = os.path.join(os.path.dirname(__file__), "build/static/")
 languages = "en cn".split()
 
 

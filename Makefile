@@ -1,7 +1,7 @@
 .PHONY: clean get-deps
 
-html: clean
-	sphinx-build -b html -d build/docs/doctrees docs build/docs/html/
+docs: clean
+	sphinx-build -b html -d build/docs docs build/static/
 
 server: clean
 	python server.py 8080
