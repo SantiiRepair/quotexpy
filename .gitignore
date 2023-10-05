@@ -22,7 +22,7 @@ poetry.lock
 /node_modules
 
 # Production
-/docs/build
+/build
 
 # Generated files
 .docusaurus
