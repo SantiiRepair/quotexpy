@@ -126,7 +126,7 @@ This is just a demonstration of the basic concept of how applications are built 
 
 .. _tutorial-routing:
 
-Request Routing
+Opening Order
 ==============================================================================
 
 In the last chapter we built a very simple web application with only a single route. Here is the routing part of the "Hello World" example again::

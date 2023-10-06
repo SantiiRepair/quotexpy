@@ -20,7 +20,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.0"
+    __version__ = "1.0.38"
 
     def __init__(self, email, password, browser=False):
         self.size = [
@@ -116,7 +116,6 @@ class Quotex(object):
 
     def get_candles(self, asset, offset, period=None):
         index = expiration.get_timestamp()
-        # index - offset
         if period:
             period = expiration.get_period_time(period)
         else:
@@ -192,7 +191,6 @@ class Quotex(object):
             if self.api.account_type > 0
             else self.api.account_balance.get("liveBalance")
         )
-        # return float(f"{truncate(balance + self.get_profit(), 2):.2f}")
         return round(balance, 2)
 
     def buy(self, price, asset, direction, duration):
