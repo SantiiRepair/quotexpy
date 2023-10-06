@@ -1,5 +1,5 @@
 .. highlight:: python
-.. currentmodule:: bottle
+.. currentmodule:: quotexpy
 
 .. _mako: http://www.makotemplates.org/
 .. _cheetah: http://www.cheetahtemplate.org/
@@ -29,7 +29,7 @@ QuotexPy: Websockets API
 
 .. rubric:: Download and Install
 
-.. __: https://github.com/bottlepy/bottle/raw/master/bottle.py
+.. __: https://github.com/SantiiRepair/quotexpy#installing
 
 Install the latest stable release with ``pip install quotexpy`` or `clone and install it manually`__ into your project directory. There are no hard [1]_ dependencies other than the Python standard library. QuotexPy supports **Python >=3.10**.
 

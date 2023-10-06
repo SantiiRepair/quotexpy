@@ -1,4 +1,4 @@
-.. module:: bottle
+.. module:: quotexpy
 
 .. _Apache Server:
 .. _Apache: http://www.apache.org/
@@ -23,60 +23,98 @@
 Tutorial
 ========
 
-This tutorial introduces you to the concepts and features of the Bottle web framework and covers basic and advanced topics alike. You can read it from start to end, or use it as a reference later on. The automatically generated :doc:`api` may be interesting for you, too. It covers more details, but explains less than this tutorial. Solutions for the most common questions can be found in our :doc:`recipes` collection or on the :doc:`faq` page. If you need any help, join our `mailing list <mailto:bottlepy@googlegroups.com>`_ or visit us in our `IRC channel <http://webchat.freenode.net/?channels=bottlepy>`_.
+This tutorial introduces you to the concepts and features of the QuotexPy and covers basic and advanced topics alike. You can read it from start to end, or use it as a reference later on. The automatically generated :doc:`api` may be interesting for you, too. It covers more details, but explains less than this tutorial. Solutions for the most common questions can be found in our :doc:`recipes` collection or on the :doc:`faq` page.
 
 .. _installation:
 
 Installation
 ==============================================================================
 
-Bottle does not depend on any external libraries. You can just download `bottle.py </bottle.py>`_ into your project directory and start coding:
+.. __: https://github.com/SantiiRepair/quotexpy#installing
+
+You can install it via ``pip install quotexpy`` or just `clone and install it`__ into your project directory and start coding:
+
+This will get you the latest development snapshot that includes all the new features. If you prefer a more stable environment, you should stick with the stable releases. These are available on `PyPI <http://pypi.python.org/pypi/quotexpy>`_ and can be installed via :command:`pip` (recommended), or your package manager:
+
+Either way, you'll need Python 3.10 or newer to use quotexpy. If you do not have permissions to install packages system-wide or simply don't want to, create a `virtualenv <http://pypi.python.org/pypi/virtualenv>`_ first:
 
 .. code-block:: bash
 
-    $ wget https://bottlepy.org/bottle.py
-
-This will get you the latest development snapshot that includes all the new features. If you prefer a more stable environment, you should stick with the stable releases. These are available on `PyPI <http://pypi.python.org/pypi/bottle>`_ and can be installed via :command:`pip` (recommended), :command:`easy_install` or your package manager:
-
-.. code-block:: bash
-
-    $ sudo pip install bottle              # recommended
-    $ sudo easy_install bottle             # alternative without pip
-    $ sudo apt-get install python-bottle   # works for debian, ubuntu, ...
-
-Either way, you'll need Python 2.7 or newer (including 3.4+) to run bottle applications. If you do not have permissions to install packages system-wide or simply don't want to, create a `virtualenv <http://pypi.python.org/pypi/virtualenv>`_ first:
-
-.. code-block:: bash
-
-    $ virtualenv develop              # Create virtual environment
-    $ source develop/bin/activate     # Change default python to virtual one
-    (develop)$ pip install -U bottle  # Install bottle to virtual environment
+    $ virtualenv develop                # Create virtual environment
+    $ source develop/bin/activate       # Change default python to virtual one
+    (develop)$ pip install -U quotexpy  # Install quotexpy to virtual environment
 
 Or, if virtualenv is not installed on your system:
 
 .. code-block:: bash
 
-    $ wget https://raw.github.com/pypa/virtualenv/master/virtualenv.py
-    $ python virtualenv.py develop    # Create virtual environment
-    $ source develop/bin/activate     # Change default python to virtual one
-    (develop)$ pip install -U bottle  # Install bottle to virtual environment
+    $ pip install virtualenv
+    $ virtualenv develop                # Create virtual environment
+    $ source develop/bin/activate       # Change default python to virtual one
+    (develop)$ pip install -U quotexpy  # Install quotexpy to virtual environment
 
 
 
-Quickstart: "Hello World"
+Quickstart: Getting Balance
 ==============================================================================
 
-This tutorial assumes you have Bottle either :ref:`installed <installation>` or copied into your project directory. Let's start with a very basic "Hello World" example::
+This tutorial assumes you have QuotexPy either :ref:`installed <installation>` or copied into your project directory. Let's start creating a new client::
 
-    from bottle import route, run
+    from quotexpy.new import Quotex
 
-    @route('/hello')
-    def hello():
-        return "Hello World!"
+    client = Quotex(
+        email="YOUR-ACCOUNT-EMAIL",
+        password="YOUR-ACCOUNT-PASSWORD",
+        browser=True,
+    )
 
-    run(host='localhost', port=8080, debug=True)
+Authenticating
+------------------------------------------------------------------------------
 
-This is it. Run this script, visit http://localhost:8080/hello and you will see "Hello World!" in your browser. Here is how it works:
+Let's do it with a very simple login handler using the client we initialized previously::
+
+    async def login(attempts=2):
+        check, reason = await client.connect()
+        print(colored("[INFO]: Connecting...", "blue"))
+        attempt = 1
+        while attempt < attempts:
+            if not client.check_connect():
+                print(colored(f"[INFO]: Trying to reconnect, try {attempt} for {attempts}", "blue"))
+                check, reason = await client.connect()
+                if check:
+                    print(colored("[INFO]: Successfully reconnected!!!", "blue"))
+                    break
+                print(colored("[INFO]: Error reconnecting", "blue"))
+                attempt += 1
+                if os.path.isfile(".session.json"):
+                    os.remove(".session.json")
+            elif not check:
+                attempt += 1
+            else:
+                break
+            time.sleep(0.5)
+        return check, reason
+
+This is it. Run this script, it will save a temp session into package dir and it will be used in every request.
+
+Now let's check your balance!
+------------------------------------------------------------------------------
+
+Now comes the expected moment, with a couple of lines of code let's print the balance::
+
+    async def get_balance():
+        check_connect, message = await login()
+        if check_connect:
+            client.change_account("practice")
+            print("Balance: ", client.get_balance())
+            print("Exiting...")
+        client.close()
+
+The final result::
+
+    [INFO]: Connecting...
+    Balance:  12957.58
+    Exiting...
 
 The :func:`route` decorator binds a piece of code to an URL path. In this case, we link the ``/hello`` path to the ``hello()`` function. This is called a `route` (hence the decorator name) and is the most important concept of this framework. You can define as many routes as you want. Whenever a browser requests a URL, the associated function is called and the return value is sent back to the browser. It's as simple as that.
 
@@ -84,29 +122,7 @@ The :func:`run` call in the last line starts a built-in development server. It r
 
 The :ref:`tutorial-debugging` is very helpful during early development, but should be switched off for public applications. Keep that in mind.
 
-This is just a demonstration of the basic concept of how applications are built with Bottle. Continue reading and you'll see what else is possible.
-
-.. _tutorial-default:
-
-The Default Application
-------------------------------------------------------------------------------
-
-For the sake of simplicity, most examples in this tutorial use a module-level :func:`route` decorator to define routes. This adds routes to a global "default application", an instance of :class:`Bottle` that is automatically created the first time you call :func:`route`. Several other module-level decorators and functions relate to this default application, but if you prefer a more object oriented approach and don't mind the extra typing, you can create a separate application object and use that instead of the global one::
-
-    from bottle import Bottle, run
-
-    app = Bottle()
-
-    @app.route('/hello')
-    def hello():
-        return "Hello World!"
-
-    run(app, host='localhost', port=8080)
-
-The object-oriented approach is further described in the :ref:`default-app` section. Just keep in mind that you have a choice.
-
-
-
+This is just a demonstration of the basic concept of how applications are built with QuotexPy. Continue reading and you'll see what else is possible.
 
 .. _tutorial-routing:
 
