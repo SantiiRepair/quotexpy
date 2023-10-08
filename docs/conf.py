@@ -5,6 +5,7 @@ import subprocess
 latest_tag = subprocess.run(["git", "describe", "--tags", "--abbrev=0"], stdout=subprocess.PIPE)
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx", "sphinx.ext.viewcode"]
 master_doc = "index"
+html_theme = "furo"
 project = "QuotexPy"
 copyright = "2023-%s, %s" % (time.strftime("%Y"), quotexpy.__author__)
 version = latest_tag.stdout.decode("utf-8")[1:]
