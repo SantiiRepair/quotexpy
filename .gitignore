@@ -11,6 +11,7 @@ dist
 
 # Codesandbox
 .codesandbox/
+.devcontainer/
 
 # vscode
 .vscode/launch.json

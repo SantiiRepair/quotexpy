@@ -1,10 +1,14 @@
 import os
 import time
-import asyncio
 from termcolor import colored
 from quotexpy.new import Quotex
+from asyncio import get_event_loop
 
-ay = asyncio.get_event_loop()
+
+def __x__(y):
+    z = get_event_loop().run_until_complete(y)
+    return z
+
 
 client = Quotex(
     email="diego.christ@outlook.com",
@@ -179,12 +183,12 @@ async def get_signal_data():
     client.close()
 
 
-# ay.run_until_complete(get_signal_data())
-ay.run_until_complete(get_balance())
-# ay.run_until_complete(get_payment())
-# ay.run_until_complete(get_candle())
-# ay.run_until_complete(get_candle_v2())
-# ay.run_until_complete(get_realtime_candle())
-# ay.run_until_complete(asset_open())
-# ay.run_until_complete(buy_and_check_win())
-# ay.run_until_complete(balance_refill())
+# __x__(get_signal_data())
+__x__(get_balance())
+# __x__(get_payment())
+# __x__(get_candle())
+# __x__(get_candle_v2())
+# __x__(get_realtime_candle())
+# __x__(asset_open())
+# __x__(buy_and_check_win())
+# __x__(balance_refill())
