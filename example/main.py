@@ -11,8 +11,8 @@ def __x__(y):
 
 
 client = Quotex(
-    email="diego.christ@outlook.com",
-    password="@D1i2e3g4o5@Quotex",
+    email="...",
+    password="...",
     browser=True,
 )
 client.debug_ws_enable = False
