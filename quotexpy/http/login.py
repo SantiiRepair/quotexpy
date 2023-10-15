@@ -3,10 +3,11 @@ import json
 from pathlib import Path
 from quotexpy.http.navigator import Browser
 from quotexpy.http.qxbroker import authorize
+from quotexpy.exceptions import QuotexParser
 
 
 class Login(Browser):
-    """Class for Quotex login resource."""
+    """Class for Quotex login resource"""
 
     url = ""
     cookies = None
@@ -63,18 +64,20 @@ class Login(Browser):
         result_data = self.get_profile()
         return result_data
 
-    async def __call__(self, username, password, browser):
+    async def __call__(self, email, password, browser):
         """Method to get Quotex API login http request.
-        :param str username: The username of a Quotex server.
+        :param str email: The email of a Quotex server.
         :param str password: The password of a Quotex server.
         :returns: The instance of :class:`requests.Response`.
         """
         if browser:
-            self.ssid, self.cookies = await authorize(username, password)
+            if "@" not in email:
+                raise QuotexParser(f"'{email}' is missing an '@'")
+            self.ssid, self.cookies = await authorize(email, password)
         else:
             data = {
                 "_token": self.get_token(),
-                "email": username,
+                "email": email,
                 "password": password,
                 "remember": 1,
             }

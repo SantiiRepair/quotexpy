@@ -39,7 +39,7 @@ cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
 
 
 class QuotexAPI(object):
-    """Class for communication with Quotex API."""
+    """Class for communication with Quotex API"""
 
     socket_option_opened = {}
     buy_id = {}
@@ -58,16 +58,16 @@ class QuotexAPI(object):
     timesync = TimeSync()
     candles = Candles()
 
-    def __init__(self, host, username, password, proxies=None, browser=False):
+    def __init__(self, host, email, password, proxies=None, browser=False):
         """
         :param str host: The hostname or ip address of a Quotex server.
-        :param str username: The username of a Quotex server.
+        :param str email: The email of a Quotex server.
         :param str password: The password of a Quotex server.
         :param proxies: The proxies of a Quotex server.
         """
         self._temp_status = ""
         self.settings_list = {}
-        self.username = username
+        self.email = email
         self.password = password
         self.signal_data = nested_dict(2, dict)
         self.getcandle_data = {}
@@ -191,18 +191,13 @@ class QuotexAPI(object):
     async def get_ssid(self):
         ssid, cookies = self.check_session()
         if not ssid:
-            # try:
             logger.info("Authenticating user...")
             ssid, cookies = await self.login(
-                self.username,
+                self.email,
                 self.password,
                 self.browser,
             )
             logger.info("Login successful!!!")
-            # except Exception as e:
-            # logger = logging.getLogger(__name__)
-            # logger.error(e)
-            # return e
         return ssid, cookies
 
     def start_websocket(self):
@@ -254,7 +249,7 @@ class QuotexAPI(object):
         return True
 
     async def connect(self):
-        """Method for connection to Quotex API."""
+        """Method for connection to Quotex API"""
         global_value.ssl_Mutual_exclusion = False
         global_value.ssl_Mutual_exclusion_write = False
         if global_value.check_websocket_if_connect:

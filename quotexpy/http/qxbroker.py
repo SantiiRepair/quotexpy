@@ -4,24 +4,33 @@ import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
-from quotexpy.utils.playwright_install import install
 from playwright.async_api import Playwright, async_playwright
 
+from quotexpy.utils.playwright_install import install
+from quotexpy.exceptions import Quotex, QuotexAuthError
 
-async def run(username, password, playwright: Playwright) -> Tuple[Any, str]:
+
+async def run(email, password, playwright: Playwright) -> Tuple[Any, str]:
     browser = await playwright.firefox.launch(headless=True)
     context = await browser.new_context()
     page = await context.new_page()
     await page.goto("https://qxbroker.com/pt/sign-in")
     await page.get_by_role("textbox", name="E-mail").click()
-    await page.get_by_role("textbox", name="E-mail").fill(username)
+    await page.get_by_role("textbox", name="E-mail").fill(email)
     await page.get_by_role("textbox", name="Senha").click()
     await page.get_by_role("textbox", name="Senha").fill(password)
     await page.get_by_role("button", name="Entrar").click()
-    await page.wait_for_url("https://qxbroker.com/pt/trade")
-    cookies = await context.cookies()
+    await page.wait_for_load_state()
+    creds_error = await page.query_selector(".hint -danger")
+    if creds_error is not None:
+        raise QuotexAuthError("email or password invalid")
     source = await page.content()
     soup = BeautifulSoup(source, "html.parser")
+    unavailable = soup.find_all("div", {"class": "modal-sign__not-avalible__title"})[0].get_text()
+    if unavailable:
+        raise Quotex("Unfortunately, Quotex is not currently available in your region")
+    await page.wait_for_url("https://qxbroker.com/pt/trade")
+    cookies = await context.cookies()
     user_agent = await page.evaluate("() => navigator.userAgent;")
     script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
     match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
@@ -43,11 +52,11 @@ async def run(username, password, playwright: Playwright) -> Tuple[Any, str]:
     return ssid, cookie_string
 
 
-async def main(username, password) -> Tuple[Any, str]:
+async def main(email, password) -> Tuple[Any, str]:
     async with async_playwright() as playwright:
         install(playwright.firefox, with_deps=True)
-        return await run(username, password, playwright)
+        return await run(email, password, playwright)
 
 
-async def authorize(username, password):
-    return await main(username, password)
+async def authorize(email, password):
+    return await main(email, password)
