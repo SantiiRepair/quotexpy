@@ -7,7 +7,7 @@ from typing import Tuple, Any
 from playwright.async_api import Playwright, async_playwright
 
 from quotexpy.utils.playwright_install import install
-from quotexpy.exceptions import Quotex, QuotexAuthError
+from quotexpy.exceptions import QuotexAuthError
 
 
 async def run(email, password, playwright: Playwright) -> Tuple[Any, str]:
