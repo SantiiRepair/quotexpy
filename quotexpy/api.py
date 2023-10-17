@@ -145,7 +145,7 @@ class QuotexAPI(object):
         return SellOption(self)
 
     @property
-    def getcandles(self):
+    def get_candles(self):
         """Property for get Quotex websocket candles channel.
 
         :returns: The instance of :class:`GetCandles

@@ -124,7 +124,7 @@ class Quotex(object):
         self.api.candles.candles_data = None
         while True:
             try:
-                self.api.getcandles(codes_asset[asset], offset, period, index)
+                self.api.get_candles(codes_asset[asset], offset, period, index)
                 while self.check_connect and self.api.candles.candles_data is None:
                     pass
                 if self.api.candles.candles_data is not None:
