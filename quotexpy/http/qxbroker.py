@@ -24,13 +24,10 @@ async def run(email, password, playwright: Playwright) -> Tuple[Any, str]:
     creds_error = await page.query_selector(".hint -danger")
     if creds_error is not None:
         raise QuotexAuthError("email or password invalid")
-    source = await page.content()
-    soup = BeautifulSoup(source, "html.parser")
-    unavailable = soup.find_all("div", {"class": "modal-sign__not-avalible__title"})[0].get_text()
-    if unavailable:
-        raise Quotex("Unfortunately, Quotex is not currently available in your region")
     await page.wait_for_url("https://qxbroker.com/pt/trade")
     cookies = await context.cookies()
+    source = await page.content()
+    soup = BeautifulSoup(source, "html.parser")
     user_agent = await page.evaluate("() => navigator.userAgent;")
     script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
     match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
@@ -45,7 +42,6 @@ async def run(email, password, playwright: Playwright) -> Tuple[Any, str]:
             indent=4,
         )
     )
-    # global_value.session = {"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}
     await context.close()
     await browser.close()
 

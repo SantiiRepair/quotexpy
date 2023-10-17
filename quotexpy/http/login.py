@@ -46,7 +46,6 @@ class Login(Browser):
                     indent=4,
                 )
             )
-            # global_value.session = {"cookies": self.cookies, "ssid": self.ssid, "user_agent": self.api.user_agent}
             return self.response, json.loads(match)
         return None, None
 
