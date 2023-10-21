@@ -241,10 +241,10 @@ class QuotexAPI(object):
         self.ssid(global_value.SSID)
         count = 0
         while not self.profile.msg:
-            time.sleep(0.3)
+            time.sleep(0.1)
             count += 1
             if count == 50:
-                raise QuotexTimeout(f"Sending authorization with SSID {global_value.SSID} took too long to respond")
+                raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
         if not self.profile.msg:
             return False
         return True
