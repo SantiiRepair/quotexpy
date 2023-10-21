@@ -1,8 +1,11 @@
 import os
 import time
+import shutup
 from termcolor import colored
 from quotexpy.new import Quotex
 from asyncio import get_event_loop
+
+shutup.please()
 
 
 def __x__(y):
@@ -181,4 +184,3 @@ async def get_signal_data():
 # __x__(asset_open())
 __x__(buy_and_check_win())
 # __x__(balance_refill())
-
