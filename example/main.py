@@ -11,7 +11,7 @@ def __x__(y):
 
 
 client = Quotex(
-    email="...",
+    email="...@gmail.com",
     password="...",
     browser=True,
 )
@@ -77,9 +77,9 @@ async def buy_and_check_win():
     check_connect, message = await login()
     if check_connect:
         client.change_account("PRACTICE")
-        print("Balance: ", client.get_balance())
+        print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
         amount = 100
-        asset = "USDJPY_otc"  # "JPYUSD_otc"
+        asset = "EURUSD_otc"  # "EURUSD_otc"
         direction = "call"
         duration = 5  # in seconds
         status, buy_info = client.buy(amount, asset, direction, duration)
@@ -90,9 +90,9 @@ async def buy_and_check_win():
             else:
                 print(f"\nLoss!!! \nLoss: R$ {client.get_profit()}")
         else:
-            print("Operation failed!!!")
-        print("Balance: ", client.get_balance())
-        print("Exiting...")
+            print(colored("[ERROR]: ", "red"), "Operation failed!!!")
+        print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
+        print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
 
@@ -173,7 +173,7 @@ async def get_signal_data():
 
 
 # __x__(get_signal_data())
-__x__(get_balance())
+# __x__(get_balance())
 # __x__(get_payment())
 # __x__(get_candle())
 # __x__(get_candle_v2())
@@ -181,3 +181,4 @@ __x__(get_balance())
 # __x__(asset_open())
 __x__(buy_and_check_win())
 # __x__(balance_refill())
+
