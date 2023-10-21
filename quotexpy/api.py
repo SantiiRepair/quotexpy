@@ -70,7 +70,7 @@ class QuotexAPI(object):
         self.email = email
         self.password = password
         self.signal_data = nested_dict(2, dict)
-        self.getcandle_data = {}
+        self.get_candle_data = {}
         self.candle_v2_data = {}
         self.cookies = None
         self.profile = None
@@ -240,7 +240,7 @@ class QuotexAPI(object):
         self.ssid(global_value.SSID)
         count = 0
         while not self.profile.msg:
-            time.sleep(0.1)
+            time.sleep(0.3)
             count += 1
             if count == 50:
                 raise QuotexTimeout(f"Sending authorization with SSID {global_value.SSID} took too long to respond")
