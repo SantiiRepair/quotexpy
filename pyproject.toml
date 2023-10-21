@@ -25,7 +25,6 @@ requests-toolbelt = "^1.0.0"
 shutup = "^0.2.0"
 simplejson = "^3.18.3"
 soupsieve = "^2.4"
-termcolor = "^2.3.0"
 tqdm = "^4.65.0"
 typing_extensions = "^4.5.0"
 urllib3 = "^2.0.5"
@@ -40,6 +39,7 @@ poetry-core = "^1.7.0"
 poetry2setup = "^1.1.0"
 pylint = "^2.17.5"
 pytest = "^7.4.2"
+termcolor = "^2.3.0"
 
 [tool.black]
 line-length = 120
