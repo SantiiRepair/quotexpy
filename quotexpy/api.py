@@ -1,4 +1,4 @@
-"""Module for Quotex websocket."""
+"""Module for Quotex websocket"""
 import os
 import time
 import json
@@ -7,7 +7,10 @@ import threading
 import collections
 import urllib3
 import certifi
+from collections import defaultdict as default_dict
+
 from quotexpy import global_value
+from quotexpy.logger import logger
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
@@ -20,14 +23,12 @@ from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
 from quotexpy.ws.objects.listinfodata import ListInfoData
 from quotexpy.ws.client import WebsocketClient
-from collections import defaultdict
-from quotexpy.logger import logger
 
 
 def nested_dict(n, typeof):
     if n == 1:
-        return defaultdict(typeof)
-    return defaultdict(lambda: nested_dict(n - 1, typeof))
+        return default_dict(typeof)
+    return default_dict(lambda: nested_dict(n - 1, typeof))
 
 
 urllib3.disable_warnings()
