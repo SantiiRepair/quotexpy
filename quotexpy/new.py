@@ -324,4 +324,3 @@ class Quotex(object):
 
     def close(self):
         self.api.close()
-
