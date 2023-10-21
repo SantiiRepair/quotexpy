@@ -30,6 +30,7 @@ poetry.lock
 .cache-loader
 
 # Misc
+*.log
 *.mp4
 .DS_Store
 .env.local
