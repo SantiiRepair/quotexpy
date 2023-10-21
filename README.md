@@ -39,7 +39,7 @@ from quotexpy.new import Quotex
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
 
 ### Donations
-If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting... :)
+If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
 
 <a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=FF5F5F&font_colour=ffffff&font_family=Poppins&outline_colour=000000&coffee_colour=FFDD00" /></a>
 
