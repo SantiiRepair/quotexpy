@@ -1,3 +1,4 @@
+"""Create new Client instance."""
 import sys
 import math
 import time
@@ -172,7 +173,7 @@ class Quotex(object):
         elif balance_mode.upper() == "PRACTICE":
             self.api.account_type = 1
         else:
-            logging.error("ERROR doesn't have this mode")
+            logging.error(f"{balance_mode} does not exist")
             sys.exit(1)
         self.api.send_ssid()
 
@@ -323,3 +324,4 @@ class Quotex(object):
 
     def close(self):
         self.api.close()
+
