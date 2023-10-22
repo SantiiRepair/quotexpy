@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 from quotexpy.http.user_agents import agents
 
 retry_strategy = Retry(
-    total=3,
+    total=5,
     backoff_factor=1,
     status_forcelist=[429, 500, 502, 503, 504, 104],
     allowed_methods=["HEAD", "POST", "PUT", "GET", "OPTIONS"],

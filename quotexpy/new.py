@@ -1,8 +1,10 @@
+"""Create a new Quotex Client instance"""
 import sys
 import math
 import time
 import logging
-from collections import defaultdict
+from collections import defaultdict as default_dict
+
 from quotexpy import expiration
 from quotexpy import global_value
 from quotexpy.api import QuotexAPI
@@ -11,8 +13,8 @@ from quotexpy.constants import codes_asset
 
 def nested_dict(n, typeof):
     if n == 1:
-        return defaultdict(typeof)
-    return defaultdict(lambda: nested_dict(n - 1, typeof))
+        return default_dict(typeof)
+    return default_dict(lambda: nested_dict(n - 1, typeof))
 
 
 def truncate(f, n):
@@ -172,7 +174,7 @@ class Quotex(object):
         elif balance_mode.upper() == "PRACTICE":
             self.api.account_type = 1
         else:
-            logging.error("ERROR doesn't have this mode")
+            logging.error(f"{balance_mode} does not exist")
             sys.exit(1)
         self.api.send_ssid()
 

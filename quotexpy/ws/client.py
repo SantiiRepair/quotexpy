@@ -1,4 +1,4 @@
-"""Module for Quotex websocket."""
+"""Module for Quotex websocket"""
 import os
 import json
 import random
@@ -11,7 +11,7 @@ user_agent_list = agents.split("\n")
 
 
 class WebsocketClient(object):
-    """Class for work with Quotex API websocket."""
+    """Class for work with Quotex API websocket"""
 
     def __init__(self, api):
         """
@@ -38,7 +38,7 @@ class WebsocketClient(object):
         )
 
     def on_message(self, wss, message):
-        """Method to process websocket messages."""
+        """Method to process websocket messages"""
         global_value.ssl_Mutual_exclusion = True
         try:
             logger = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ class WebsocketClient(object):
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
-                    # logger.info(message)
+                    logger.info(message)
                     self.api.candles.candles_data = message
                 elif message.get("id"):
                     self.api.buy_successful[message["asset"]] = message
@@ -87,7 +87,7 @@ class WebsocketClient(object):
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
-                    # logger.info(message)
+                    logger.error(message)
                     pass
             except:
                 pass
@@ -108,23 +108,23 @@ class WebsocketClient(object):
 
     @staticmethod
     def on_error(wss, error):
-        """Method to process websocket errors."""
+        """Method to process websocket errors"""
         logger = logging.getLogger(__name__)
         logger.error(error)
         global_value.websocket_error_reason = str(error)
         global_value.check_websocket_if_error = True
 
     def on_open(self, wss):
-        """Method to process websocket open."""
+        """Method to process websocket open"""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket client connected.")
+        logger.debug("Websocket client connected")
         global_value.check_websocket_if_connect = 1
 
     @staticmethod
     def on_close(wss, close_status_code, close_msg):
-        """Method to process websocket close."""
+        """Method to process websocket close"""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket connection closed.")
+        logger.debug("Websocket connection closed")
         global_value.check_websocket_if_connect = 0
 
     @staticmethod

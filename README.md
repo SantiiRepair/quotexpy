@@ -39,9 +39,9 @@ from quotexpy.new import Quotex
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
 
 ### Donations
-If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee or beer :)
+If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
 
-<a href="https://buymeacoff.ee/SantiiRepair" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
 
 ### ⚠️ Atention 
 Because cloudfare blocks requests you should enable `browser=True` to avoid `HTTP 403` errors.

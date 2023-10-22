@@ -1,4 +1,4 @@
-"""Module for Quotex websocket."""
+"""Module for Quotex websocket"""
 import os
 import time
 import json
@@ -7,7 +7,10 @@ import threading
 import collections
 import urllib3
 import certifi
+from collections import defaultdict as default_dict
+
 from quotexpy import global_value
+from quotexpy.logger import logger
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
@@ -20,14 +23,12 @@ from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
 from quotexpy.ws.objects.listinfodata import ListInfoData
 from quotexpy.ws.client import WebsocketClient
-from collections import defaultdict
-from quotexpy.logger import logger
 
 
 def nested_dict(n, typeof):
     if n == 1:
-        return defaultdict(typeof)
-    return defaultdict(lambda: nested_dict(n - 1, typeof))
+        return default_dict(typeof)
+    return default_dict(lambda: nested_dict(n - 1, typeof))
 
 
 urllib3.disable_warnings()
@@ -70,7 +71,7 @@ class QuotexAPI(object):
         self.email = email
         self.password = password
         self.signal_data = nested_dict(2, dict)
-        self.getcandle_data = {}
+        self.get_candle_data = {}
         self.candle_v2_data = {}
         self.cookies = None
         self.profile = None
@@ -243,7 +244,7 @@ class QuotexAPI(object):
             time.sleep(0.3)
             count += 1
             if count == 50:
-                raise QuotexTimeout(f"Sending authorization with SSID {global_value.SSID} took too long to respond")
+                raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
         if not self.profile.msg:
             return False
         return True
