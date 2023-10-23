@@ -1,12 +1,10 @@
 import json
-from quotexpy.utils import unix_time
+from quotexpy.util import unix_time
 from quotexpy.ws.channels.base import Base
 
 
-class Buy(Base):
-    """Class for Quotex buy websocket channel"""
-
-    name = "buy"
+class Trade(Base):
+    """Class for Quotex trade websocket channel"""
 
     def __call__(self, action: str, amount, asset: str, duration, request_id):
         payload = {
@@ -22,3 +20,4 @@ class Buy(Base):
 
         data = f'42["orders/open",{json.dumps(payload)}]'
         self.send_websocket_request(data)
+
