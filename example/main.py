@@ -21,7 +21,7 @@ client = Quotex(
 client.debug_ws_enable = False
 
 
-async def login(attempts=2):
+async def login(attempts=8):
     attempt = 1
     print(colored("[INFO]: ", "blue"), "Connecting...")
     while attempt < attempts:
@@ -61,57 +61,39 @@ async def balance_refill():
     client.close()
 
 
-async def buy():
+async def trade():
     check_connect, message = await login()
     if check_connect:
         client.change_account("PRACTICE")
         amount = 30
-        asset = "EURUSD_otc"  # "EURUSD_otc"
-        direction = "call"
-        duration = 10  # in seconds
-        status, buy_info = client.buy(amount, asset, direction, duration)
-        print(status, buy_info)
+        asset = "EURUSD_otc"  # "EURUSD"
+        action = "call"  # call (green), put (red)
+        duration = 60  # in seconds
+        status, buy_info = client.trade(action, amount, asset, duration)
         print("Balance: ", client.get_balance())
         print("Exiting...")
     client.close()
 
 
-async def buy_and_check_win():
+async def trade_and_check():
     check_connect, message = await login()
     if check_connect:
         client.change_account("PRACTICE")
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
-        amount = 100
-        asset = "EURUSD_otc"  # "EURUSD_otc"
-        direction = "call"
-        duration = 5  # in seconds
-        status, buy_info = client.buy(amount, asset, direction, duration)
+        amount = 10
+        asset = "EURUSD_otc"  # "EURUSD"
+        action = "call"  # call (green), put (red)
+        duration = 60  # in seconds
+        status, buy_info = client.trade(action, amount, asset, duration)
         if status:
-            print("Awaiting result...")
             if client.check_win(buy_info["id"]):
-                print(f"\nWin!!! \nProfit: BRL {client.get_profit()}")
+                print(f"\nWin!!! \nProfit: {client.get_profit()}")
             else:
-                print(f"\nLoss!!! \nLoss: R$ {client.get_profit()}")
+                print(f"\nLoss!!! \nLoss: {client.get_profit()}")
         else:
             print(colored("[ERROR]: ", "red"), "Operation failed!!!")
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
-    client.close()
-
-
-async def sell_option():
-    check_connect, message = await login()
-    if check_connect:
-        client.change_account("PRACTICE")
-        amount = 30
-        asset = "CADCHF_otc"  # "EURUSD_otc"
-        direction = "put"
-        duration = 1000  # in seconds
-        status, buy_info = client.buy(amount, asset, direction, duration)
-        print(status, buy_info)
-        client.sell_option(buy_info["id"])
-        print("Balance: ", client.get_balance())
-        print("Exiting...")
     client.close()
 
 
@@ -182,5 +164,5 @@ async def get_signal_data():
 # __x__(get_candle_v2())
 # __x__(get_realtime_candle())
 # __x__(asset_open())
-__x__(buy_and_check_win())
+__x__(trade_and_check())
 # __x__(balance_refill())

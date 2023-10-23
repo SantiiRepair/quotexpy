@@ -14,10 +14,9 @@ from quotexpy.logger import logger
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
-from quotexpy.ws.channels.buy import Buy
+from quotexpy.ws.channels.trade import Trade
 from quotexpy.exceptions import QuotexTimeout
 from quotexpy.ws.channels.candles import GetCandles
-from quotexpy.ws.channels.sell_option import SellOption
 from quotexpy.ws.objects.timesync import TimeSync
 from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
@@ -134,16 +133,12 @@ class QuotexAPI(object):
         return Ssid(self)
 
     @property
-    def buy(self):
+    def trade(self):
         """Property for get Quotex websocket ssid channel.
-        :returns: The instance of :class:`Buy
-            <quotexpy.ws.channels.buy.Buy>`.
+        :returns: The instance of :class:`Trade
+            <quotexpy.ws.channels.trade.Trade>`.
         """
-        return Buy(self)
-
-    @property
-    def sell_option(self):
-        return SellOption(self)
+        return Trade(self)
 
     @property
     def get_candles(self):

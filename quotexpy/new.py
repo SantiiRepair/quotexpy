@@ -195,8 +195,8 @@ class Quotex(object):
         )
         return round(balance, 2)
 
-    def buy(self, price, asset, direction, duration):
-        """Buy Binary option"""
+    def trade(self, action: str, amount, asset: str, duration):
+        """Trade Binary option"""
         count = 0
         status_buy = False
         self.duration = duration - 1
@@ -204,7 +204,7 @@ class Quotex(object):
         self.api.current_asset = asset
         self.api.buy_id[asset] = None
         self.api.buy_successful[asset] = None
-        self.api.buy(price, asset, direction, duration, request_id)
+        self.api.trade(action, amount, asset, duration, request_id)
         while not self.api.buy_id[asset]:
             if count == 10:
                 break
@@ -213,14 +213,6 @@ class Quotex(object):
         else:
             status_buy = True
         return status_buy, self.api.buy_successful[asset]
-
-    def sell_option(self, options_ids):
-        """Sell asset Quotex"""
-        self.api.sell_option(options_ids)
-        self.api.sold_options_respond = None
-        while self.api.sold_options_respond is None:
-            pass
-        return self.api.sold_options_respond
 
     def get_payment(self):
         """Payment Quotex server"""
@@ -240,8 +232,8 @@ class Quotex(object):
         # remaing_time = int((expiration_stamp - now_stamp).total_seconds())
         while True:
             try:
-                listinfodata_dict = self.api.listinfodata.get(id_number)
-                if listinfodata_dict["game_state"] == 1:
+                list_info_data_dict = self.api.listinfodata.get(id_number)
+                if list_info_data_dict["game_state"] == 1:
                     break
             except Exception:
                 pass
@@ -249,8 +241,8 @@ class Quotex(object):
             # time.sleep(1)
             # logger.info(f"\rRestando {remaing_time} segundos ...", end="")
         self.api.listinfodata.delete(id_number)
-        # return listinfodata_dict["win"]
-        return listinfodata_dict
+        # return list_info_data_dict["win"]
+        return list_info_data_dict
 
     def start_candles_stream(self, asset, size, period=0):
         self.api.subscribe_realtime_candle(asset, size, period)
