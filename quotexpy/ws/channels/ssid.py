@@ -3,7 +3,7 @@ from quotexpy.ws.channels.base import Base
 
 
 class Ssid(Base):
-    """Class for Quotex API ssid websocket channel."""
+    """Class for Quotex API ssid websocket channel"""
 
     name = "ssid"
 

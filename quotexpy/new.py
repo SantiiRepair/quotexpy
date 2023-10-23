@@ -195,7 +195,7 @@ class Quotex(object):
         )
         return round(balance, 2)
 
-    def buy(self, price, asset, direction, duration):
+    def buy(self, action: str, amount, asset: str, duration):
         """Buy Binary option"""
         count = 0
         status_buy = False
@@ -204,7 +204,7 @@ class Quotex(object):
         self.api.current_asset = asset
         self.api.buy_id[asset] = None
         self.api.buy_successful[asset] = None
-        self.api.buy(price, asset, direction, duration, request_id)
+        self.api.buy(action, amount, asset, duration, request_id)
         while not self.api.buy_id[asset]:
             if count == 10:
                 break
