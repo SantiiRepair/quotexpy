@@ -195,8 +195,8 @@ class Quotex(object):
         )
         return round(balance, 2)
 
-    def buy(self, action: str, amount, asset: str, duration):
-        """Buy Binary option"""
+    def trade(self, action: str, amount, asset: str, duration):
+        """Trade Binary option"""
         count = 0
         status_buy = False
         self.duration = duration - 1
@@ -213,14 +213,6 @@ class Quotex(object):
         else:
             status_buy = True
         return status_buy, self.api.buy_successful[asset]
-
-    def sell_option(self, options_ids):
-        """Sell asset Quotex"""
-        self.api.sell_option(options_ids)
-        self.api.sold_options_respond = None
-        while self.api.sold_options_respond is None:
-            pass
-        return self.api.sold_options_respond
 
     def get_payment(self):
         """Payment Quotex server"""
