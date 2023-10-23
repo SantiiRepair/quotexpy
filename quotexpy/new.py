@@ -22,7 +22,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.0.38"
+    __version__ = "1.0.40"
 
     def __init__(self, email, password, browser=False):
         self.size = [
@@ -198,21 +198,27 @@ class Quotex(object):
     def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
         count = 0
-        status_buy = False
-        self.duration = duration - 1
+        trade_status = False
+        self.duration = duration
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
-        self.api.buy_id[asset] = None
-        self.api.buy_successful[asset] = None
-        self.api.trade(action, amount, asset, duration, request_id)
-        while not self.api.buy_id[asset]:
+        self.api.trade_id[asset] = None
+        self.api.trade_successful[asset] = None
+        self.api.trade(
+            action,
+            amount,
+            asset,
+            duration,
+            request_id,
+        )
+        while not self.api.trade_id[asset]:
             if count == 10:
                 break
             count += 1
             time.sleep(1)
         else:
-            status_buy = True
-        return status_buy, self.api.buy_successful[asset]
+            trade_status = True
+        return trade_status, self.api.trade_successful[asset]
 
     def get_payment(self):
         """Payment Quotex server"""

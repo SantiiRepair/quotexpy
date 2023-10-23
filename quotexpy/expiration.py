@@ -3,7 +3,7 @@ import calendar
 from datetime import datetime, timedelta
 
 
-def get_timestamp():
+def get_timestamp() -> int:
     return calendar.timegm(time.gmtime())
 
 

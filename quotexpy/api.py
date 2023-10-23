@@ -42,11 +42,11 @@ class QuotexAPI(object):
     """Class for communication with Quotex API"""
 
     socket_option_opened = {}
-    buy_id = {}
+    trade_id = {}
     trace_ws = False
     buy_expiration = None
     current_asset = None
-    buy_successful = {}
+    trade_successful = {}
     account_balance = None
     account_type = None
     instruments = None

@@ -14,7 +14,7 @@ def __x__(y):
 
 
 client = Quotex(
-    email="...@gmail.com",
+    email="...",
     password="...",
     browser=True,
 )
@@ -47,7 +47,7 @@ async def login(attempts=8):
 async def get_balance():
     check_connect, message = await login()
     if check_connect:
-        client.change_account("practice")
+        client.change_account("PRACTICE")
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()

@@ -68,8 +68,8 @@ class WebsocketClient(object):
                     logger.info(message)
                     self.api.candles.candles_data = message
                 elif message.get("id"):
-                    self.api.buy_successful[message["asset"]] = message
-                    self.api.buy_id[message["asset"]] = message["id"]
+                    self.api.trade_successful[message["asset"]] = message
+                    self.api.trade_id[message["asset"]] = message["id"]
                     self.api.timesync.server_timestamp = message["closeTimestamp"]
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
