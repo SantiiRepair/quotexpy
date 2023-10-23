@@ -12,7 +12,7 @@ class Buy(Base):
         payload = {
             "action": action,
             "amount": amount,
-            "asset": asset.replace("_otc", "").strip().upper() if "_otc" in asset else asset.upper(),
+            "asset": asset.replace("_otc", "").strip().upper() if "_otc" in asset else asset.strip().upper(),
             "time": unix_time() + duration,
             "isDemo": self.api.account_type,
             "optionType": 100 if self.api.account_type else 1,
