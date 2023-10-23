@@ -68,7 +68,7 @@ async def trade():
         amount = 30
         asset = "EURUSD_otc"  # "EURUSD"
         action = "call"  # call (green), put (red)
-        duration = 10  # in seconds
+        duration = 60  # in seconds
         status, buy_info = client.trade(action, amount, asset, duration)
         print("Balance: ", client.get_balance())
         print("Exiting...")

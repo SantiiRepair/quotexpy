@@ -16,6 +16,6 @@ class Trade(Base):
             "requestId": request_id,
             "tournamentId": 0,
         }
-
+        
         data = f'42["orders/open",{json.dumps(payload)}]'
         self.send_websocket_request(data)
