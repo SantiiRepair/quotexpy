@@ -238,21 +238,21 @@ class QuotexAPI(object):
                 os.remove(".session.json")
             return False
         self.ssid(global_value.SSID)
-        #count = 0
+        # count = 0
         start_time = time.time()
         previous_second = -1
         print("\n")
         while not self.profile.msg:
             time.sleep(0.3)
             elapsed_time = time.time() - start_time
-            current_second = int(elapsed_time)            
+            current_second = int(elapsed_time)
             if current_second != previous_second:
                 print(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="\r")
                 previous_second = current_second
-                
+
             if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
                 raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-        
+
         if not self.profile.msg:
             return False
         return True
