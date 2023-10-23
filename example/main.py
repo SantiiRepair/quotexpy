@@ -21,7 +21,7 @@ client = Quotex(
 client.debug_ws_enable = False
 
 
-async def login(attempts=2):
+async def login(attempts=8):
     attempt = 1
     print(colored("[INFO]: ", "blue"), "Connecting...")
     while attempt < attempts:
@@ -84,14 +84,14 @@ async def buy_and_check_win():
         amount = 100
         asset = "EURUSD_otc"  # "EURUSD_otc"
         direction = "call"
-        duration = 5  # in seconds
+        duration = 60  # in seconds
         status, buy_info = client.buy(amount, asset, direction, duration)
         if status:
             print("Awaiting result...")
             if client.check_win(buy_info["id"]):
-                print(f"\nWin!!! \nProfit: BRL {client.get_profit()}")
+                print(f"\nWin!!! \nProfit: {client.get_profit()}")
             else:
-                print(f"\nLoss!!! \nLoss: R$ {client.get_profit()}")
+                print(f"\nLoss!!! \nLoss: {client.get_profit()}")
         else:
             print(colored("[ERROR]: ", "red"), "Operation failed!!!")
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
