@@ -18,7 +18,7 @@ ______________________________________________________________________
 
 ## Installing
 
-📈 QuotexPy is tested on Ubuntu 18.04 and Windows 10 with **Python >= 3.10, <= 3.11.**
+📈 QuotexPy is tested on Ubuntu 18.04 and Windows 10 with **Python >= 3.10, <= 3.12.**
 ```bash
 pip install quotexpy
 ```
