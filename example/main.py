@@ -5,8 +5,8 @@ import asyncio
 from termcolor import colored
 from asyncio import get_event_loop
 
-from quotexpy.stable_api import Quotex
-from quotexpy.utils.util import asset_parse
+from quotexpy.new import Quotex
+from quotexpy.utils import asset_parse
 
 
 shutup.please()
