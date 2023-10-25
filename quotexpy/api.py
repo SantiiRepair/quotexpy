@@ -191,7 +191,6 @@ class QuotexAPI(object):
             ssid, cookies = await self.login(
                 self.email,
                 self.password,
-                self.browser,
             )
             logger.info("Login successful!!!")
         return ssid, cookies
