@@ -42,6 +42,8 @@ For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main
 If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
 
 <a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
+<br>
+<a href="https://www.buymeacoffee.com/ricardospinoza"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=ricardospinoza&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
 
 ### ⚠️ Atention 
 Because cloudfare blocks requests you should enable `browser=True` to avoid `HTTP 403` errors.

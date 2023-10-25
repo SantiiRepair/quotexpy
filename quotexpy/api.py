@@ -12,7 +12,7 @@ from quotexpy import global_value
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
-from quotexpy.ws.channels.buy import Buy
+from quotexpy.ws.channels.trade import Trade
 from quotexpy.exceptions import QuotexTimeout
 from quotexpy.ws.channels.candles import GetCandles
 from quotexpy.ws.channels.sell_option import SellOption
@@ -133,12 +133,12 @@ class QuotexAPI(object):
         return Ssid(self)
 
     @property
-    def buy(self):
+    def trade(self):
         """Property for get Quotex websocket ssid channel.
         :returns: The instance of :class:`Buy
             <Quotex.ws.channels.buy.Buy>`.
         """
-        return Buy(self)
+        return Trade(self)
 
     @property
     def sell_option(self):
