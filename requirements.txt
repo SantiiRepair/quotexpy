@@ -13,7 +13,6 @@ idna==3.4
 importlib-metadata==6.2.0
 playwright==1.39.0
 pycparser>=2.21
-pyee==9.0.4
 pyOpenSSL==23.1.1
 pyparsing==3.1.1
 requests==2.31.0
