@@ -23,7 +23,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.0.40"
+    __version__ = "1.0.40+1"
 
     def __init__(self, email, password, browser=False):
         self.size = [
