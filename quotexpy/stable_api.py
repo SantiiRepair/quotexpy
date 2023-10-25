@@ -201,11 +201,11 @@ class Quotex(object):
         start_time = time.time()
         previous_second = -1
         while not self.api.buy_id:
-            time.sleep(0.1)
+            time.sleep(0.3)
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"\nWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                print(f"Waiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="\r")
                 previous_second = current_second
             if elapsed_time >= 10:
                 break
