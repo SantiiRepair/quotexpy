@@ -9,20 +9,6 @@ server: clean
 install: get-deps
 	pip install -e .
 
-tx-pull:
-	cd docs/_locale/ \
-	&& tx pull -af
-
-tx-push:
-	cd docs/_locale/ \
-	&& sphinx-build -b gettext -E .. _pot \
-	&& sphinx-intl update-txconfig-resources -p _pot -d . --transifex-project-name bottle \
-	&& tx push -s
-
-tx:
-	$(MAKE) tx-push
-	$(MAKE) tx-pull
-
 clean:
 	rm -rf build/ dist/ MANIFEST .coverage .name htmlcov  2>/dev/null || true
 	find . -name '__pycache__' -exec rm -rf {} +
