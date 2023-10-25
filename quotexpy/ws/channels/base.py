@@ -1,10 +1,10 @@
 class Base(object):
-    """Class for base Quotex websocket channel"""
+    """Class for base Quotex websocket channel."""
 
     def __init__(self, api):
         """
         :param api: The instance of :class:`QuotexAPI
-            <quotexapi.api.QuotexAPI>`.
+            <quotexpy.api.QuotexAPI>`.
         """
         self.api = api
 

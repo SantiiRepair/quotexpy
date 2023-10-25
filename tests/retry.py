@@ -1,6 +1,5 @@
 import time
 from functools import wraps
-from quotexpy.logger import logger as log
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -24,6 +23,7 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """
 
     def deco_retry(f):
+
         @wraps(f)
         def f_retry(*args, **kwargs):
             mtries, mdelay = tries, delay
@@ -33,9 +33,9 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
                 except ExceptionToCheck as e:
                     msg = "%s, Retrying in %d seconds..." % (str(e), mdelay)
                     if logger:
-                        log.warning(msg)
+                        logger.warning(msg)
                     else:
-                        log.info(msg)
+                        print(msg)
                     time.sleep(mdelay)
                     mtries -= 1
                     mdelay *= backoff

@@ -1,8 +1,10 @@
-"""Module for Quotex websocket"""
+"""Module for Quotex websocket."""
 import os
 import json
 import random
 import logging
+import time
+
 import websocket
 from quotexpy import global_value
 from quotexpy.http.user_agents import agents
@@ -11,18 +13,17 @@ user_agent_list = agents.split("\n")
 
 
 class WebsocketClient(object):
-    """Class for work with Quotex API websocket"""
+    """Class for work with Quotex API websocket."""
 
     def __init__(self, api):
         """
         :param api: The instance of :class:`QuotexAPI
-            <quotexapi.api.QuotexAPI>`.
+            <quotexpy.api.QuotexAPI>`.
         :trace_ws: Enables and disable `enableTrace` in WebSocket Client.
         """
         self.api = api
         self.headers = {
-            "User-Agent": self.api.user_agent
-            if not None
+            "User-Agent": self.api.user_agent if not None
             else user_agent_list[random.randint(0, len(user_agent_list) - 1)],
         }
         websocket.enableTrace(self.api.trace_ws)
@@ -32,14 +33,18 @@ class WebsocketClient(object):
             on_error=self.on_error,
             on_close=self.on_close,
             on_open=self.on_open,
+            on_ping=self.on_ping,
             on_pong=self.on_pong,
             header=self.headers,
-            cookie=self.api.cookies,
+            cookie=self.api.cookies
         )
 
     def on_message(self, wss, message):
-        """Method to process websocket messages"""
+        """Method to process websocket messages."""
         global_value.ssl_Mutual_exclusion = True
+        current_time = time.localtime()
+        if current_time.tm_sec == 0:
+            self.wss.send('42["tick"]')
         try:
             logger = logging.getLogger(__name__)
             message = message
@@ -56,24 +61,28 @@ class WebsocketClient(object):
                 logger.debug(message)
                 message = json.loads(str(message))
                 self.api.profile.msg = message
-                if "call" in str(message) or "put" in str(message):
+                if "call" in str(message) or 'put' in str(message):
                     self.api.instruments = message
+                    # print(message)
                 elif "signals" in str(message):
+                    #print(message)
                     for i in message["signals"]:
                         self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
                         self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
+
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
-                    logger.info(message)
+                    # print(message)
                     self.api.candles.candles_data = message
                 elif message.get("id"):
-                    self.api.buy_successful[message["asset"]] = message
-                    self.api.buy_id[message["asset"]] = message["id"]
+                    self.api.buy_successful = message
+                    self.api.buy_id = message["id"]
                     self.api.timesync.server_timestamp = message["closeTimestamp"]
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
+                    print(message["deals"])
                     for get_m in message["deals"]:
                         self.api.profit_in_operation = get_m["profit"]
                         get_m["win"] = True if get_m["profit"] > 0 else False
@@ -103,30 +112,30 @@ class WebsocketClient(object):
                 self.api.realtime_price[message[0][0]].append(ans)
         except:
             pass
-        wss.send('42["tick"]')
         global_value.ssl_Mutual_exclusion = False
+        self.wss.send('42["tick"]')
 
-    @staticmethod
-    def on_error(wss, error):
-        """Method to process websocket errors"""
+    def on_error(self, wss, error):
+        """Method to process websocket errors."""
         logger = logging.getLogger(__name__)
         logger.error(error)
         global_value.websocket_error_reason = str(error)
         global_value.check_websocket_if_error = True
 
     def on_open(self, wss):
-        """Method to process websocket open"""
+        """Method to process websocket open."""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket client connected")
+        logger.debug("Websocket client connected.")
         global_value.check_websocket_if_connect = 1
 
-    @staticmethod
-    def on_close(wss, close_status_code, close_msg):
-        """Method to process websocket close"""
+    def on_close(self, wss, close_status_code, close_msg):
+        """Method to process websocket close."""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket connection closed")
+        logger.debug("Websocket connection closed.")
         global_value.check_websocket_if_connect = 0
 
-    @staticmethod
-    def on_pong(wss, a):
-        """Method to process websocket close."""
+    def on_ping(self, wss, ping_msg):
+        pass
+
+    def on_pong(self, wss, pong_msg):
+        self.wss.send("2")

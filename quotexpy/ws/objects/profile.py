@@ -2,7 +2,7 @@ from quotexpy.ws.objects.base import Base
 
 
 class Profile(Base):
-    """Class for Quotex Profile websocket object"""
+    """Class for Quotex Profile websocket object."""
 
     def __init__(self):
         super(Profile, self).__init__()
@@ -28,7 +28,7 @@ class Profile(Base):
 
     @nick_name.setter
     def nick_name(self, nick_name):
-        """Method to set nick_name value"""
+        """Method to set nick_name value."""
         self.__nick_name = nick_name
 
     @property
@@ -41,7 +41,7 @@ class Profile(Base):
 
     @live_balance.setter
     def live_balance(self, live_balance):
-        """Method to set live_balance value"""
+        """Method to set live_balance value."""
         self.__live_balance = live_balance
 
     @property
@@ -54,7 +54,7 @@ class Profile(Base):
 
     @profile_id.setter
     def profile_id(self, profile_id):
-        """Method to set profile value"""
+        """Method to set profile value."""
         self.__profile_id = profile_id
 
     @property
@@ -67,7 +67,7 @@ class Profile(Base):
 
     @demo_balance.setter
     def demo_balance(self, demo_balance):
-        """Method to set demo_balance value"""
+        """Method to set demo_balance value."""
         self.__demo_balance = demo_balance
 
     @property
@@ -80,7 +80,7 @@ class Profile(Base):
 
     @avatar.setter
     def avatar(self, avatar):
-        """Method to set avatar value"""
+        """Method to set avatar value."""
         self.__avatar = avatar
 
     @property
