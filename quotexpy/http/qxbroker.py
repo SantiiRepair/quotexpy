@@ -48,7 +48,7 @@ class Browser(object):
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
-        output_file = Path("./session.json")
+        output_file = Path("./.session.json")
         output_file.parent.mkdir(exist_ok=True, parents=True)
         cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
         cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])

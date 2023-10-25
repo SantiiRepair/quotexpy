@@ -246,7 +246,7 @@ class QuotexAPI(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                logger.info(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds")
                 previous_second = current_second
 
             if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
