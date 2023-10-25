@@ -1,9 +1,13 @@
 import os
 import time
 import shutup
+import asyncio
 from termcolor import colored
-from quotexpy.new import Quotex
 from asyncio import get_event_loop
+
+from quotexpy.stable_api import Quotex
+from quotexpy.utils.util import asset_parse
+
 
 shutup.please()
 
@@ -13,19 +17,16 @@ def __x__(y):
     return z
 
 
-client = Quotex(
-    email="...",
-    password="...",
-    browser=True,
-)
+client = Quotex(email="...", password="...")
 client.debug_ws_enable = False
 
 
-async def login(attempts=8):
+async def login(attempts=5):
+    check, reason = await client.connect()
+    print(colored("[INFO]: ", "blue"), "Start your robot")
     attempt = 1
     print(colored("[INFO]: ", "blue"), "Connecting...")
     while attempt < attempts:
-        check, reason = await client.connect()
         if not client.check_connect():
             print(colored("[INFO]: ", "blue"), f"Trying to reconnect, try {attempt} for {attempts}")
             check, reason = await client.connect()
@@ -40,14 +41,15 @@ async def login(attempts=8):
             attempt += 1
         else:
             break
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
     return check, reason
 
 
 async def get_balance():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")
+        client.change_account("PRACTICE")  # "REAL"
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
@@ -55,50 +57,87 @@ async def get_balance():
 
 async def balance_refill():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
-        result = client.edit_practice_balance(50000)
+        result = await client.edit_practice_balance(1000)
         print(result)
     client.close()
 
 
 async def trade():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")
-        amount = 30
+        client.change_account("PRACTICE")  # "REAL"
+        amount = 5
         asset = "EURUSD_otc"  # "EURUSD"
         action = "call"  # call (green), put (red)
         duration = 60  # in seconds
-        status, buy_info = client.trade(action, amount, asset, duration)
-        print("Balance: ", client.get_balance())
-        print("Exiting...")
+        asset_query = asset_parse(asset)
+        asset_open = client.check_asset_open(asset_query)
+        if asset_open[2]:
+            print(colored("[INFO]: ", "blue"), "Asset is open.")
+            status, buy_info = await client.trade(action, amount, asset, duration)
+            print(status, buy_info)
+        else:
+            print(colored("[WARN]: ", "blue"), "Asset is closed.")
+        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+        print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
 
 async def trade_and_check():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")
-        print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
-        amount = 10
-        asset = "EURUSD_otc"  # "EURUSD"
+        client.change_account("PRACTICE")  # "REAL"
+        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+        amount = 1
+        asset = "AUDCAD"  # "AUDCAD_otc"
+        # action = random.choice(["call", "put"]) # call (green), put (red)
         action = "call"  # call (green), put (red)
         duration = 60  # in seconds
-        status, buy_info = client.trade(action, amount, asset, duration)
-        if status:
-            if client.check_win(buy_info["id"]):
-                print(f"\nWin!!! \nProfit: {client.get_profit()}")
+        asset_query = asset_parse(asset)
+        asset_open = client.check_asset_open(asset_query)
+        if asset_open[2]:
+            print(colored("[INFO]: "), "OK: Asset is open")
+            status, buy_info = await client.trade(action, amount, asset, duration)
+            print(status, buy_info)
+            if status:
+                print(colored("[INFO]: ", "blue"), "Waiting for result...")
+                if await client.check_win(buy_info["id"]):
+                    print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
+                else:
+                    print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
             else:
-                print(f"\nLoss!!! \nLoss: {client.get_profit()}")
+                print(colored("[ERROR]: ", "red"), "Operation failed!!!")
         else:
-            print(colored("[ERROR]: ", "red"), "Operation failed!!!")
-        print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
+            print(colored("[WARN]: ", "red"), "Asset is closed.")
+        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
 
-async def asset_open():
+async def sell_option():
     check_connect, message = await login()
+    print(check_connect, message)
+    if check_connect:
+        client.change_account("PRACTICE")  # "REAL"
+        amount = 30
+        asset = "EURUSD_otc"  # "EURUSD_otc"
+        direction = "put"
+        duration = 1000  # in seconds
+        status, buy_info = await client.trade(amount, asset, direction, duration)
+        print(status, buy_info)
+        await client.sell_option(buy_info["id"])
+        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+        print(colored("[INFO]: ", "blue"), "Exiting...")
+    client.close()
+
+
+async def assets_open():
+    check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
         print("Check Asset Open")
         for i in client.get_all_asset_name():
@@ -108,11 +147,12 @@ async def asset_open():
 
 async def get_candle():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
         asset = "AUDCAD_otc"
         offset = 180  # in seconds
         period = 3600  # in seconds / opcional
-        candles = client.get_candles(asset, offset, period)
+        candles = await client.get_candles(asset, offset, period)
         for candle in candles["data"]:
             print(candle)
     client.close()
@@ -120,6 +160,7 @@ async def get_candle():
 
 async def get_payment():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
         all_data = client.get_payment()
         for asset_name in all_data:
@@ -130,9 +171,10 @@ async def get_payment():
 
 async def get_candle_v2():
     check_connect, message = await login()
+    print(check_connect, message)
     if check_connect:
-        a = client.get_candle_v2("USDJPY_otc", 10)
-        print(a)
+        candles = await client.get_candle_v2("USDJPY", 180)
+        print(candles)
     client.close()
 
 
@@ -157,12 +199,18 @@ async def get_signal_data():
     client.close()
 
 
-# __x__(get_signal_data())
-# __x__(get_balance())
-# __x__(get_payment())
-# __x__(get_candle())
-# __x__(get_candle_v2())
-# __x__(get_realtime_candle())
-# __x__(asset_open())
-__x__(trade_and_check())
-# __x__(balance_refill())
+async def main():
+    # await get_balance()
+    # await get_signal_data()
+    # await get_payment()
+    # await get_candle()
+    # await get_candle_v2()
+    # await get_realtime_candle()
+    # await assets_open()
+    # await buy()
+    await trade_and_check()
+    # await balance_refill()
+
+
+if __name__ == "__main__":
+    __x__(main())
