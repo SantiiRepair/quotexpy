@@ -1,3 +1,4 @@
+import sys
 import time
 import math
 import asyncio
@@ -13,8 +14,7 @@ from collections import defaultdict
 def nested_dict(n, typeof):
     if n == 1:
         return defaultdict(typeof)
-    else:
-        return defaultdict(lambda: nested_dict(n - 1, typeof))
+    return defaultdict(lambda: nested_dict(n - 1, typeof))
 
 
 def truncate(f, n):
@@ -173,7 +173,7 @@ class Quotex(object):
             self.api.account_type = 1
         else:
             logger.error(f"{balance_mode} does not exist")
-            exit(1)
+            sys.exit(1)
         self.api.send_ssid()
 
     async def edit_practice_balance(self, amount=None):
@@ -271,13 +271,13 @@ class Quotex(object):
         return self.api.profit_in_operation or 0
 
     async def start_candles_one_stream(self, asset, size):
-        if not (str(asset + "," + str(size)) in self.subscribe_candle):
+        if f"{asset},{size}" not in self.subscribe_candle:
             self.subscribe_candle.append((asset + "," + str(size)))
         start = time.time()
         self.api.candle_generated_check[str(asset)][int(size)] = {}
         while True:
             if time.time() - start > 20:
-                logging.error("**error** start_candles_one_stream late for 20 sec")
+                logger.error("**error** start_candles_one_stream late for 20 sec")
                 return False
             try:
                 if self.api.candle_generated_check[str(asset)][int(size)]:
@@ -293,7 +293,7 @@ class Quotex(object):
 
     async def start_candles_all_size_stream(self, asset):
         self.api.candle_generated_all_size_check[str(asset)] = {}
-        if not (str(asset) in self.subscribe_candle_all_size):
+        if str(asset) not in self.subscribe_candle_all_size:
             self.subscribe_candle_all_size.append(str(asset))
         start = time.time()
         while True:
