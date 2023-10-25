@@ -44,3 +44,4 @@ yarn-debug.log*
 yarn-error.log*
 session.json
 .gitignore
+.env
