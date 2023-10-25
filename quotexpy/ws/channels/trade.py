@@ -8,11 +8,11 @@ class Trade(Base):
 
     name = "trade"
 
-    def __call__(self, price, asset, direction, duration, request_id):
+    def __call__(self, action: str, amount, asset: str, duration: int, request_id: int):
         """exp, idx = get_expiration_time(
             int(self.api.timesync.server_timestamp), duration)"""
         option_type = 100
-        if "_otc" not in asset:
+        if "_otc" not in asset.strip().lower():
             option_type = 1
             duration = get_expiration_time(
                 int(self.api.timesync.server_timestamp), duration)
@@ -47,9 +47,9 @@ class Trade(Base):
 
         payload = {
             "asset": asset,
-            "amount": price,
+            "amount": amount,
             "time": duration,
-            "action": direction,
+            "action": action,
             "isDemo": self.api.account_type,
             "tournamentId": 0,
             "requestId": request_id,
