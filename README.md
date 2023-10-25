@@ -44,4 +44,4 @@ If you feel like showing your love and/or appreciation for this project, then ho
 <a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
 
 ### Acknowledgements
-Thanks to @ricardospinoza for solving the `trade` error in the code 🚀
+Thanks to [@ricardospinoza](https://github.com/ricardospinoza) for solving the `trade` error in the code 🚀
