@@ -1,27 +1,27 @@
 """Module for Quotex websocket"""
 import os
+import ssl
 import time
 import json
-import ssl
+import certifi
+import urllib3
+import logging
 import threading
 import collections
-import urllib3
-import certifi
 from collections import defaultdict as default_dict
 
 from quotexpy import global_value
-from quotexpy.logger import logger
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
 from quotexpy.ws.channels.trade import Trade
 from quotexpy.exceptions import QuotexTimeout
-from quotexpy.ws.channels.candles import GetCandles
-from quotexpy.ws.objects.timesync import TimeSync
+from quotexpy.ws.client import WebsocketClient
 from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
+from quotexpy.ws.objects.timesync import TimeSync
+from quotexpy.ws.channels.candles import GetCandles
 from quotexpy.ws.objects.listinfodata import ListInfoData
-from quotexpy.ws.client import WebsocketClient
 
 
 def nested_dict(n, typeof):
@@ -84,6 +84,8 @@ class QuotexAPI(object):
         self.browser = browser
         self.realtime_price = {}
         self.profile = Profile()
+
+        self.logger = logging.getLogger(__name__)
 
     @property
     def websocket(self):
@@ -177,7 +179,7 @@ class QuotexAPI(object):
         # self.websocket.send('42["chart_notification/get"]')
         # self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
-        logger.debug(data)
+        self.logger.debug(data)
         global_value.ssl_Mutual_exclusion_write = False
 
     def edit_training_balance(self, amount):
@@ -187,12 +189,12 @@ class QuotexAPI(object):
     async def get_ssid(self):
         ssid, cookies = self.check_session()
         if not ssid:
-            logger.info("Authenticating user...")
+            self.logger.info("Authenticating user...")
             ssid, cookies = await self.login(
                 self.email,
                 self.password,
             )
-            logger.info("Login successful!!!")
+            self.logger.info("Login successful!!!")
         return ssid, cookies
 
     def start_websocket(self):
@@ -221,35 +223,31 @@ class QuotexAPI(object):
                 if global_value.check_websocket_if_error:
                     return False, global_value.websocket_error_reason
                 if global_value.check_websocket_if_connect == 0:
-                    logger.info("Websocket connection closed.")
-                    logger.debug("Websocket connection closed.")
+                    self.logger.info("Websocket connection closed.")
+                    self.logger.debug("Websocket connection closed.")
                     return False, "Websocket connection closed."
                 if global_value.check_websocket_if_connect == 1:
-                    logger.debug("Websocket successfully connected!!!")
+                    self.logger.debug("Websocket successfully connected!!!")
                     return True, "Websocket successfully connected!!!"
             except:
                 pass
 
-    def send_ssid(self):
+    def send_ssid(self, max_attemps=10):
+        attemps = 0
         self.profile.msg = None
-        if not global_value.SSID:
-            if os.path.exists(os.path.join(".session.json")):
-                os.remove(".session.json")
-            return False
-        self.ssid(global_value.SSID)
-        # count = 0
-        start_time = time.time()
-        previous_second = -1
-        print("\n")
+
+        def rssid():
+            if not global_value.SSID:
+                if os.path.exists(os.path.join(".session.json")):
+                    os.remove(".session.json")
+                return False
+            self.ssid(global_value.SSID)
+
         while not self.profile.msg:
             time.sleep(0.3)
-            elapsed_time = time.time() - start_time
-            current_second = int(elapsed_time)
-            if current_second != previous_second:
-                logger.info(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds")
-                previous_second = current_second
-
-            if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
+            rssid()
+            attemps += 1
+            if attemps == max_attemps:
                 raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
 
         if not self.profile.msg:

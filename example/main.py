@@ -186,6 +186,7 @@ async def get_signal_data():
             time.sleep(1)
     client.close()
 
+
 if __name__ == "__main__":
     # __x__(get_balance())
     # __x__(get_signal_data())

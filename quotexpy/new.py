@@ -2,11 +2,12 @@ import sys
 import time
 import math
 import asyncio
+import logging
+
 from datetime import datetime
 from quotexpy import expiration
 from quotexpy import global_value
 from quotexpy.api import QuotexAPI
-from quotexpy.logger import logger
 from quotexpy.constants import codes_asset
 from collections import defaultdict
 
@@ -59,6 +60,8 @@ class Quotex(object):
         self.debug_ws_enable = False
         self.api = None
 
+        self.logger = logging.getLogger(__name__)
+
     @property
     def websocket(self):
         """Property to get websocket.
@@ -101,7 +104,7 @@ class Quotex(object):
                 while self.api.instruments is None and time.time() - start < 10:
                     await asyncio.sleep(0.1)
             except:
-                logger.error("**error** api.get_instruments need reconnect")
+                self.logger.error("**error** api.get_instruments need reconnect")
                 await self.connect()
         return self.api.instruments
 
@@ -131,7 +134,7 @@ class Quotex(object):
                 if self.api.candles.candles_data is not None:
                     break
             except:
-                logger.error("**error** get_candles need reconnect")
+                self.logger.error("**error** get_candles need reconnect")
                 await self.connect()
         return self.api.candles.candles_data
 
@@ -165,14 +168,14 @@ class Quotex(object):
                     )
         return check, reason
 
-    def change_account(self, balance_mode="PRACTICE"):
+    def change_account(self, mode="PRACTICE"):
         """Change active account `real` or `practice`"""
-        if balance_mode.upper() == "REAL":
+        if mode.upper() == "REAL":
             self.api.account_type = 0
-        elif balance_mode.upper() == "PRACTICE":
+        elif mode.upper() == "PRACTICE":
             self.api.account_type = 1
         else:
-            logger.error(f"{balance_mode} does not exist")
+            self.logger.error(f"{mode} does not exist")
             sys.exit(1)
         self.api.send_ssid()
 
@@ -207,7 +210,7 @@ class Quotex(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                logger.info(f"\nWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds")
+                self.logger.info(f"\nWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds")
                 previous_second = current_second
             if elapsed_time >= 10:
                 break
@@ -277,7 +280,7 @@ class Quotex(object):
         self.api.candle_generated_check[str(asset)][int(size)] = {}
         while True:
             if time.time() - start > 20:
-                logger.error("**error** start_candles_one_stream late for 20 sec")
+                self.logger.error("**error** start_candles_one_stream late for 20 sec")
                 return False
             try:
                 if self.api.candle_generated_check[str(asset)][int(size)]:
@@ -287,7 +290,7 @@ class Quotex(object):
             try:
                 self.api.subscribe(codes_asset[asset], size)
             except:
-                logger.error("**error** start_candles_stream reconnect")
+                self.logger.error("**error** start_candles_stream reconnect")
                 await self.connect()
             await asyncio.sleep(1)
 
@@ -298,7 +301,7 @@ class Quotex(object):
         start = time.time()
         while True:
             if time.time() - start > 20:
-                logger.error(f"**error** fail {asset} start_candles_all_size_stream late for 10 sec")
+                self.logger.error(f"**error** fail {asset} start_candles_all_size_stream late for 10 sec")
                 return False
             try:
                 if self.api.candle_generated_all_size_check[str(asset)]:
@@ -308,7 +311,7 @@ class Quotex(object):
             try:
                 self.api.subscribe_all_size(codes_asset[asset])
             except:
-                logger.error("**error** start_candles_all_size_stream reconnect")
+                self.logger.error("**error** start_candles_all_size_stream reconnect")
                 await self.connect()
             await asyncio.sleep(1)
 

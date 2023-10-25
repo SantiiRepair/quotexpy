@@ -37,11 +37,12 @@ class WebsocketClient(object):
             cookie=self.api.cookies,
         )
 
+        self.logger = logging.getLogger(__name__)
+
     def on_message(self, wss, message):
         """Method to process websocket messages"""
         global_value.ssl_Mutual_exclusion = True
         try:
-            logger = logging.getLogger(__name__)
             message = message
             if "authorization/reject" in str(message):
                 if os.path.isfile(".session.json"):
@@ -53,7 +54,7 @@ class WebsocketClient(object):
             try:
                 message = message[1:]
                 message = message.decode()
-                logger.debug(message)
+                self.logger.debug(message)
                 message = json.loads(str(message))
                 self.api.profile.msg = message
                 if "call" in str(message) or "put" in str(message):
@@ -65,7 +66,7 @@ class WebsocketClient(object):
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
-                    logger.info(message)
+                    self.logger.info(message)
                     self.api.candles.candles_data = message
                 elif message.get("id"):
                     self.api.trade_successful[message["asset"]] = message
@@ -87,7 +88,7 @@ class WebsocketClient(object):
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
-                    logger.error(message)
+                    self.logger.error(message)
                     pass
             except:
                 pass
@@ -116,8 +117,7 @@ class WebsocketClient(object):
 
     def on_open(self, wss):
         """Method to process websocket open"""
-        logger = logging.getLogger(__name__)
-        logger.debug("Websocket client connected")
+        self.logger.debug("Websocket client connected")
         global_value.check_websocket_if_connect = 1
 
     @staticmethod
