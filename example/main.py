@@ -22,11 +22,11 @@ client = Quotex(
 client.debug_ws_enable = False
 
 async def login(attempts=5):
-    check, reason = await client.connect()    
+    check, reason = await client.connect()
     print(colored("[INFO]: ", "blue"), "Start your robot")
     attempt = 1
     print(colored("[INFO]: ", "blue"), "Connecting...")
-    while attempt < attempts:
+    while attempt <= attempts:
         if not client.check_connect():
             print(colored("[INFO]: ", "blue"), f"Trying to reconnect, try {attempt} for {attempts}")
             check, reason = await client.connect()
@@ -35,8 +35,8 @@ async def login(attempts=5):
                 break
             print(colored("[INFO]: ", "blue"), "Error reconnecting")
             attempt += 1
-            if os.path.isfile(".session.json"):
-                os.remove(".session.json")
+            if os.path.isfile("session.json"):
+                os.remove("session.json")
         elif not check:
             attempt += 1
         else:

@@ -10,7 +10,7 @@ from playwright.async_api import Playwright, async_playwright, expect
 
 class Browser(object):
 
-    username = None
+    email = None
     password = None
 
     def __init__(self, api):
@@ -22,7 +22,7 @@ class Browser(object):
         page = await context.new_page()
         await page.goto("https://qxbroker.com/pt/sign-in")
         await page.get_by_role("textbox", name="E-mail").click()
-        await page.get_by_role("textbox", name="E-mail").fill(self.username)
+        await page.get_by_role("textbox", name="E-mail").fill(self.email)
         await page.get_by_role("textbox", name="Senha").click()
         await page.get_by_role("textbox", name="Senha").fill(self.password)
         await page.get_by_role("button", name="Entrar").click()

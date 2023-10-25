@@ -59,16 +59,16 @@ class QuotexAPI(object):
     timesync = TimeSync()
     candles = Candles()
 
-    def __init__(self, host, username, password, proxies=None):
+    def __init__(self, host, email, password, proxies=None):
         """
         :param str host: The hostname or ip address of a Quotex server.
-        :param str username: The username of a Quotex server.
+        :param str email: The email of a Quotex server.
         :param str password: The password of a Quotex server.
         :param proxies: The proxies of a Quotex server.
         """
         self._temp_status = ""
         self.settings_list = {}
-        self.username = username
+        self.email = email
         self.password = password
         self.signal_data = nested_dict(2, dict)
         self.get_candle_data = {}
@@ -155,8 +155,8 @@ class QuotexAPI(object):
 
     def check_session(self):
         data = {}
-        if os.path.isfile(".session.json"):
-            with open(".session.json") as file:
+        if os.path.isfile("session.json"):
+            with open("session.json") as file:
                 data = json.loads(file.read())
             self.user_agent = data.get("user_agent")
         return data.get("ssid"), data.get("cookies")
@@ -189,7 +189,7 @@ class QuotexAPI(object):
         if not ssid:
             logger.info("Authenticating user...")
             ssid, cookies = await self.login(
-                self.username,
+                self.email,
                 self.password,
             )
             logger.info("Login successful!!!")
@@ -236,8 +236,8 @@ class QuotexAPI(object):
     def send_ssid(self):
         self.profile.msg = None
         if not global_value.SSID:
-            if os.path.exists(os.path.join(".session.json")):
-                os.remove(".session.json")
+            if os.path.exists(os.path.join("session.json")):
+                os.remove("session.json")
             return False
         self.ssid(global_value.SSID)
         

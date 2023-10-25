@@ -49,8 +49,8 @@ class WebsocketClient(object):
             logger = logging.getLogger(__name__)
             message = message
             if "authorization/reject" in str(message):
-                if os.path.isfile(".session.json"):
-                    os.remove(".session.json")
+                if os.path.isfile("session.json"):
+                    os.remove("session.json")
                 global_value.SSID = None
                 global_value.check_rejected_connection = 1
             elif "s_authorization" in str(message):
