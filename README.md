@@ -43,7 +43,12 @@ If you feel like showing your love and/or appreciation for this project, then ho
 
 <a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
 <br>
-<a href="https://www.buymeacoffee.com/ricardospinoza"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=ricardospinoza&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
 
 ### ⚠️ Atention 
-Because cloudfare blocks requests you should enable `browser=True` to avoid `HTTP 403` errors.
+- Because cloudfare blocks requests you should enable `browser=True` to avoid `HTTP 403` errors.
+
+- If the Quotex broker understands that the operation is being carried out by a trading bot, it will apply the rules of use and block the account at the broker. We are not responsible for the use of this bot, use at your own risk. According to the broker’s message:
+"... The use of automated bots for trading is prohibited according to account rules.
+If you use them, your account will be blocked without the possibility of withdrawing funds and re-registration.
+Respectfully,
+Quotex"
