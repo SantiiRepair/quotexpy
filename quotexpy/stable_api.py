@@ -126,7 +126,7 @@ class Quotex(object):
         self.api.candles.candles_data = None
         while True:
             try:
-                self.api.getcandles(codes_asset[asset], offset, period, index)
+                self.api.get_candles(codes_asset[asset], offset, period, index)
                 while self.check_connect and self.api.candles.candles_data is None:
                     await asyncio.sleep(0.1)
                 if self.api.candles.candles_data is not None:
@@ -238,7 +238,7 @@ class Quotex(object):
         remaing_time = int((expiration_stamp - now_stamp).total_seconds())
         while remaing_time >= 0:
             remaing_time -= 1
-            print(f"\rRestando {remaing_time if remaing_time > 0 else 0} segundos ...", end="")
+            print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
             await asyncio.sleep(1)
 
     async def check_win(self, id_number):
