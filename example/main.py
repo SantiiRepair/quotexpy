@@ -4,7 +4,7 @@ import shutup
 import random
 from termcolor import colored
 import asyncio
-#import schedule
+import schedule
 from quotexpy.stable_api import Quotex
 from quotexpy.utils.util import asset_parse
 from asyncio import get_event_loop
@@ -16,8 +16,8 @@ def __x__(y):
     return z
 
 client = Quotex(
-     email="...@gmail.com",
-    password="..."
+    email=os.environ['EMAIL'],
+    password=os.environ['PASSWORD']
 )
 client.debug_ws_enable = False
 
@@ -71,51 +71,55 @@ async def trade():
         client.change_account("PRACTICE")#"REAL"
         amount = 5
         asset = "EURUSD_otc"  # "EURUSD"
-        action = "call"  # call (green), put (red)
+        #action = "call"  # call (green), put (red)
+        action = random.choice(["call", "put"]) # call (green), put (red)
         duration = 60  # in seconds
         asset_query = asset_parse(asset)
         asset_open = client.check_asset_open(asset_query)
-        if asset_open[2]:            
+        if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
-            status, buy_info = await client.trade(action, amount, asset, duration)
-            print(status, buy_info)
+            try:
+                status, buy_info = await client.trade(action, amount, asset, duration)
+                print(status, buy_info)
+            except:
+                pass
         else:
             print(colored("[WARN]: ", "blue"), "Asset is closed.")
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
-
 async def trade_and_check():
-    check_connect, message = await login()
-    print(check_connect, message)
-    if check_connect:
-        client.change_account("PRACTICE")#"REAL"
-        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
-        amount = 1
-        asset = "AUDCAD"  # "AUDCAD_otc"
-        #action = random.choice(["call", "put"]) # call (green), put (red)
-        action = "call" # call (green), put (red)
-        duration = 60  # in seconds
-        asset_query = asset_parse(asset)
-        asset_open = client.check_asset_open(asset_query)
-        if asset_open[2]:
-            print(colored("[INFO]: "), "OK: Asset is open")
-            status, buy_info = await client.trade(action, amount, asset, duration)
-            print(status, buy_info)
-            if status:
+   check_connect, message = await login()
+   print(check_connect, message)
+   if check_connect:
+       client.change_account("PRACTICE")#"REAL"
+       print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+       amount = 1
+       action = random.choice(["call", "put"]) # call (green), put (red)
+        #horario negociacao 09:00 as 15:00 fora isto é otc
+        #nao opera sabado e domingos
+       asset = "AUDCAD_otc"  # "EURUSD_otc"       
+       duration = 60  # in seconds
+       asset_query = asset_parse(asset)
+       asset_open = client.check_asset_open(asset_query)
+       if asset_open[2]:
+           print(colored("[INFO]: "), "OK: Asset is open")
+           status, buy_info = await client.trade(action, amount, asset, duration)
+           print(status, buy_info, "\n")
+           if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
                 if await client.check_win(buy_info["id"]):
                     print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")            
                 else:
                     print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")            
-            else:
+           else:
                 print(colored("[ERROR]: ", "red"), "Operation failed!!!")
-        else:
+       else:
             print(colored("[WARN]: ", "red"), "Asset is closed.")
-        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
-        print(colored("[INFO]: ", "blue"), "Exiting...")
-    client.close()
+       print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+       print(colored("[INFO]: ", "blue"), "Exiting...")
+   client.close()
 
 async def sell_option():
     check_connect, message = await login()
@@ -220,15 +224,15 @@ async def main():
     await trade_and_check()
     # await balance_refill()
 
-if __name__ == "__main__":
-#def run_main():
+#if __name__ == "__main__":
+def run_main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
     #loop.run_forever()
 
 #Agendamentos:
-#schedule.every(10).seconds.do(run_main)
+schedule.every(10).seconds.do(run_main)
 
-#while True:
-#    schedule.run_pending()
-#    time.sleep(1)
+while True:
+    schedule.run_pending()
+    time.sleep(1)

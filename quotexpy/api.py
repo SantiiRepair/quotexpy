@@ -13,7 +13,6 @@ from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
 from quotexpy.ws.channels.trade import Trade
-from quotexpy.exceptions import QuotexTimeout
 from quotexpy.ws.channels.candles import GetCandles
 from quotexpy.ws.channels.sell_option import SellOption
 from quotexpy.ws.objects.timesync import TimeSync
@@ -166,6 +165,10 @@ class QuotexAPI(object):
         :param str data: The websocket request data.
         :param bool no_force_send: Default None.
         """
+        if global_value.check_websocket_if_connect == 0:
+            logger.info("Websocket connection closed.")
+            return
+
         while (global_value.ssl_Mutual_exclusion or global_value.ssl_Mutual_exclusion_write) and no_force_send:
             pass
         global_value.ssl_Mutual_exclusion_write = True
@@ -253,7 +256,9 @@ class QuotexAPI(object):
                 previous_second = current_second
                 
             if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
-                raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+                #raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+                logger.error(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+                return False
         
         if not self.profile.msg:
             return False
