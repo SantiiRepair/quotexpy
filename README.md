@@ -18,7 +18,7 @@ ______________________________________________________________________
 
 ## Installing
 
-📈 QuotexPy is tested on Ubuntu 18.04 and Windows 10 with **Python >= 3.10, <= 3.11.**
+📈 QuotexPy is tested on Ubuntu 18.04 and Windows 10 with **Python >= 3.10, <= 3.12.**
 ```bash
 pip install quotexpy
 ```
@@ -38,17 +38,20 @@ from quotexpy.stable_api import Quotex
 ### Examples
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
 
-### Donations
-If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
-
-<a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
-<br>
-
-### ⚠️ Atention 
-- Because cloudfare blocks requests you should enable `browser=True` to avoid `HTTP 403` errors.
+## Atettion
+- Because cloudfare blocks requests you should enable browser=True to avoid HTTP 403 errors.
 
 - If the Quotex broker understands that the operation is being carried out by a trading bot, it will apply the rules of use and block the account at the broker. We are not responsible for the use of this bot, use at your own risk. According to the broker’s message:
 "... The use of automated bots for trading is prohibited according to account rules.
 If you use them, your account will be blocked without the possibility of withdrawing funds and re-registration.
 Respectfully,
 Quotex"
+
+### Donations
+If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
+
+<a href="https://www.buymeacoffee.com/SantiiRepair"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a whore&emoji=👯‍♀️&slug=SantiiRepair&button_colour=980028&font_colour=ffffff&font_family=Poppins&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
+<br>
+
+### Acknowledgements
+Thanks to [@ricardospinoza](https://github.com/ricardospinoza) for solving the `trade` error in the code 🚀

@@ -6,8 +6,8 @@ from termcolor import colored
 import asyncio
 import schedule
 from quotexpy.stable_api import Quotex
-from quotexpy.utils.util import asset_parse
 from asyncio import get_event_loop
+from quotexpy.utils import asset_parse
 
 shutup.please()
 
@@ -49,7 +49,7 @@ async def get_balance():
     check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")#"REAL"
+        client.change_account("PRACTICE")  # "REAL"
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
@@ -99,7 +99,7 @@ async def trade_and_check():
         action = random.choice(["call", "put"]) # call (green), put (red)
         #horario negociacao 09:00 as 15:00 fora isto é otc
         #nao opera sabado e domingos
-        asset = "AUDCAD"  # "EURUSD_otc"
+        asset = "AUDCAD_otc"  # "EURUSD_otc"
         duration = 60  # in seconds
         asset_query = asset_parse(asset)
         asset_open = client.check_asset_open(asset_query)
@@ -109,7 +109,7 @@ async def trade_and_check():
             print(status, buy_info, "\n")
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                if await client.check_win(buy_info["id"]):
+                if await client.check_win(buy_info[asset]["id"]):
                     print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                 else:
                     print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")

@@ -2,7 +2,6 @@ import json
 from quotexpy.ws.channels.base import Base
 from quotexpy.expiration import get_expiration_time
 
-
 class Trade(Base):
     """Class for Quotex trade websocket channel."""
 
@@ -28,9 +27,7 @@ class Trade(Base):
                 "isIndicatorsShowing": True,
                 "isShortBetElement": False,
                 "chartPeriod": 4,
-                "currentAsset": {
-                    "symbol": asset
-                },
+                "currentAsset": {"symbol": asset},
                 "dealValue": 5,
                 "dealPercentValue": 1,
                 "isVisible": True,

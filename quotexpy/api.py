@@ -1,5 +1,6 @@
 """Module for Quotex websocket"""
 import os
+import ssl
 import time
 import json
 import ssl
@@ -42,11 +43,11 @@ cacert = os.environ.get('WEBSOCKET_CLIENT_CA_BUNDLE')
 class QuotexAPI(object):
     """Class for communication with Quotex API"""
     socket_option_opened = {}
-    buy_id = None
+    trade_id = {}
     trace_ws = False
     buy_expiration = None
     current_asset = None
-    buy_successful = None
+    trade_successful = {}
     account_balance = None
     account_type = None
     instruments = None
@@ -83,6 +84,8 @@ class QuotexAPI(object):
         self.proxies = proxies
         self.realtime_price = {}
         self.profile = Profile()
+
+        self.logger = logging.getLogger(__name__)
 
     @property
     def websocket(self):
@@ -180,7 +183,7 @@ class QuotexAPI(object):
         self.websocket.send('42["chart_notification/get"]')
         self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
-        logger.debug(data)
+        self.logger.debug(data)
         global_value.ssl_Mutual_exclusion_write = False
 
     def edit_training_balance(self, amount):
@@ -190,12 +193,12 @@ class QuotexAPI(object):
     async def get_ssid(self):
         ssid, cookies = self.check_session()
         if not ssid:
-            logger.info("Authenticating user...")
+            self.logger.info("Authenticating user...")
             ssid, cookies = await self.login(
                 self.email,
                 self.password,
             )
-            logger.info("Login successful!!!")
+            self.logger.info("Login successful!!!")
         return ssid, cookies
 
     def start_websocket(self):
@@ -236,7 +239,8 @@ class QuotexAPI(object):
                 pass
             pass
 
-    def send_ssid(self):
+    def send_ssid(self, max_attemps=10):
+        attemps = 0
         self.profile.msg = None
         if not global_value.SSID:
             if os.path.exists(os.path.join("session.json")):

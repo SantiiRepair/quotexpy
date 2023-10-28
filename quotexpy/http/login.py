@@ -12,7 +12,7 @@ class Login(Browser):
 
     async def __call__(self, email, password):
         """Method to get Quotex API login http request.
-        :param str email: The email of a Quotex server.
+        :param str username: The username of a Quotex server.
         :param str password: The password of a Quotex server.
         :returns: The instance of :class:`playwright.cookies`.
         """

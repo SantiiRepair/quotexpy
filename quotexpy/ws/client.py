@@ -39,6 +39,8 @@ class WebsocketClient(object):
             cookie=self.api.cookies
         )
 
+        self.logger = logging.getLogger(__name__)
+
     def on_message(self, wss, message):
         """Method to process websocket messages."""
         global_value.ssl_Mutual_exclusion = True
@@ -46,7 +48,6 @@ class WebsocketClient(object):
         if current_time.tm_sec == 0:
             self.wss.send('42["tick"]')
         try:
-            logger = logging.getLogger(__name__)
             message = message
             if "authorization/reject" in str(message):
                 if os.path.isfile("session.json"):
@@ -58,7 +59,7 @@ class WebsocketClient(object):
             try:
                 message = message[1:]
                 message = message.decode()
-                logger.debug(message)
+                self.logger.debug(message)
                 message = json.loads(str(message))
                 self.api.profile.msg = message
                 if "call" in str(message) or 'put' in str(message):
@@ -73,11 +74,11 @@ class WebsocketClient(object):
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
-                    # print(message)
+                    self.logger.info(message)
                     self.api.candles.candles_data = message
                 elif message.get("id"):
-                    self.api.buy_successful = message
-                    self.api.buy_id = message["id"]
+                    self.api.trade_successful[message["asset"]] = message
+                    self.api.trade_id[message["asset"]] = message["id"]
                     self.api.timesync.server_timestamp = message["closeTimestamp"]
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
@@ -96,7 +97,7 @@ class WebsocketClient(object):
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
-                    logger.error(message)
+                    self.logger.error(message)
                     pass
             except:
                 pass
@@ -123,9 +124,9 @@ class WebsocketClient(object):
         global_value.check_websocket_if_error = True
 
     def on_open(self, wss):
-        """Method to process websocket open."""
+        """Method to process websocket open"""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket client connected.")
+        logger.debug("Websocket client connected")
         global_value.check_websocket_if_connect = 1
 
     def on_close(self, wss, close_status_code, close_msg):
