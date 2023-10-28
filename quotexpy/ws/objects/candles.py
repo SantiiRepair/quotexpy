@@ -58,7 +58,7 @@ class Candle(object):
         """
         if self.candle_open < self.candle_close:
             return "green"
-        if self.candle_open > self.candle_close:
+        elif self.candle_open > self.candle_close:
             return "red"
 
 
@@ -88,7 +88,7 @@ class Candles(Base):
         """Method to get first candle.
 
         :returns: The instance of :class:`Candle
-            <quotexapi.ws.objects.candles.Candle>`.
+            <quotexpy.ws.objects.candles.Candle>`.
         """
         return Candle(self.candles_data[0])
 
@@ -97,7 +97,7 @@ class Candles(Base):
         """Method to get second candle.
 
         :returns: The instance of :class:`Candle
-            <quotexapi.ws.objects.candles.Candle>`.
+            <quotexpy.ws.objects.candles.Candle>`.
         """
         return Candle(self.candles_data[1])
 
@@ -106,6 +106,6 @@ class Candles(Base):
         """Method to get current candle.
 
         :returns: The instance of :class:`Candle
-            <quotexapi.ws.objects.candles.Candle>`.
+            <quotexpy.ws.objects.candles.Candle>`.
         """
         return Candle(self.candles_data[-1])

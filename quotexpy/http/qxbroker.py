@@ -9,7 +9,8 @@ from playwright.async_api import Playwright, async_playwright
 
 
 class Browser(object):
-    username = None
+
+    email = None
     password = None
 
     def __init__(self, api):
@@ -21,7 +22,7 @@ class Browser(object):
         page = await context.new_page()
         await page.goto("https://qxbroker.com/pt/sign-in")
         await page.get_by_role("textbox", name="E-mail").click()
-        await page.get_by_role("textbox", name="E-mail").fill(self.username)
+        await page.get_by_role("textbox", name="E-mail").fill(self.email)
         await page.get_by_role("textbox", name="Senha").click()
         await page.get_by_role("textbox", name="Senha").fill(self.password)
         await page.get_by_role("button", name="Entrar").click()
@@ -44,15 +45,19 @@ class Browser(object):
         soup = BeautifulSoup(source, "html.parser")
         user_agent = await page.evaluate("() => navigator.userAgent;")
         self.api.user_agent = user_agent
-        script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
-        match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
+        script = soup.find_all(
+            "script", {"type": "text/javascript"})[1].get_text()
+        match = re.sub(
+            "window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
-        output_file = Path("./.session.json")
+        output_file = Path("./session.json")
         output_file.parent.mkdir(exist_ok=True, parents=True)
-        cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
-        cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
-        output_file.write_text(json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4))
+        cookiejar = requests.utils.cookiejar_from_dict({c['name']: c['value'] for c in cookies})
+        cookie_string = '; '.join([f'{c.name}={c.value}' for c in cookiejar])
+        output_file.write_text(
+            json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4)
+        )
         await context.close()
         await browser.close()
 

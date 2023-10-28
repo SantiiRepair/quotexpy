@@ -3,44 +3,45 @@ import os
 import ssl
 import time
 import json
-import certifi
-import urllib3
+import ssl
 import logging
 import threading
 import collections
-from collections import defaultdict as default_dict
-
+import urllib3
+import certifi
 from quotexpy import global_value
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
 from quotexpy.ws.channels.trade import Trade
-from quotexpy.exceptions import QuotexTimeout
-from quotexpy.ws.client import WebsocketClient
+from quotexpy.ws.channels.candles import GetCandles
+from quotexpy.ws.channels.sell_option import SellOption
+from quotexpy.ws.objects.timesync import TimeSync
 from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
-from quotexpy.ws.objects.timesync import TimeSync
-from quotexpy.ws.channels.candles import GetCandles
 from quotexpy.ws.objects.listinfodata import ListInfoData
+from quotexpy.ws.client import WebsocketClient
+from collections import defaultdict
 
 
 def nested_dict(n, typeof):
     if n == 1:
-        return default_dict(typeof)
-    return default_dict(lambda: nested_dict(n - 1, typeof))
+        return defaultdict(typeof)
+    else:
+        return defaultdict(lambda: nested_dict(n - 1, typeof))
 
 
 urllib3.disable_warnings()
+logger = logging.getLogger(__name__)
 
 cert_path = certifi.where()
-os.environ["SSL_CERT_FILE"] = cert_path
-os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
-cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
+os.environ['SSL_CERT_FILE'] = cert_path
+os.environ['WEBSOCKET_CLIENT_CA_BUNDLE'] = cert_path
+cacert = os.environ.get('WEBSOCKET_CLIENT_CA_BUNDLE')
 
 
 class QuotexAPI(object):
     """Class for communication with Quotex API"""
-
     socket_option_opened = {}
     trade_id = {}
     trace_ws = False
@@ -58,7 +59,7 @@ class QuotexAPI(object):
     timesync = TimeSync()
     candles = Candles()
 
-    def __init__(self, host, email, password, proxies=None, browser=False):
+    def __init__(self, host, email, password, proxies=None):
         """
         :param str host: The hostname or ip address of a Quotex server.
         :param str email: The email of a Quotex server.
@@ -81,7 +82,6 @@ class QuotexAPI(object):
         self.user_agent = None
         self.token_login2fa = None
         self.proxies = proxies
-        self.browser = browser
         self.realtime_price = {}
         self.profile = Profile()
 
@@ -137,10 +137,14 @@ class QuotexAPI(object):
     @property
     def trade(self):
         """Property for get Quotex websocket ssid channel.
-        :returns: The instance of :class:`Trade
-            <quotexpy.ws.channels.trade.Trade>`.
+        :returns: The instance of :class:`Buy
+            <Quotex.ws.channels.buy.Buy>`.
         """
         return Trade(self)
+
+    @property
+    def sell_option(self):
+        return SellOption(self)
 
     @property
     def get_candles(self):
@@ -153,31 +157,31 @@ class QuotexAPI(object):
 
     def check_session(self):
         data = {}
-        if os.path.isfile(".session.json"):
-            with open(".session.json") as file:
+        if os.path.isfile("session.json"):
+            with open("session.json") as file:
                 data = json.loads(file.read())
             self.user_agent = data.get("user_agent")
         return data.get("ssid"), data.get("cookies")
-        # if global_value.session:
-        #     data = global_value.session
-        #     self.user_agent = data.get("user_agent")
-        # return data.get("ssid"), data.get("cookies")
 
     def send_websocket_request(self, data, no_force_send=True):
         """Send websocket request to Quotex server.
         :param str data: The websocket request data.
         :param bool no_force_send: Default None.
         """
-        # while (global_value.ssl_Mutual_exclusion or global_value.ssl_Mutual_exclusion_write) and no_force_send:
-        #     pass
+        if global_value.check_websocket_if_connect == 0:
+            logger.info("Websocket connection closed.")
+            return
+
+        while (global_value.ssl_Mutual_exclusion or global_value.ssl_Mutual_exclusion_write) and no_force_send:
+            pass
         global_value.ssl_Mutual_exclusion_write = True
-        # self.websocket.send('42["tick"]')
-        # self.websocket.send('42["indicator/list"]')
-        # self.websocket.send('42["drawing/load"]')
-        # self.websocket.send('42["pending/list"]')
-        # self.websocket.send('42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
-        # self.websocket.send('42["chart_notification/get"]')
-        # self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
+        self.websocket.send('42["tick"]')
+        self.websocket.send('42["indicator/list"]')
+        self.websocket.send('42["drawing/load"]')
+        self.websocket.send('42["pending/list"]')
+        self.websocket.send('42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
+        self.websocket.send('42["chart_notification/get"]')
+        self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
         self.logger.debug(data)
         global_value.ssl_Mutual_exclusion_write = False
@@ -205,16 +209,18 @@ class QuotexAPI(object):
         self.websocket_thread = threading.Thread(
             target=self.websocket.run_forever,
             kwargs={
-                "ping_interval": 2,
-                "ping_payload": "2",
-                "origin": "https://qxbroker.com",
-                "host": "ws2.qxbroker.com",
-                "sslopt": {
-                    "check_hostname": False,
+                'ping_interval': 24,
+                'ping_timeout': 15,
+                'ping_payload': "2",
+                'origin': 'https://qxbroker.com',
+                'host': 'ws2.qxbroker.com',
+                'sslopt': {
+                    # "check_hostname": False,
                     "cert_reqs": ssl.CERT_NONE,
                     "ca_certs": cacert,
-                },
-            },
+                    "ssl_version": ssl.PROTOCOL_TLSv1_2
+                }
+            }
         )
         self.websocket_thread.daemon = True
         self.websocket_thread.start()
@@ -222,34 +228,42 @@ class QuotexAPI(object):
             try:
                 if global_value.check_websocket_if_error:
                     return False, global_value.websocket_error_reason
-                if global_value.check_websocket_if_connect == 0:
-                    self.logger.info("Websocket connection closed.")
-                    self.logger.debug("Websocket connection closed.")
+                elif global_value.check_websocket_if_connect == 0:
+                    logger.info("Websocket connection closed.")
+                    logger.debug("Websocket connection closed.")
                     return False, "Websocket connection closed."
-                if global_value.check_websocket_if_connect == 1:
-                    self.logger.debug("Websocket successfully connected!!!")
+                elif global_value.check_websocket_if_connect == 1:
+                    logger.debug("Websocket successfully connected!!!")
                     return True, "Websocket successfully connected!!!"
             except:
                 pass
+            pass
 
     def send_ssid(self, max_attemps=10):
         attemps = 0
         self.profile.msg = None
-
-        def rssid():
-            if not global_value.SSID:
-                if os.path.exists(os.path.join(".session.json")):
-                    os.remove(".session.json")
-                return False
-            self.ssid(global_value.SSID)
-
+        if not global_value.SSID:
+            if os.path.exists(os.path.join("session.json")):
+                os.remove("session.json")
+            return False
+        self.ssid(global_value.SSID)
+        
+        start_time = time.time()
+        previous_second = -1
+        
         while not self.profile.msg:
             time.sleep(0.3)
-            rssid()
-            attemps += 1
-            if attemps == max_attemps:
-                raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-
+            elapsed_time = time.time() - start_time
+            current_second = int(elapsed_time)            
+            if current_second != previous_second:
+                print(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                previous_second = current_second
+                
+            if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
+                #raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+                logger.error(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+                return False
+        
         if not self.profile.msg:
             return False
         return True

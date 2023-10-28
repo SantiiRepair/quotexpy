@@ -12,10 +12,11 @@ from quotexpy.constants import codes_asset
 from collections import defaultdict
 
 
-def nested_dict(n, typeof):
+def nested_dict(n, type):
     if n == 1:
-        return defaultdict(typeof)
-    return defaultdict(lambda: nested_dict(n - 1, typeof))
+        return defaultdict(type)
+    else:
+        return defaultdict(lambda: nested_dict(n - 1, type))
 
 
 def truncate(f, n):
@@ -25,7 +26,7 @@ def truncate(f, n):
 class Quotex(object):
     __version__ = "1.40.0"
 
-    def __init__(self, email, password, browser=False):
+    def __init__(self, email, password):
         self.size = [
             1,
             5,
@@ -120,6 +121,7 @@ class Quotex(object):
 
     async def get_candles(self, asset, offset, period=None):
         index = expiration.get_timestamp()
+        # index - offset
         if period:
             period = expiration.get_period_time(period)
         else:
@@ -128,7 +130,7 @@ class Quotex(object):
         self.api.candles.candles_data = None
         while True:
             try:
-                self.api.getcandles(codes_asset[asset], offset, period, index)
+                self.api.get_candles(codes_asset[asset], offset, period, index)
                 while self.check_connect and self.api.candles.candles_data is None:
                     await asyncio.sleep(0.1)
                 if self.api.candles.candles_data is not None:
@@ -210,7 +212,7 @@ class Quotex(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                self.logger.info(f"\nWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds")
+                print(f"Waiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="\r")
                 previous_second = current_second
             if elapsed_time >= 10:
                 break
@@ -239,7 +241,7 @@ class Quotex(object):
         remaing_time = int((expiration_stamp - now_stamp).total_seconds())
         while remaing_time >= 0:
             remaing_time -= 1
-            print(f"\rRestando {remaing_time if remaing_time > 0 else 0} segundos ...", end="")
+            print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
             await asyncio.sleep(1)
 
     async def check_win(self, id_number):
@@ -274,7 +276,7 @@ class Quotex(object):
         return self.api.profit_in_operation or 0
 
     async def start_candles_one_stream(self, asset, size):
-        if f"{asset},{size}" not in self.subscribe_candle:
+        if str(asset + ',' + str(size)) not in self.subscribe_candle:
             self.subscribe_candle.append((asset + "," + str(size)))
         start = time.time()
         self.api.candle_generated_check[str(asset)][int(size)] = {}
@@ -319,7 +321,8 @@ class Quotex(object):
         if asset not in self.subscribe_mood:
             self.subscribe_mood.append(asset)
         while True:
-            self.api.subscribe_Traders_mood(asset[asset], instrument)
+            self.api.subscribe_Traders_mood(
+                asset[asset], instrument)
             try:
                 self.api.traders_mood[codes_asset[asset]] = codes_asset[asset]
                 break

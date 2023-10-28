@@ -2,6 +2,8 @@
 
 import logging
 
+import logging
+
 __author__ = "Santiago Ramirez"
 
 logging.basicConfig(
