@@ -193,11 +193,13 @@ class QuotexAPI(object):
     async def get_ssid(self):
         ssid, cookies = self.check_session()
         if not ssid:
+            print("Authenticating user...")
             self.logger.info("Authenticating user...")
             ssid, cookies = await self.login(
                 self.email,
                 self.password,
             )
+            print("Login successful!!!")
             self.logger.info("Login successful!!!")
         return ssid, cookies
 
@@ -240,7 +242,10 @@ class QuotexAPI(object):
             pass
 
     def send_ssid(self, max_attemps=10):
-        attemps = 0
+        '''
+        Send ssid to Quotex
+            max_attemps - time to wait for authorization in seconds
+        '''
         self.profile.msg = None
         if not global_value.SSID:
             if os.path.exists(os.path.join("session.json")):
@@ -250,17 +255,16 @@ class QuotexAPI(object):
         start_time = time.time()
         previous_second = -1
         while not self.profile.msg:
-            time.sleep(0.3)
+            time.sleep(0.1)
             elapsed_time = time.time() - start_time
-            current_second = int(elapsed_time)            
+            current_second = int(elapsed_time)
             if current_second != previous_second:
                 print(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="\r")
                 previous_second = current_second
-            if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
+            if elapsed_time >= max_attemps:  # Verifica se o tempo limite de segundos foi atingido
                 #raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
                 logger.error(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-                return False
-        
+                return False        
         if not self.profile.msg:
             return False
         return True

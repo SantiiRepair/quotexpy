@@ -158,7 +158,7 @@ class Quotex(object):
         self.api.trace_ws = self.debug_ws_enable
         check, reason = await self.api.connect()
         if check:
-            self.api.send_ssid()
+            self.api.send_ssid(max_attemps=10)
             if global_value.check_accepted_connection == 0:
                 check, reason = await self.connect()
                 if not check:
