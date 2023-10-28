@@ -16,8 +16,8 @@ def __x__(y):
     return z
 
 client = Quotex(
-    email=os.environ['EMAIL'],
-    password=os.environ['PASSWORD']
+    email="your@email.com",
+    password="yourpassword"
 )
 client.debug_ws_enable = False
 
