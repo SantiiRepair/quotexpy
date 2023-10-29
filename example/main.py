@@ -98,7 +98,7 @@ async def trade_and_check():
         amount = 1
         action = random.choice(["call", "put"]) # call (green), put (red)
         #horario negociacao 09:00 as 15:00 fora isto é otc
-        #nao opera sabado e domingos
+        #nao opera sabado e domingo, só otc
         asset = "AUDCAD_otc"  # "EURUSD_otc"
         duration = 60  # in seconds
         asset_query = asset_parse(asset)
@@ -231,7 +231,7 @@ def run_main():
     #loop.run_forever()
 
 #Agendamentos:
-schedule.every(10).seconds.do(run_main)
+schedule.every(20).seconds.do(run_main)
 
 while True:
     schedule.run_pending()

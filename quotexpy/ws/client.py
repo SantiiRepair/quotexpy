@@ -58,7 +58,10 @@ class WebsocketClient(object):
                 global_value.check_accepted_connection = 1
             try:
                 message = message[1:]
-                message = message.decode()
+                try:
+                    message = message.decode()
+                except:
+                    pass
                 self.logger.debug(message)
                 message = json.loads(str(message))
                 self.api.profile.msg = message
@@ -70,7 +73,8 @@ class WebsocketClient(object):
                     for i in message["signals"]:
                         self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
                         self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
-
+                #elif callable(getattr(message, "get", None)) or message in range(0,2):
+                #    pass
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
@@ -86,7 +90,7 @@ class WebsocketClient(object):
                     print(message["deals"])
                     for get_m in message["deals"]:
                         self.api.profit_in_operation = get_m["profit"]
-                        get_m["win"] = True if get_m["profit"] > 0 else False
+                        get_m["win"] = True if message["profit"] > 0 else False
                         get_m["game_state"] = 1
                         self.api.listinfodata.set(
                             get_m["win"],
@@ -97,9 +101,13 @@ class WebsocketClient(object):
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
+                    #print(message)
                     self.logger.error(message)
                     pass
-            except:
+            except Exception as e:
+                #print("Exception in on_message (code 1)", e)
+                self.logger.error("on_message: ")
+                self.logger.error(e)
                 pass
             if "51-" in str(message):
                 self.api._temp_status = str(message)
@@ -111,7 +119,10 @@ class WebsocketClient(object):
             elif len(message[0]) == 4:
                 ans = {"time": message[0][1], "price": message[0][2]}
                 self.api.realtime_price[message[0][0]].append(ans)
-        except:
+        except Exception as e:
+            #print("Exception in on_message (code 2)", e)
+            self.logger.error("on_message: ")
+            self.logger.error(e)
             pass
         global_value.ssl_Mutual_exclusion = False
         self.wss.send('42["tick"]')
@@ -119,6 +130,7 @@ class WebsocketClient(object):
     def on_error(self, wss, error):
         """Method to process websocket errors."""
         logger = logging.getLogger(__name__)
+        #print("on_error: " , error)
         logger.error(error)
         global_value.websocket_error_reason = str(error)
         global_value.check_websocket_if_error = True
