@@ -22,7 +22,6 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2):
     """
 
     def deco_retry(f):
-
         @wraps(f)
         def f_retry(*args, **kwargs):
             logger = logging.getLogger(__name__)

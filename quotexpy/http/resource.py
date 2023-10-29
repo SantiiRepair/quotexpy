@@ -3,6 +3,7 @@
 
 class Resource(object):
     """Class for base Quotex API http resource."""
+
     # pylint: disable=too-few-public-methods
 
     def __init__(self, api):

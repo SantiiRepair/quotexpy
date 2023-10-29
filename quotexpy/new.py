@@ -17,6 +17,7 @@ def nested_dict(n, type):
         return defaultdict(type)
     return defaultdict(lambda: nested_dict(n - 1, type))
 
+
 def truncate(f, n):
     return math.floor(f * 10**n) / 10**n
 
@@ -274,7 +275,7 @@ class Quotex(object):
         return self.api.profit_in_operation or 0
 
     async def start_candles_one_stream(self, asset, size):
-        if str(asset + ',' + str(size)) not in self.subscribe_candle:
+        if str(asset + "," + str(size)) not in self.subscribe_candle:
             self.subscribe_candle.append((asset + "," + str(size)))
         start = time.time()
         self.api.candle_generated_check[str(asset)][int(size)] = {}
@@ -319,8 +320,7 @@ class Quotex(object):
         if asset not in self.subscribe_mood:
             self.subscribe_mood.append(asset)
         while True:
-            self.api.subscribe_Traders_mood(
-                asset[asset], instrument)
+            self.api.subscribe_Traders_mood(asset[asset], instrument)
             try:
                 self.api.traders_mood[codes_asset[asset]] = codes_asset[asset]
                 break

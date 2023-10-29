@@ -23,7 +23,8 @@ class WebsocketClient(object):
         """
         self.api = api
         self.headers = {
-            "User-Agent": self.api.user_agent if not None
+            "User-Agent": self.api.user_agent
+            if not None
             else user_agent_list[random.randint(0, len(user_agent_list) - 1)],
         }
         websocket.enableTrace(self.api.trace_ws)
@@ -36,7 +37,7 @@ class WebsocketClient(object):
             on_ping=self.on_ping,
             on_pong=self.on_pong,
             header=self.headers,
-            cookie=self.api.cookies
+            cookie=self.api.cookies,
         )
 
         self.logger = logging.getLogger(__name__)
@@ -62,11 +63,11 @@ class WebsocketClient(object):
                 self.logger.debug(message)
                 message = json.loads(str(message))
                 self.api.profile.msg = message
-                if "call" in str(message) or 'put' in str(message):
+                if "call" in str(message) or "put" in str(message):
                     self.api.instruments = message
                     # print(message)
                 elif "signals" in str(message):
-                    #print(message)
+                    # print(message)
                     for i in message["signals"]:
                         self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
                         self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]

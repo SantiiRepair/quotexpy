@@ -32,7 +32,7 @@ pip install -e .
 
 ### Import
 ```python
-from quotexpy.stable_api import Quotex
+from quotexpy.new import Quotex
 ```
 
 ### Examples

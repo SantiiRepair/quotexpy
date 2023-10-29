@@ -12,13 +12,9 @@ class SellOption(Base):
         :param options_ids: list or int
         """
         if not isinstance(options_ids, list):
-            payload = {
-                "ticket": options_ids
-            }
+            payload = {"ticket": options_ids}
             self.send_websocket_request(f'42["orders/cancel",{json.dumps(payload)}]')
         else:
             for ids in options_ids:
-                payload = {
-                    "ticket": ids
-                }
+                payload = {"ticket": ids}
                 self.send_websocket_request(f'42["orders/cancel",{json.dumps(payload)}]')
