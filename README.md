@@ -38,14 +38,16 @@ from quotexpy.stable_api import Quotex
 ### Examples
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
 
-## Atention
-- Because cloudfare blocks requests you should enable browser=True to avoid HTTP 403 errors.
+### Atention
 
-- If the Quotex broker understands that the operation is being carried out by a trading bot, it will apply the rules of use and block the account at the broker. We are not responsible for the use of this lib, use at your own risk. According to the broker’s message:
-"... The use of automated bots for trading is prohibited according to account rules.
+- If the Quotex broker understands that the trade is being made by a trading robot, it will apply the usage rules and block the broker's account, we are not responsible for the use of this library, use it at your own risk.
+  - According to the broker's message:
+
+```
+The use of automated bots for trading is prohibited according to account rules.
 If you use them, your account will be blocked without the possibility of withdrawing funds and re-registration.
-Respectfully,
-Quotex"
+Respectfully, Quotex
+```
 
 ### Donations
 If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
