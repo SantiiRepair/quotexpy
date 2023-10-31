@@ -12,6 +12,9 @@ class Ssid(Base):
 
         :param ssid: The session identifier.
         """
+        if self.api.account_type is None:
+            self.api.account_type = 1 #default 1-demo
+
         payload = {
             "session": ssid,
             "isDemo": self.api.account_type,
