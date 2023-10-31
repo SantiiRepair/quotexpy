@@ -3,7 +3,6 @@ import os
 import ssl
 import time
 import json
-import ssl
 import logging
 import threading
 import collections
@@ -184,6 +183,8 @@ class QuotexAPI(object):
         self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
         self.logger.debug(data)
+        #print("send_websocket_request:")
+        #print(data)
         global_value.ssl_Mutual_exclusion_write = False
 
     def edit_training_balance(self, amount):
@@ -259,12 +260,14 @@ class QuotexAPI(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                print(f"\rWaiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="")
                 previous_second = current_second
             if elapsed_time >= max_attemps:  # Verifica se o tempo limite de segundos foi atingido
                 #raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-                logger.error(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-                return False        
+                msg = f"Sending authorization with SSID '{global_value.SSID}' took too long to respond"
+                #print(msg)
+                logger.error(msg)
+                return False
         if not self.profile.msg:
             return False
         return True
