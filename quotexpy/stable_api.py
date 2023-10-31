@@ -10,6 +10,7 @@ from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
 from collections import defaultdict
+from quotexpy.ws.objects.listinfodata import ListInfoData
 
 
 def nested_dict(n, type):
@@ -198,7 +199,7 @@ class Quotex(object):
 
     async def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
-        status_buy = False
+        status_trade = False
         self.duration = duration - 1
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
@@ -210,13 +211,13 @@ class Quotex(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"Waiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                print(f"\rWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="")
                 previous_second = current_second
-            if elapsed_time >= 10:
+            if elapsed_time >= 3:
                 break
         else:
-            status_buy = True
-        return status_buy, self.api.trade_successful
+            status_trade = True
+        return status_trade, self.api.trade_successful
 
     async def sell_option(self, options_ids):
         """Sell asset Quotex"""
@@ -242,17 +243,26 @@ class Quotex(object):
             print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
             await asyncio.sleep(1)
 
-    async def check_win(self, id_number):
-        """Check win based id"""
+
+    async def check_win(self, asset, id_number, openTimestamp, closeTimestamp):
+        """Check win based id"""        
+        self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
         while True:
             try:
-                listinfodata_dict = self.api.listinfodata.get(id_number)
-                if listinfodata_dict["game_state"] == 1:
+                #listinfodata_dict = self.api.listinfodata.get(id_number)
+                listinfodata_dict = self.api.listinfodata.get(asset)
+                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
                     break
+                #for infodata in self.api.listinfodata:
+                #    if infodata["asset"] == asset and infodata["openTimestamp"] == openTimestamp and infodata["closeTimestamp"] == closeTimestamp and infodata and infodata["game_state"] == 1:
+                #        break
             except:
                 pass
-        self.api.listinfodata.delete(id_number)
+            time.sleep(0.1)
+        self.logger.debug("end check wind")
+        #self.api.listinfodata.delete(id_number)
+        self.api.listinfodata.delete(asset)
         return listinfodata_dict["win"]
 
     def start_candles_stream(self, asset, size, period=0):

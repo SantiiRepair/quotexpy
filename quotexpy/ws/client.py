@@ -67,14 +67,10 @@ class WebsocketClient(object):
                 self.api.profile.msg = message
                 if "call" in str(message) or 'put' in str(message):
                     self.api.instruments = message
-                    # print(message)
                 elif "signals" in str(message):
-                    #print(message)
                     for i in message["signals"]:
                         self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
                         self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
-                #elif callable(getattr(message, "get", None)) or message in range(0,2):
-                #    pass
                 elif message.get("liveBalance") or message.get("demoBalance"):
                     self.api.account_balance = message
                 elif message.get("index"):
@@ -87,16 +83,20 @@ class WebsocketClient(object):
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
+                    #print("messagem client")
                     print(message["deals"])
                     for get_m in message["deals"]:
                         self.api.profit_in_operation = get_m["profit"]
-                        get_m["win"] = True if message["profit"] > 0 else False
+                        get_m["win"] = True if get_m["profit"] > 0 else False
                         get_m["game_state"] = 1
                         self.api.listinfodata.set(
                             get_m["win"],
-                            get_m["game_state"],
                             get_m["profit"],
+                            get_m["game_state"],
                             get_m["id"],
+                            get_m["asset"],
+                            get_m["openTimestamp"],
+                            get_m["closeTimestamp"]
                         )
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
@@ -116,7 +116,7 @@ class WebsocketClient(object):
                 self.api._temp_status = ""
             elif self.api._temp_status == """51-["history/list/v2",{"_placeholder":true,"num":0}]""":
                 self.api.candle_v2_data[message["asset"]] = message["history"]
-            elif len(message[0]) == 4:
+            elif (isinstance(message,list) and len(message[0]) == 4):
                 ans = {"time": message[0][1], "price": message[0][2]}
                 self.api.realtime_price[message[0][0]].append(ans)
         except Exception as e:
