@@ -59,7 +59,7 @@ async def balance_refill():
     check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
-        result = await client.edit_practice_balance(1000)
+        result = await client.edit_practice_balance(100)
         print(result)
     client.close()
 
@@ -94,31 +94,44 @@ async def trade_and_check():
     print(check_connect, message)
     if check_connect:
         client.change_account("PRACTICE")#"REAL"
-        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
-        amount = 1
-        action = random.choice(["call", "put"]) # call (green), put (red)
-        #horario negociacao 09:00 as 15:00 fora isto é otc
-        #nao opera sabado e domingo, só otc
-        asset = "AUDCAD_otc"  # "EURUSD_otc"
-        duration = 60  # in seconds
-        asset_query = asset_parse(asset)
-        asset_open = client.check_asset_open(asset_query)
-        if asset_open[2]:
-            print(colored("[INFO]: "), "OK: Asset is open")
-            status, buy_info = await client.trade(action, amount, asset, duration)
-            print(status, buy_info, "\n")
-            if status:
-                print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                if await client.check_win(buy_info[asset]["id"]):
-                    print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
+        balance = await client.get_balance()
+        print(colored("[INFO]: ", "blue"), "Balance: ", balance)
+        if balance >= 1:
+            amount = 1
+            action = random.choice(["call", "put"]) # call (green), put (red)
+            #horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc        
+            asset = "AUDCAD"
+            duration = 60  # in seconds
+            asset_query = asset_parse(asset)
+            asset_open = client.check_asset_open(asset_query)
+            if not asset_open[2]:
+                print(colored("[WARN]: ", "blue"), "Asset is closed.")
+                asset = f"{asset}_otc"
+                print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
+                asset_query = asset_parse(asset)
+                asset_open = client.check_asset_open(asset_query)
+
+            if asset_open[2]:
+                print(colored("[INFO]: "), "OK: Asset is open")
+                status, trade_info = await client.trade(action, amount, asset, duration)
+                print(status, trade_info, "\n")
+                if status:
+                    print(colored("[INFO]: ", "blue"), "Waiting for result...")
+                    #print(f"id checking {trade_info[asset]['id']}")
+                    openTimestamp = trade_info[asset]["openTimestamp"]
+                    closeTimestamp = trade_info[asset]["closeTimestamp"]
+                    if await client.check_win(asset, trade_info[asset]["id"], openTimestamp, closeTimestamp):
+                        print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
+                    else:
+                        print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
                 else:
-                    print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
+                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")
             else:
-                print(colored("[ERROR]: ", "red"), "Operation failed!!!")
+                print(colored("[WARN]: ", "light_red"), "Asset is closed.")
+            print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+            print(colored("[INFO]: ", "blue"), "Exiting...")
         else:
-            print(colored("[WARN]: ", "red"), "Asset is closed.")
-        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
-        print(colored("[INFO]: ", "blue"), "Exiting...")
+            print(colored("[WARN]: ", "light_red"), "No balance available :(")
     client.close()
 
 async def sell_option():
