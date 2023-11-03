@@ -84,7 +84,7 @@ class WebsocketClient(object):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
                     #print("messagem client")
-                    print(message["deals"])
+                    #print(message["deals"])
                     for get_m in message["deals"]:
                         self.api.profit_in_operation = get_m["profit"]
                         get_m["win"] = True if get_m["profit"] > 0 else False
