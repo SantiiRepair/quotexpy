@@ -94,9 +94,7 @@ class WebsocketClient(object):
                             get_m["profit"],
                             get_m["game_state"],
                             get_m["id"],
-                            get_m["asset"],
-                            get_m["openTimestamp"],
-                            get_m["closeTimestamp"]
+                            get_m["asset"]
                         )
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message

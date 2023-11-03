@@ -89,6 +89,9 @@ async def trade():
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
+lastAction = None
+modifySide = 0
+
 async def trade_and_check():
     check_connect, message = await login()
     print(check_connect, message)
@@ -98,8 +101,16 @@ async def trade_and_check():
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
         if balance >= 1:
             amount = 1
-            action = random.choice(["call", "put"]) # call (green), put (red)
-            #horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc        
+            global lastAction
+            global modifySide
+            if lastAction is None:
+                action = random.choice(["call", "put"]) # call (green), put (red)
+                lastAction = action
+            else:
+                action = lastAction
+
+            #action =  "put" # call (green), put (red)
+            #horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc
             asset = "AUDCAD"
             duration = 60  # in seconds
             asset_query = asset_parse(asset)
@@ -117,13 +128,26 @@ async def trade_and_check():
                 print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
+                    print(colored("[INFO]: ", "blue"), f"Side: {action}, count modify side: {modifySide}")
                     #print(f"id checking {trade_info[asset]['id']}")
-                    openTimestamp = trade_info[asset]["openTimestamp"]
-                    closeTimestamp = trade_info[asset]["closeTimestamp"]
-                    if await client.check_win(asset, trade_info[asset]["id"], openTimestamp, closeTimestamp):
+                    
+                    if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
+                        lastAction = action
+                        modifySide = 0
                     else:
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
+                        if modifySide >= 1:
+                            if lastAction == "call":
+                                lastAction = "put"
+                            else:
+                                lastAction = "call"
+                            modifySide = 0
+                        else:
+                            modifySide += 1
+                    #else: #error
+                    #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
+                        #lastAction = None
                 else:
                     print(colored("[ERROR]: ", "red"), "Operation failed!!!")
             else:
@@ -244,7 +268,7 @@ def run_main():
     #loop.run_forever()
 
 #Agendamentos:
-schedule.every(20).seconds.do(run_main)
+schedule.every(2).seconds.do(run_main)
 
 while True:
     schedule.run_pending()

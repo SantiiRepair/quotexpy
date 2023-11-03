@@ -4,7 +4,7 @@ import math
 import asyncio
 import logging
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from quotexpy import expiration
 from quotexpy import global_value
 from quotexpy.api import QuotexAPI
@@ -235,34 +235,50 @@ class Quotex(object):
         return assets_data
 
     async def start_remaing_time(self):
-        now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
-        expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
-        remaing_time = int((expiration_stamp - now_stamp).total_seconds())
-        while remaing_time >= 0:
-            remaing_time -= 1
-            print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
-            await asyncio.sleep(1)
-
-
-    async def check_win(self, asset, id_number, openTimestamp, closeTimestamp):
+        try:
+            now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
+            #print("now_stamp",now_stamp)
+            expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
+            #print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
+            #print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))            
+            #print("expiration_stamp",expiration_stamp)
+            remaing_time = int((expiration_stamp - now_stamp).total_seconds())
+            #print("remaing_time",remaing_time)
+            if remaing_time < 0:
+                now_stamp_ajusted = now_stamp - timedelta(seconds=self.duration)
+                #print("now_stamp_ajusted",now_stamp_ajusted)
+                remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
+                #print("remaing_time ajusted",remaing_time)
+            while remaing_time >= 0:
+                remaing_time -= 1
+                print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
+                await asyncio.sleep(1)
+        except Exception as e:
+            print(e)
+    
+    async def check_win(self, asset, id_number):
+       
         """Check win based id"""        
         self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        while True:
+        #start_time = time.time()
+        #listinfodata_dict = {}
+        while True: #time.time() - start_time < 5:
             try:
-                #listinfodata_dict = self.api.listinfodata.get(id_number)
                 listinfodata_dict = self.api.listinfodata.get(asset)
                 if listinfodata_dict and listinfodata_dict["game_state"] == 1:
                     break
-                #for infodata in self.api.listinfodata:
-                #    if infodata["asset"] == asset and infodata["openTimestamp"] == openTimestamp and infodata["closeTimestamp"] == closeTimestamp and infodata and infodata["game_state"] == 1:
-                #        break
+                listinfodata_dict = self.api.listinfodata.get(id_number)
+                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
+                    break
             except:
                 pass
             time.sleep(0.1)
         self.logger.debug("end check wind")
-        #self.api.listinfodata.delete(id_number)
+        self.api.listinfodata.delete(id_number)
         self.api.listinfodata.delete(asset)
+        #if len(listinfodata_dict) == 0:
+        #    return None
         return listinfodata_dict["win"]
 
     def start_candles_stream(self, asset, size, period=0):
