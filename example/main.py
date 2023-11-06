@@ -5,21 +5,21 @@ import random
 from termcolor import colored
 import asyncio
 import schedule
-from quotexpy.stable_api import Quotex
+from quotexpy.new import Quotex
 from asyncio import get_event_loop
 from quotexpy.utils import asset_parse
 
 shutup.please()
 
+
 def __x__(y):
     z = get_event_loop().run_until_complete(y)
     return z
 
-client = Quotex(
-    email="your@email.com",
-    password="yourpassword"
-)
+
+client = Quotex(email="your@email.com", password="yourpassword")
 client.debug_ws_enable = False
+
 
 async def login(attempts=5):
     check, reason = await client.connect()
@@ -68,11 +68,11 @@ async def trade():
     check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")#"REAL"
+        client.change_account("PRACTICE")  # "REAL"
         amount = 1
         asset = "AUDCAD"  # "AUDCAD_otc"
-        #action = "call"  # call (green), put (red)
-        action = random.choice(["call", "put"]) # call (green), put (red)
+        # action = "call"  # call (green), put (red)
+        action = random.choice(["call", "put"])  # call (green), put (red)
         duration = 60  # in seconds
         asset_query = asset_parse(asset)
         asset_open = client.check_asset_open(asset_query)
@@ -172,11 +172,12 @@ async def trade_and_check():
             print(colored("[WARN]: ", "light_red"), "No balance available :(")
     client.close()
 
+
 async def sell_option():
     check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")#"REAL"
+        client.change_account("PRACTICE")  # "REAL"
         amount = 30
         asset = "EURUSD_otc"  # "EURUSD_otc"
         direction = "put"
@@ -282,15 +283,16 @@ async def get_moving_average():
 # __x__(get_candle_v2())
 # __x__(get_realtime_candle())
 # __x__(assets_open())
-#__x__(trade_and_check())
+# __x__(trade_and_check())
 # __x__(balance_refill())
 
+
 async def main():
-    #await get_balance()
-    #await get_signal_data()
+    # await get_balance()
+    # await get_signal_data()
     # await get_payment()
     # await get_candle()
-    #await get_candle_v2()
+    # await get_candle_v2()
     # await get_realtime_candle()
     # await assets_open()
     # await buy()
@@ -298,11 +300,12 @@ async def main():
     # await balance_refill()
     #await get_moving_average()
 
-#if __name__ == "__main__":
+
+# if __name__ == "__main__":
 def run_main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
-    #loop.run_forever()
+    # loop.run_forever()
 
 #Agendamentos:
 schedule.every(2).seconds.do(run_main)

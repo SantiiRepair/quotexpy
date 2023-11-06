@@ -7,8 +7,8 @@ class Login(Browser):
     url = ""
     cookies = None
     ssid = None
-    base_url = 'qxbroker.com'
-    https_base_url = f'https://{base_url}'
+    base_url = "qxbroker.com"
+    https_base_url = f"https://{base_url}"
 
     async def __call__(self, email, password):
         """Method to get Quotex API login http request.

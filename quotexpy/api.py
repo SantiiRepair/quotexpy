@@ -4,10 +4,10 @@ import ssl
 import time
 import json
 import logging
+import urllib3
 import threading
 import collections
-import urllib3
-import certifi
+
 from quotexpy import global_value
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
@@ -20,27 +20,26 @@ from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
 from quotexpy.ws.objects.listinfodata import ListInfoData
 from quotexpy.ws.client import WebsocketClient
-from collections import defaultdict
 
 
 def nested_dict(n, typeof):
     if n == 1:
-        return defaultdict(typeof)
-    else:
-        return defaultdict(lambda: nested_dict(n - 1, typeof))
+        return collections.defaultdict(typeof)
+    return collections.defaultdict(lambda: nested_dict(n - 1, typeof))
 
 
 urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
 cert_path = certifi.where()
-os.environ['SSL_CERT_FILE'] = cert_path
-os.environ['WEBSOCKET_CLIENT_CA_BUNDLE'] = cert_path
-cacert = os.environ.get('WEBSOCKET_CLIENT_CA_BUNDLE')
+os.environ["SSL_CERT_FILE"] = cert_path
+os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
+cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
 
 
 class QuotexAPI(object):
     """Class for communication with Quotex API"""
+
     socket_option_opened = {}
     trade_id = {}
     trace_ws = False
@@ -212,18 +211,18 @@ class QuotexAPI(object):
         self.websocket_thread = threading.Thread(
             target=self.websocket.run_forever,
             kwargs={
-                'ping_interval': 24,
-                'ping_timeout': 15,
-                'ping_payload': "2",
-                'origin': 'https://qxbroker.com',
-                'host': 'ws2.qxbroker.com',
-                'sslopt': {
+                "ping_interval": 24,
+                "ping_timeout": 15,
+                "ping_payload": "2",
+                "origin": "https://qxbroker.com",
+                "host": "ws2.qxbroker.com",
+                "sslopt": {
                     # "check_hostname": False,
                     "cert_reqs": ssl.CERT_NONE,
                     "ca_certs": cacert,
-                    "ssl_version": ssl.PROTOCOL_TLSv1_2
-                }
-            }
+                    "ssl_version": ssl.PROTOCOL_TLSv1_2,
+                },
+            },
         )
         self.websocket_thread.daemon = True
         self.websocket_thread.start()
@@ -231,11 +230,11 @@ class QuotexAPI(object):
             try:
                 if global_value.check_websocket_if_error:
                     return False, global_value.websocket_error_reason
-                elif global_value.check_websocket_if_connect == 0:
+                if global_value.check_websocket_if_connect == 0:
                     logger.info("Websocket connection closed.")
                     logger.debug("Websocket connection closed.")
                     return False, "Websocket connection closed."
-                elif global_value.check_websocket_if_connect == 1:
+                if global_value.check_websocket_if_connect == 1:
                     logger.debug("Websocket successfully connected!!!")
                     return True, "Websocket successfully connected!!!"
             except:
