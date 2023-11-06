@@ -91,7 +91,7 @@ async def trade():
 
 lastAction = None
 countSequenceLoss = 0
-countSequenceWin  = 0  
+countSequenceWin  = 0
 
 async def trade_and_check():
     check_connect, message = await login()
@@ -253,7 +253,7 @@ async def get_signal_data():
     client.close()
 
 async def get_moving_average():
-    
+
     symbol = "AUDCAD=X"
     interval = "1m"
     periods = 21
@@ -266,14 +266,6 @@ async def get_moving_average():
 
     lastCandles = await client.get_last_candles(symbol=symbol, interval=interval)
     print(lastCandles)
-    
-
-
-    
-
-    
-    
-
 
 # __x__(get_signal_data())
 # __x__(get_balance())
