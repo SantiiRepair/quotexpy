@@ -90,7 +90,8 @@ async def trade():
     client.close()
 
 lastAction = None
-modifySide = 0
+countSequenceLoss = 0
+countSequenceWin  = 0  
 
 async def trade_and_check():
     check_connect, message = await login()
@@ -99,10 +100,19 @@ async def trade_and_check():
         client.change_account("PRACTICE")#"REAL"
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
-        if balance >= 1:
+        global lastAction
+        global countSequenceLoss
+        global countSequenceWin
+        while balance >= 1:
             amount = 1
-            global lastAction
-            global modifySide
+            #if countSequenceLoss == 1:
+            #    amount = 2 #martigale
+            #if countSequenceWin > 1:
+            #    amount = countSequenceWin #martigale
+            #if countLoss == 2:
+            #    amount = 4 #martigale
+            #if isModifyActionByLoss > 1:
+            #    amount = 1 #martigale
             if lastAction is None:
                 action = random.choice(["call", "put"]) # call (green), put (red)
                 lastAction = action
@@ -128,23 +138,25 @@ async def trade_and_check():
                 print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                    print(colored("[INFO]: ", "blue"), f"Side: {action}, count modify side: {modifySide}")
+                    print(colored("[INFO]: ", "blue"), f"Side: {action}, count modify side: {countSequenceLoss}")
                     #print(f"id checking {trade_info[asset]['id']}")
                     
                     if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                         lastAction = action
-                        modifySide = 0
+                        countSequenceLoss = 0
+                        #countSequenceWin += 1
                     else:
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
-                        if modifySide >= 1:
+                        countSequenceLoss += 1
+                        #countSequenceWin = 0
+                        if countSequenceLoss > 1:
                             if lastAction == "call":
                                 lastAction = "put"
                             else:
                                 lastAction = "call"
-                            modifySide = 0
-                        else:
-                            modifySide += 1
+                        #     modifySide = 0
+                        #else:
                     #else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
                         #lastAction = None
@@ -154,6 +166,8 @@ async def trade_and_check():
                 print(colored("[WARN]: ", "light_red"), "Asset is closed.")
             print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
             print(colored("[INFO]: ", "blue"), "Exiting...")
+        if balance >= 1:
+            pass
         else:
             print(colored("[WARN]: ", "light_red"), "No balance available :(")
     client.close()
@@ -238,6 +252,28 @@ async def get_signal_data():
             time.sleep(1)
     client.close()
 
+async def get_moving_average():
+    
+    symbol = "AUDCAD=X"
+    interval = "1m"
+    periods = 21
+
+    ema21 = await client.get_moving_average(symbol=symbol, interval=interval, periods=periods)
+
+    #for ema in ema21:
+    print(ema21)
+
+
+    lastCandles = await client.get_last_candles(symbol=symbol, interval=interval)
+    print(lastCandles)
+    
+
+
+    
+
+    
+    
+
 
 # __x__(get_signal_data())
 # __x__(get_balance())
@@ -260,6 +296,7 @@ async def main():
     # await buy()
     await trade_and_check()
     # await balance_refill()
+    #await get_moving_average()
 
 #if __name__ == "__main__":
 def run_main():

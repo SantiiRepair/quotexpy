@@ -3,6 +3,7 @@ import time
 import math
 import asyncio
 import logging
+import yfinance as yf
 
 from datetime import datetime, timedelta
 from quotexpy import expiration
@@ -355,3 +356,18 @@ class Quotex(object):
 
     def close(self):
         self.api.close()
+
+    async def get_moving_average(self, symbol, interval, periods):
+        # Obter os dados do par de negociação no intervalo desejado
+        data = yf.download(symbol, interval=interval, period="1d")
+
+        # Calcular a média móvel com o número de períodos especificado
+        data["Close_MA"] = data["Close"].rolling(window=periods).mean()
+
+        return data["Close_MA"]
+    
+    async def get_last_candles(self, symbol, interval):
+        ticker = yf.Ticker(symbol)
+        last_candles = ticker.history(period="1d", interval=interval)
+        return last_candles
+
