@@ -3,7 +3,6 @@ import os
 import ssl
 import time
 import json
-import certifi
 import logging
 import urllib3
 import threading
@@ -183,6 +182,8 @@ class QuotexAPI(object):
         self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
         self.logger.debug(data)
+        #print("send_websocket_request:")
+        #print(data)
         global_value.ssl_Mutual_exclusion_write = False
 
     def edit_training_balance(self, amount):
@@ -192,11 +193,13 @@ class QuotexAPI(object):
     async def get_ssid(self):
         ssid, cookies = self.check_session()
         if not ssid:
+            print("Authenticating user...")
             self.logger.info("Authenticating user...")
             ssid, cookies = await self.login(
                 self.email,
                 self.password,
             )
+            print("Login successful!!!")
             self.logger.info("Login successful!!!")
         return ssid, cookies
 
@@ -239,7 +242,10 @@ class QuotexAPI(object):
             pass
 
     def send_ssid(self, max_attemps=10):
-        attemps = 0
+        '''
+        Send ssid to Quotex
+            max_attemps - time to wait for authorization in seconds
+        '''
         self.profile.msg = None
         if not global_value.SSID:
             if os.path.exists(os.path.join("session.json")):
@@ -249,17 +255,18 @@ class QuotexAPI(object):
         start_time = time.time()
         previous_second = -1
         while not self.profile.msg:
-            time.sleep(0.3)
+            time.sleep(0.1)
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                print(f"\rWaiting for authorization... Elapsed time: {round(elapsed_time)} seconds", end="")
                 previous_second = current_second
-            if elapsed_time >= 60:  # Verifica se o tempo limite de 60 segundos foi atingido
-                # raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-                logger.error(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+            if elapsed_time >= max_attemps:  # Verifica se o tempo limite de segundos foi atingido
+                #raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
+                msg = f"Sending authorization with SSID '{global_value.SSID}' took too long to respond"
+                #print(msg)
+                logger.error(msg)
                 return False
-
         if not self.profile.msg:
             return False
         return True

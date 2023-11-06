@@ -3,13 +3,15 @@ import time
 import math
 import asyncio
 import logging
+import yfinance as yf
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from quotexpy import expiration
 from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
 from collections import defaultdict
+from quotexpy.ws.objects.listinfodata import ListInfoData
 
 
 def nested_dict(n, type):
@@ -159,7 +161,7 @@ class Quotex(object):
         self.api.trace_ws = self.debug_ws_enable
         check, reason = await self.api.connect()
         if check:
-            self.api.send_ssid()
+            self.api.send_ssid(max_attemps=10)
             if global_value.check_accepted_connection == 0:
                 check, reason = await self.connect()
                 if not check:
@@ -199,7 +201,7 @@ class Quotex(object):
 
     async def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
-        status_buy = False
+        status_trade = False
         self.duration = duration - 1
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
@@ -211,13 +213,13 @@ class Quotex(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"Waiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="\r")
+                print(f"\rWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="")
                 previous_second = current_second
-            if elapsed_time >= 10:
+            if elapsed_time >= 3:
                 break
         else:
-            status_buy = True
-        return status_buy, self.api.trade_successful
+            status_trade = True
+        return status_trade, self.api.trade_successful
 
     async def sell_option(self, options_ids):
         """Sell asset Quotex"""
@@ -235,25 +237,50 @@ class Quotex(object):
         return assets_data
 
     async def start_remaing_time(self):
-        now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
-        expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
-        remaing_time = int((expiration_stamp - now_stamp).total_seconds())
-        while remaing_time >= 0:
-            remaing_time -= 1
-            print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
-            await asyncio.sleep(1)
-
-    async def check_win(self, id_number):
-        """Check win based id"""
+        try:
+            now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
+            #print("now_stamp",now_stamp)
+            expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
+            #print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
+            #print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))            
+            #print("expiration_stamp",expiration_stamp)
+            remaing_time = int((expiration_stamp - now_stamp).total_seconds())
+            #print("remaing_time",remaing_time)
+            if remaing_time < 0:
+                now_stamp_ajusted = now_stamp - timedelta(seconds=self.duration)
+                #print("now_stamp_ajusted",now_stamp_ajusted)
+                remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
+                #print("remaing_time ajusted",remaing_time)
+            while remaing_time >= 0:
+                remaing_time -= 1
+                print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
+                await asyncio.sleep(1)
+        except Exception as e:
+            print(e)
+    
+    async def check_win(self, asset, id_number):
+       
+        """Check win based id"""        
+        self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        while True:
+        #start_time = time.time()
+        #listinfodata_dict = {}
+        while True: #time.time() - start_time < 5:
             try:
+                listinfodata_dict = self.api.listinfodata.get(asset)
+                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
+                    break
                 listinfodata_dict = self.api.listinfodata.get(id_number)
-                if listinfodata_dict["game_state"] == 1:
+                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
                     break
             except:
                 pass
+            time.sleep(0.1)
+        self.logger.debug("end check wind")
         self.api.listinfodata.delete(id_number)
+        self.api.listinfodata.delete(asset)
+        #if len(listinfodata_dict) == 0:
+        #    return None
         return listinfodata_dict["win"]
 
     def start_candles_stream(self, asset, size, period=0):
@@ -329,3 +356,18 @@ class Quotex(object):
 
     def close(self):
         self.api.close()
+
+    async def get_moving_average(self, symbol, interval, periods):
+        # Obter os dados do par de negociação no intervalo desejado
+        data = yf.download(symbol, interval=interval, period="1d")
+
+        # Calcular a média móvel com o número de períodos especificado
+        data["Close_MA"] = data["Close"].rolling(window=periods).mean()
+
+        return data["Close_MA"]
+    
+    async def get_last_candles(self, symbol, interval):
+        ticker = yf.Ticker(symbol)
+        last_candles = ticker.history(period="1d", interval=interval)
+        return last_candles
+
