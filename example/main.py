@@ -89,15 +89,17 @@ async def trade():
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
+
 lastAction = None
 countSequenceLoss = 0
-countSequenceWin  = 0
+countSequenceWin = 0
+
 
 async def trade_and_check():
     check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")#"REAL"
+        client.change_account("PRACTICE")  # "REAL"
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
         global lastAction
@@ -105,22 +107,22 @@ async def trade_and_check():
         global countSequenceWin
         while balance >= 1:
             amount = 1
-            #if countSequenceLoss == 1:
+            # if countSequenceLoss == 1:
             #    amount = 2 #martigale
-            #if countSequenceWin > 1:
+            # if countSequenceWin > 1:
             #    amount = countSequenceWin #martigale
-            #if countLoss == 2:
+            # if countLoss == 2:
             #    amount = 4 #martigale
-            #if isModifyActionByLoss > 1:
+            # if isModifyActionByLoss > 1:
             #    amount = 1 #martigale
             if lastAction is None:
-                action = random.choice(["call", "put"]) # call (green), put (red)
+                action = random.choice(["call", "put"])  # call (green), put (red)
                 lastAction = action
             else:
                 action = lastAction
 
-            #action =  "put" # call (green), put (red)
-            #horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc
+            # action =  "put" # call (green), put (red)
+            # horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc
             asset = "AUDCAD"
             duration = 60  # in seconds
             asset_query = asset_parse(asset)
@@ -139,27 +141,27 @@ async def trade_and_check():
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
                     print(colored("[INFO]: ", "blue"), f"Side: {action}, count modify side: {countSequenceLoss}")
-                    #print(f"id checking {trade_info[asset]['id']}")
-                    
+                    # print(f"id checking {trade_info[asset]['id']}")
+
                     if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                         lastAction = action
                         countSequenceLoss = 0
-                        #countSequenceWin += 1
+                        # countSequenceWin += 1
                     else:
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
                         countSequenceLoss += 1
-                        #countSequenceWin = 0
+                        # countSequenceWin = 0
                         if countSequenceLoss > 1:
                             if lastAction == "call":
                                 lastAction = "put"
                             else:
                                 lastAction = "call"
                         #     modifySide = 0
-                        #else:
-                    #else: #error
+                        # else:
+                    # else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
-                        #lastAction = None
+                    # lastAction = None
                 else:
                     print(colored("[ERROR]: ", "red"), "Operation failed!!!")
             else:
@@ -253,20 +255,20 @@ async def get_signal_data():
             time.sleep(1)
     client.close()
 
-async def get_moving_average():
 
+async def get_moving_average():
     symbol = "AUDCAD=X"
     interval = "1m"
     periods = 21
 
     ema21 = await client.get_moving_average(symbol=symbol, interval=interval, periods=periods)
 
-    #for ema in ema21:
+    # for ema in ema21:
     print(ema21)
-
 
     lastCandles = await client.get_last_candles(symbol=symbol, interval=interval)
     print(lastCandles)
+
 
 # __x__(get_signal_data())
 # __x__(get_balance())
@@ -290,7 +292,7 @@ async def main():
     # await buy()
     await trade_and_check()
     # await balance_refill()
-    #await get_moving_average()
+    # await get_moving_average()
 
 
 # if __name__ == "__main__":
@@ -299,7 +301,8 @@ def run_main():
     loop.run_until_complete(main())
     # loop.run_forever()
 
-#Agendamentos:
+
+# Agendamentos:
 schedule.every(2).seconds.do(run_main)
 
 while True:

@@ -239,33 +239,32 @@ class Quotex(object):
     async def start_remaing_time(self):
         try:
             now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
-            #print("now_stamp",now_stamp)
+            # print("now_stamp",now_stamp)
             expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
-            #print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
-            #print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))            
-            #print("expiration_stamp",expiration_stamp)
+            # print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
+            # print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))
+            # print("expiration_stamp",expiration_stamp)
             remaing_time = int((expiration_stamp - now_stamp).total_seconds())
-            #print("remaing_time",remaing_time)
+            # print("remaing_time",remaing_time)
             if remaing_time < 0:
                 now_stamp_ajusted = now_stamp - timedelta(seconds=self.duration)
-                #print("now_stamp_ajusted",now_stamp_ajusted)
+                # print("now_stamp_ajusted",now_stamp_ajusted)
                 remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
-                #print("remaing_time ajusted",remaing_time)
+                # print("remaing_time ajusted",remaing_time)
             while remaing_time >= 0:
                 remaing_time -= 1
                 print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
                 await asyncio.sleep(1)
         except Exception as e:
             print(e)
-    
+
     async def check_win(self, asset, id_number):
-       
-        """Check win based id"""        
+        """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        #start_time = time.time()
-        #listinfodata_dict = {}
-        while True: #time.time() - start_time < 5:
+        # start_time = time.time()
+        # listinfodata_dict = {}
+        while True:  # time.time() - start_time < 5:
             try:
                 listinfodata_dict = self.api.listinfodata.get(asset)
                 if listinfodata_dict and listinfodata_dict["game_state"] == 1:
@@ -279,7 +278,7 @@ class Quotex(object):
         self.logger.debug("end check wind")
         self.api.listinfodata.delete(id_number)
         self.api.listinfodata.delete(asset)
-        #if len(listinfodata_dict) == 0:
+        # if len(listinfodata_dict) == 0:
         #    return None
         return listinfodata_dict["win"]
 
@@ -365,9 +364,8 @@ class Quotex(object):
         data["Close_MA"] = data["Close"].rolling(window=periods).mean()
 
         return data["Close_MA"]
-    
+
     async def get_last_candles(self, symbol, interval):
         ticker = yf.Ticker(symbol)
         last_candles = ticker.history(period="1d", interval=interval)
         return last_candles
-

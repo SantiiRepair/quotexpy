@@ -14,8 +14,7 @@ class Trade(Base):
         option_type = 100
         if "_otc" not in asset.strip().lower():
             option_type = 1
-            duration = get_expiration_time_quotex(
-                int(self.api.timesync.server_timestamp), duration)
+            duration = get_expiration_time_quotex(int(self.api.timesync.server_timestamp), duration)
         payload = {
             "chartId": "graph",
             "settings": {
@@ -54,8 +53,8 @@ class Trade(Base):
             "optionType": option_type,
         }
         data = f'42["orders/open",{json.dumps(payload)}]'
-        #print("envio json request websocket")
-        #print(data)
+        # print("envio json request websocket")
+        # print(data)
         self.send_websocket_request(data)
 
 

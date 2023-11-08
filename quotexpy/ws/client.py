@@ -84,27 +84,23 @@ class WebsocketClient(object):
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
-                    #print("messagem client")
-                    #print(message["deals"])
+                    # print("messagem client")
+                    # print(message["deals"])
                     for get_m in message["deals"]:
                         self.api.profit_in_operation = get_m["profit"]
                         get_m["win"] = True if get_m["profit"] > 0 else False
                         get_m["game_state"] = 1
                         self.api.listinfodata.set(
-                            get_m["win"],
-                            get_m["profit"],
-                            get_m["game_state"],
-                            get_m["id"],
-                            get_m["asset"]
+                            get_m["win"], get_m["profit"], get_m["game_state"], get_m["id"], get_m["asset"]
                         )
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
-                    #print(message)
+                    # print(message)
                     self.logger.error(message)
                     pass
             except Exception as e:
-                #print("Exception in on_message (code 1)", e)
+                # print("Exception in on_message (code 1)", e)
                 self.logger.error("on_message: ")
                 self.logger.error(e)
                 pass
@@ -115,11 +111,11 @@ class WebsocketClient(object):
                 self.api._temp_status = ""
             elif self.api._temp_status == """51-["history/list/v2",{"_placeholder":true,"num":0}]""":
                 self.api.candle_v2_data[message["asset"]] = message["history"]
-            elif (isinstance(message,list) and len(message[0]) == 4):
+            elif isinstance(message, list) and len(message[0]) == 4:
                 ans = {"time": message[0][1], "price": message[0][2]}
                 self.api.realtime_price[message[0][0]].append(ans)
         except Exception as e:
-            #print("Exception in on_message (code 2)", e)
+            # print("Exception in on_message (code 2)", e)
             self.logger.error("on_message: ")
             self.logger.error(e)
             pass
@@ -129,7 +125,7 @@ class WebsocketClient(object):
     def on_error(self, wss, error):
         """Method to process websocket errors."""
         logger = logging.getLogger(__name__)
-        #print("on_error: " , error)
+        # print("on_error: " , error)
         logger.error(error)
         global_value.websocket_error_reason = str(error)
         global_value.check_websocket_if_error = True
