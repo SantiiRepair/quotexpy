@@ -4,14 +4,13 @@ import math
 import asyncio
 import logging
 import yfinance as yf
-
+from collections import defaultdict
 from datetime import datetime, timedelta
+
 from quotexpy import expiration
 from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
-from collections import defaultdict
-from quotexpy.ws.objects.listinfodata import ListInfoData
 
 
 def nested_dict(n, type):

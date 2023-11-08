@@ -38,8 +38,6 @@ from quotexpy.new import Quotex
 ### Examples
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
 
-
-
 ### Donations
 If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
 
