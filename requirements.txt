@@ -10,7 +10,7 @@ h11==0.14.0
 httpcore==0.17.0
 httpx==0.24.0
 idna==3.4
-importlib-metadata==6.2.0
+importlib-metadata>=6.6.0
 playwright==1.39.0
 pycparser>=2.21
 pyOpenSSL==23.1.1
@@ -27,6 +27,4 @@ urllib3>=2.0.5
 websocket-client==1.6.3
 websockets==11.0.3
 zipp==3.17.0
-setuptools
-schedule
-yfinance
+yfinance==0.2.31
