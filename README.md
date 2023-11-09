@@ -8,7 +8,7 @@
 
 ______________________________________________________________________
 
-[![License](https://img.shields.io/badge/License-GPL--3.0-magenta.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
+[![License](https://img.shields.io/badge/License-LGPL--2.1-magenta.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
 [![PyPI version](https://badge.fury.io/py/quotexpy.svg)](https://badge.fury.io/py/quotexpy)
 ![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/pylint.yml/badge.svg)
 
