@@ -12,16 +12,13 @@ from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
 
-
 def nested_dict(n, type):
     if n == 1:
         return defaultdict(type)
     return defaultdict(lambda: nested_dict(n - 1, type))
 
-
 def truncate(f, n):
     return math.floor(f * 10**n) / 10**n
-
 
 class Quotex(object):
     __version__ = "1.40.0"
@@ -237,18 +234,11 @@ class Quotex(object):
     async def start_remaing_time(self):
         try:
             now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
-            # print("now_stamp",now_stamp)
             expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
-            # print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
-            # print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))
-            # print("expiration_stamp",expiration_stamp)
             remaing_time = int((expiration_stamp - now_stamp).total_seconds())
-            # print("remaing_time",remaing_time)
             if remaing_time < 0:
                 now_stamp_ajusted = now_stamp - timedelta(seconds=self.duration)
-                # print("now_stamp_ajusted",now_stamp_ajusted)
                 remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
-                # print("remaing_time ajusted",remaing_time)
             while remaing_time >= 0:
                 remaing_time -= 1
                 print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
@@ -261,8 +251,6 @@ class Quotex(object):
         """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        #start_time = time.time()
-        #listinfodata_dict = {}
         while True: #await self.start_remaing_time():
             try:
                 listinfodata_dict = self.api.listinfodata.get(asset)
@@ -277,8 +265,6 @@ class Quotex(object):
         self.logger.debug("end check wind")
         self.api.listinfodata.delete(id_number)
         self.api.listinfodata.delete(asset)
-        # if len(listinfodata_dict) == 0:
-        #    return None
         return listinfodata_dict["win"]
 
     def start_candles_stream(self, asset, size, period=0):

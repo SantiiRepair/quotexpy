@@ -18,9 +18,8 @@ def __x__(y):
     return z
 
 
-client = Quotex(email="buture@gmail.com", password="780405")
+client = Quotex(email="your@mail.com", password="yourPassword")
 client.debug_ws_enable = False
-
 
 async def login(attempts=5):
     check, reason = await client.connect()
@@ -36,8 +35,8 @@ async def login(attempts=5):
                 break
             print(colored("[INFO]: ", "blue"), "Error reconnecting")
             attempt += 1
-            if os.path.isfile(".session.json"):
-                os.remove(".session.json")
+            if os.path.isfile("session.json"):
+                os.remove("session.json")
         elif not check:
             attempt += 1
         else:
@@ -78,14 +77,10 @@ async def trade():
     if check_connect:
         client.change_account("PRACTICE")  # "REAL"
         amount = 1
-        #asset = "AUDCAD"  # "AUDCAD_otc"
-        #action = "call"  # call (green), put (red)
         action = random.choice(["call", "put"]) # call (green), put (red)
         duration = 60  # in seconds
         global CONST_ASSET
         asset, asset_open = check_asset(CONST_ASSET)
-        #asset_query = asset_parse(asset)
-        #asset_open = client.check_asset_open(asset_query)
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
             try:
@@ -115,28 +110,15 @@ async def trade_and_check():
             amount = 1
             if countSequenceLoss > 0:
                 #amount = countSequenceLoss + countSequenceLoss #martigale
-                amount = 2
-            #    countSequenceLoss = 0
+                amount = 2            
 
             if lastAction is None:
                 action = random.choice(["call", "put"]) # call (green), put (red)
-                #action = "call"
                 lastAction = action
             else:
                 action = lastAction
 
-            #action =  "put" # call (green), put (red)
-            #horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc
-            #asset = "AUDCAD"
             duration = 60  # in seconds
-            #asset_query = asset_parse(asset)
-            #asset_open = client.check_asset_open(asset_query)
-            #if not asset_open[2]:
-            #    print(colored("[WARN]: ", "blue"), "Asset is closed.")
-            #    asset = f"{asset}_otc"
-            #    print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
-            #    asset_query = asset_parse(asset)
-            #    asset_open = client.check_asset_open(asset_query)
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
 
