@@ -256,7 +256,7 @@ class Quotex(object):
         except Exception as e:
             print(e)
         return True
-    
+
     async def check_win(self, asset, id_number):
         """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
