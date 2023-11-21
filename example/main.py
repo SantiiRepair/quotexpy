@@ -110,7 +110,7 @@ async def trade_and_check():
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
         global lastAction
-        global countSequenceLoss        
+        global countSequenceLoss
         while balance >= 1:
             amount = 1
             if countSequenceLoss > 0:
@@ -148,7 +148,7 @@ async def trade_and_check():
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
                     print(colored("[INFO]: ", "blue"), f"Side: {action}, countSequenceLoss: {countSequenceLoss}")
                     #print(f"id checking {trade_info[asset]['id']}")
-                    
+
                     if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                         lastAction = action
@@ -251,7 +251,7 @@ async def get_candle_v2():
 
         for candle in candles:
             print(candle)
-            timestamp = candle[0]            
+            timestamp = candle[0]
             data = datetime.datetime.fromtimestamp(timestamp).strftime('%d/%m/%Y %H:%M:%S')
             print(data)
     client.close()
