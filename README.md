@@ -8,7 +8,7 @@
 
 ______________________________________________________________________
 
-[![License](https://img.shields.io/badge/License-GPL--3.0-magenta.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
+[![License](https://img.shields.io/badge/License-LGPL--2.1-magenta.svg)](https://www.gnu.org/licenses/gpl-3.0.txt)
 [![PyPI version](https://badge.fury.io/py/quotexpy.svg)](https://badge.fury.io/py/quotexpy)
 ![GithubActions](https://github.com/SantiiRepair/quotexpy/actions/workflows/pylint.yml/badge.svg)
 
@@ -32,20 +32,11 @@ pip install -e .
 
 ### Import
 ```python
-from quotexpy.stable_api import Quotex
+from quotexpy.new import Quotex
 ```
 
 ### Examples
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
-
-## Atettion
-- Because cloudfare blocks requests you should enable browser=True to avoid HTTP 403 errors.
-
-- If the Quotex broker understands that the operation is being carried out by a trading bot, it will apply the rules of use and block the account at the broker. We are not responsible for the use of this bot, use at your own risk. According to the broker’s message:
-"... The use of automated bots for trading is prohibited according to account rules.
-If you use them, your account will be blocked without the possibility of withdrawing funds and re-registration.
-Respectfully,
-Quotex"
 
 ### Donations
 If you feel like showing your love and/or appreciation for this project, then how about shouting me a coffee, beer or something more interesting ;)
