@@ -11,6 +11,8 @@ from quotexpy.utils import asset_parse
 
 shutup.please()
 
+CONST_ASSET = "AUDCAD"
+
 def __x__(y):
     z = get_event_loop().run_until_complete(y)
     return z
@@ -44,6 +46,16 @@ async def login(attempts=5):
         await asyncio.sleep(0.5)
     return check, reason
 
+def check_asset(asset):
+    asset_query = asset_parse(asset)
+    asset_open = client.check_asset_open(asset_query)
+    if not asset_open[2]:
+        print(colored("[WARN]: ", "blue"), "Asset is closed.")
+        asset = f"{asset}_otc"
+        print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
+        asset_query = asset_parse(asset)
+        asset_open = client.check_asset_open(asset_query)
+    return asset, asset_open
 
 async def get_balance():
     check_connect, message = await login()
@@ -70,12 +82,14 @@ async def trade():
     if check_connect:
         client.change_account("PRACTICE")#"REAL"
         amount = 1
-        asset = "AUDCAD"  # "AUDCAD_otc"
+        #asset = "AUDCAD"  # "AUDCAD_otc"
         #action = "call"  # call (green), put (red)
         action = random.choice(["call", "put"]) # call (green), put (red)
         duration = 60  # in seconds
-        asset_query = asset_parse(asset)
-        asset_open = client.check_asset_open(asset_query)
+        global CONST_ASSET
+        asset, asset_open = check_asset(CONST_ASSET)
+        #asset_query = asset_parse(asset)
+        #asset_open = client.check_asset_open(asset_query)
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
             try:
@@ -91,7 +105,6 @@ async def trade():
 
 lastAction = None
 countSequenceLoss = 0
-countSequenceWin  = 0
 
 async def trade_and_check():
     check_connect, message = await login()
@@ -101,36 +114,35 @@ async def trade_and_check():
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
         global lastAction
-        global countSequenceLoss
-        global countSequenceWin
+        global countSequenceLoss        
         while balance >= 1:
             amount = 1
-            #if countSequenceLoss == 1:
-            #    amount = 2 #martigale
-            #if countSequenceWin > 1:
-            #    amount = countSequenceWin #martigale
-            #if countLoss == 2:
-            #    amount = 4 #martigale
-            #if isModifyActionByLoss > 1:
-            #    amount = 1 #martigale
+            if countSequenceLoss > 0:
+                #amount = countSequenceLoss + countSequenceLoss #martigale
+                amount = 2
+            #    countSequenceLoss = 0
+
             if lastAction is None:
                 action = random.choice(["call", "put"]) # call (green), put (red)
+                #action = "call"
                 lastAction = action
             else:
                 action = lastAction
 
             #action =  "put" # call (green), put (red)
             #horario negociacao 09:00 as 15:00 de segunda a sexta, fora isto é otc
-            asset = "AUDCAD"
+            #asset = "AUDCAD"
             duration = 60  # in seconds
-            asset_query = asset_parse(asset)
-            asset_open = client.check_asset_open(asset_query)
-            if not asset_open[2]:
-                print(colored("[WARN]: ", "blue"), "Asset is closed.")
-                asset = f"{asset}_otc"
-                print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
-                asset_query = asset_parse(asset)
-                asset_open = client.check_asset_open(asset_query)
+            #asset_query = asset_parse(asset)
+            #asset_open = client.check_asset_open(asset_query)
+            #if not asset_open[2]:
+            #    print(colored("[WARN]: ", "blue"), "Asset is closed.")
+            #    asset = f"{asset}_otc"
+            #    print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
+            #    asset_query = asset_parse(asset)
+            #    asset_open = client.check_asset_open(asset_query)
+            global CONST_ASSET
+            asset, asset_open = check_asset(CONST_ASSET)
 
             if asset_open[2]:
                 print(colored("[INFO]: "), "OK: Asset is open")
@@ -138,30 +150,30 @@ async def trade_and_check():
                 print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                    print(colored("[INFO]: ", "blue"), f"Side: {action}, count modify side: {countSequenceLoss}")
+                    print(colored("[INFO]: ", "blue"), f"Side: {action}, countSequenceLoss: {countSequenceLoss}")
                     #print(f"id checking {trade_info[asset]['id']}")
                     
                     if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                         lastAction = action
                         countSequenceLoss = 0
-                        #countSequenceWin += 1
                     else:
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
                         countSequenceLoss += 1
-                        #countSequenceWin = 0
                         if countSequenceLoss > 1:
                             if lastAction == "call":
                                 lastAction = "put"
                             else:
                                 lastAction = "call"
-                        #     modifySide = 0
+                            countSequenceLoss = 0
                         #else:
                     #else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
                         #lastAction = None
                 else:
                     print(colored("[ERROR]: ", "red"), "Operation failed!!!")
+                    #erro de tempo incorreto
+                    return
             else:
                 print(colored("[WARN]: ", "light_red"), "Asset is closed.")
             print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
@@ -178,7 +190,9 @@ async def sell_option():
     if check_connect:
         client.change_account("PRACTICE")#"REAL"
         amount = 30
-        asset = "EURUSD_otc"  # "EURUSD_otc"
+        #asset = "EURUSD_otc"  # "EURUSD_otc"
+        global CONST_ASSET
+        asset, asset_open = check_asset(CONST_ASSET)
         direction = "put"
         duration = 1000  # in seconds
         status, buy_info = await client.trade(amount, asset, direction, duration)
@@ -203,7 +217,9 @@ async def get_candle():
     check_connect, message = await login()
     print(check_connect, message)
     if check_connect:
-        asset = "AUDCAD_otc"
+        #asset = "AUDCAD_otc"
+        global CONST_ASSET
+        asset, asset_open = check_asset(CONST_ASSET)
         offset = 180  # in seconds
         period = 3600  # in seconds / opcional
         candles = await client.get_candles(asset, offset, period)
@@ -222,13 +238,29 @@ async def get_payment():
             print(asset_name, asset_data["payment"], asset_data["open"])
     client.close()
 
-
+import datetime
+#import numpy as np
 async def get_candle_v2():
     check_connect, message = await login()
     print(check_connect, message)
+    period = 1
+    size = 50
     if check_connect:
-        candles = await client.get_candle_v2("USDJPY", 180)
-        print(candles)
+        global CONST_ASSET
+        asset, asset_open = check_asset(CONST_ASSET)
+        candles = await client.get_candle_v2(asset, period, size)
+        #data = np.array(candles)
+        ## Adiciona uma nova coluna com os valores convertidos em data
+        #timestamps = data[:, 0]
+        #datas = [datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S') for ts in timestamps]
+        #new_column = np.array(datas).reshape(-1, 1)
+        #data_with_dates = np.hstack((data, new_column))
+
+        for candle in candles:
+            print(candle)
+            timestamp = candle[0]            
+            data = datetime.datetime.fromtimestamp(timestamp).strftime('%d/%m/%Y %H:%M:%S')
+            print(data)
     client.close()
 
 
@@ -236,11 +268,13 @@ async def get_realtime_candle():
     check_connect, message = await login()
     if check_connect:
         list_size = 10
-        client.start_candles_stream("USDJPY_otc", list_size)
+        global CONST_ASSET
+        asset, asset_open = check_asset(CONST_ASSET)
+        client.start_candles_stream(asset, list_size)
         while True:
-            if len(client.get_realtime_candles("USDJPY_otc")) == list_size:
+            if len(client.get_realtime_candles(asset)) == list_size:
                 break
-        print(client.get_realtime_candles("USDJPY_otc"))
+        print(client.get_realtime_candles(asset))
     client.close()
 
 
@@ -281,12 +315,12 @@ async def main():
     #await get_balance()
     #await get_signal_data()
     # await get_payment()
-    # await get_candle()
-    #await get_candle_v2()
-    # await get_realtime_candle()
+    #await get_candle()
+    await get_candle_v2()
+    #await get_realtime_candle()
     # await assets_open()
     # await buy()
-    await trade_and_check()
+    #await trade_and_check()
     # await balance_refill()
     #await get_moving_average()
 
@@ -297,7 +331,7 @@ def run_main():
     #loop.run_forever()
 
 #Agendamentos:
-schedule.every(2).seconds.do(run_main)
+schedule.every(30).seconds.do(run_main)
 
 while True:
     schedule.run_pending()

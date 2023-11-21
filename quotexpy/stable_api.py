@@ -140,9 +140,8 @@ class Quotex(object):
                 await self.connect()
         return self.api.candles.candles_data
 
-    async def get_candle_v2(self, asset, period):
+    async def get_candle_v2(self, asset, period, size=10):
         self.api.candle_v2_data[asset] = None
-        size = 10
         self.stop_candles_stream(asset)
         self.api.subscribe_realtime_candle(asset, size, period)
         while self.api.candle_v2_data[asset] is None:
@@ -256,15 +255,16 @@ class Quotex(object):
                 await asyncio.sleep(1)
         except Exception as e:
             print(e)
+        return True
     
     async def check_win(self, asset, id_number):
        
         """Check win based id"""        
         self.logger.debug(f"begin check wind {id_number}")
-        await self.start_remaing_time()
+        #await self.start_remaing_time()
         #start_time = time.time()
         #listinfodata_dict = {}
-        while True: #time.time() - start_time < 5:
+        while await self.start_remaing_time(): #True: #time.time() - start_time < 5:
             try:
                 listinfodata_dict = self.api.listinfodata.get(asset)
                 if listinfodata_dict and listinfodata_dict["game_state"] == 1:
