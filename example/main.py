@@ -6,7 +6,7 @@ import asyncio
 import schedule
 from termcolor import colored
 
-from quotexpy.new import Quotex
+from quotexpy.stable_api import Quotex
 from quotexpy.utils import asset_parse
 
 shutup.please()
@@ -18,7 +18,7 @@ def __x__(y):
     return z
 
 
-client = Quotex(email="your@email.com", password="password")
+client = Quotex(email="buture@gmail.com", password="780405")
 client.debug_ws_enable = False
 
 
