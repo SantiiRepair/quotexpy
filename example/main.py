@@ -316,11 +316,11 @@ async def main():
     #await get_signal_data()
     # await get_payment()
     #await get_candle()
-    await get_candle_v2()
+    #await get_candle_v2()
     #await get_realtime_candle()
     # await assets_open()
     # await buy()
-    #await trade_and_check()
+    await trade_and_check()
     # await balance_refill()
     #await get_moving_average()
 
