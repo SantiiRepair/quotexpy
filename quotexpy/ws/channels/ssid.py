@@ -13,12 +13,8 @@ class Ssid(Base):
         :param ssid: The session identifier.
         """
         if self.api.account_type is None:
-            self.api.account_type = 1 #default 1-demo
+            self.api.account_type = 1  # default 1-demo
 
-        payload = {
-            "session": ssid,
-            "isDemo": self.api.account_type,
-            "tournamentId": 0
-        }
+        payload = {"session": ssid, "isDemo": self.api.account_type, "tournamentId": 0}
         data = f'42["authorization",{json.dumps(payload)}]'
         self.send_websocket_request(data)

@@ -58,7 +58,7 @@ class Candle(object):
         """
         if self.candle_open < self.candle_close:
             return "green"
-        elif self.candle_open > self.candle_close:
+        if self.candle_open > self.candle_close:
             return "red"
 
 

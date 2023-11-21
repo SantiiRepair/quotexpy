@@ -2,11 +2,11 @@ import os
 import time
 import shutup
 import random
-from termcolor import colored
 import asyncio
 import schedule
-from quotexpy.stable_api import Quotex
-from asyncio import get_event_loop
+from termcolor import colored
+
+from quotexpy.new import Quotex
 from quotexpy.utils import asset_parse
 
 shutup.please()
@@ -14,14 +14,13 @@ shutup.please()
 CONST_ASSET = "AUDCAD"
 
 def __x__(y):
-    z = get_event_loop().run_until_complete(y)
+    z = asyncio.get_event_loop().run_until_complete(y)
     return z
 
-client = Quotex(
-    email="your@email.com",
-    password="yourpassword"
-)
+
+client = Quotex(email="your@email.com", password="password")
 client.debug_ws_enable = False
+
 
 async def login(attempts=5):
     check, reason = await client.connect()
@@ -37,8 +36,8 @@ async def login(attempts=5):
                 break
             print(colored("[INFO]: ", "blue"), "Error reconnecting")
             attempt += 1
-            if os.path.isfile("session.json"):
-                os.remove("session.json")
+            if os.path.isfile(".session.json"):
+                os.remove(".session.json")
         elif not check:
             attempt += 1
         else:
@@ -59,7 +58,6 @@ def check_asset(asset):
 
 async def get_balance():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
         client.change_account("PRACTICE")  # "REAL"
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
@@ -69,7 +67,6 @@ async def get_balance():
 
 async def balance_refill():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
         result = await client.edit_practice_balance(100)
         print(result)
@@ -78,9 +75,8 @@ async def balance_refill():
 
 async def trade():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")#"REAL"
+        client.change_account("PRACTICE")  # "REAL"
         amount = 1
         #asset = "AUDCAD"  # "AUDCAD_otc"
         #action = "call"  # call (green), put (red)
@@ -103,14 +99,14 @@ async def trade():
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
+
 lastAction = None
 countSequenceLoss = 0
 
 async def trade_and_check():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
-        client.change_account("PRACTICE")#"REAL"
+        client.change_account("PRACTICE")  # "REAL"
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
         global lastAction
@@ -169,7 +165,7 @@ async def trade_and_check():
                         #else:
                     #else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
-                        #lastAction = None
+                    # lastAction = None
                 else:
                     print(colored("[ERROR]: ", "red"), "Operation failed!!!")
                     #erro de tempo incorreto
@@ -205,7 +201,6 @@ async def sell_option():
 
 async def assets_open():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
         print("Check Asset Open")
         for i in client.get_all_asset_name():
@@ -215,7 +210,6 @@ async def assets_open():
 
 async def get_candle():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
         #asset = "AUDCAD_otc"
         global CONST_ASSET
@@ -230,7 +224,6 @@ async def get_candle():
 
 async def get_payment():
     check_connect, message = await login()
-    print(check_connect, message)
     if check_connect:
         all_data = client.get_payment()
         for asset_name in all_data:
@@ -286,49 +279,31 @@ async def get_signal_data():
             time.sleep(1)
     client.close()
 
+
 async def get_moving_average():
-
-    symbol = "AUDCAD=X"
-    interval = "1m"
     periods = 21
-
-    ema21 = await client.get_moving_average(symbol=symbol, interval=interval, periods=periods)
-
-    #for ema in ema21:
-    print(ema21)
-
-
+    interval = "1m"
+    symbol = "AUDCAD=X"
+    await client.get_moving_average(symbol=symbol, interval=interval, periods=periods)
     lastCandles = await client.get_last_candles(symbol=symbol, interval=interval)
     print(lastCandles)
 
-# __x__(get_signal_data())
-# __x__(get_balance())
-# __x__(get_payment())
-# __x__(get_candle())
-# __x__(get_candle_v2())
-# __x__(get_realtime_candle())
-# __x__(assets_open())
-#__x__(trade_and_check())
-# __x__(balance_refill())
 
 async def main():
-    #await get_balance()
-    #await get_signal_data()
+    # await get_balance()
+    # await get_signal_data()
     # await get_payment()
     #await get_candle()
     #await get_candle_v2()
     #await get_realtime_candle()
     # await assets_open()
-    # await buy()
     await trade_and_check()
     # await balance_refill()
-    #await get_moving_average()
+    # await get_moving_average()
 
-#if __name__ == "__main__":
+
 def run_main():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-    #loop.run_forever()
+    __x__(main())
 
 #Agendamentos:
 schedule.every(30).seconds.do(run_main)

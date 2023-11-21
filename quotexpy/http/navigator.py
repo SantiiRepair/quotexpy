@@ -10,14 +10,13 @@ retry_strategy = Retry(
     total=3,
     backoff_factor=1,
     status_forcelist=[429, 500, 502, 503, 504, 104],
-    allowed_methods=["HEAD", "POST", "PUT", "GET", "OPTIONS"]
+    allowed_methods=["HEAD", "POST", "PUT", "GET", "OPTIONS"],
 )
 adapter = HTTPAdapter(max_retries=retry_strategy)
 user_agent_list = agents.split("\n")
 
 
 class Browser(object):
-
     def __init__(self, api):
         self.api = api
         self.response = None

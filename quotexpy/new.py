@@ -4,20 +4,20 @@ import math
 import asyncio
 import logging
 import yfinance as yf
-
+from collections import defaultdict
 from datetime import datetime, timedelta
+
 from quotexpy import expiration
 from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
-from collections import defaultdict
-from quotexpy.ws.objects.listinfodata import ListInfoData
 
 
 def nested_dict(n, type):
     if n == 1:
         return defaultdict(type)
     return defaultdict(lambda: nested_dict(n - 1, type))
+
 
 def truncate(f, n):
     return math.floor(f * 10**n) / 10**n
@@ -237,18 +237,18 @@ class Quotex(object):
     async def start_remaing_time(self):
         try:
             now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
-            #print("now_stamp",now_stamp)
+            # print("now_stamp",now_stamp)
             expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
-            #print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
-            #print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))            
-            #print("expiration_stamp",expiration_stamp)
+            # print("self.api.timesync.server_timestamp",self.api.timesync.server_timestamp)
+            # print("self.api.timesync.server_timestamp",expiration_stamp.strftime("%d/%m/%Y %H:%M:%S"))
+            # print("expiration_stamp",expiration_stamp)
             remaing_time = int((expiration_stamp - now_stamp).total_seconds())
-            #print("remaing_time",remaing_time)
+            # print("remaing_time",remaing_time)
             if remaing_time < 0:
                 now_stamp_ajusted = now_stamp - timedelta(seconds=self.duration)
-                #print("now_stamp_ajusted",now_stamp_ajusted)
+                # print("now_stamp_ajusted",now_stamp_ajusted)
                 remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
-                #print("remaing_time ajusted",remaing_time)
+                # print("remaing_time ajusted",remaing_time)
             while remaing_time >= 0:
                 remaing_time -= 1
                 print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
@@ -258,8 +258,7 @@ class Quotex(object):
         return True
     
     async def check_win(self, asset, id_number):
-       
-        """Check win based id"""        
+        """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
         #await self.start_remaing_time()
         #start_time = time.time()
@@ -278,7 +277,7 @@ class Quotex(object):
         self.logger.debug("end check wind")
         self.api.listinfodata.delete(id_number)
         self.api.listinfodata.delete(asset)
-        #if len(listinfodata_dict) == 0:
+        # if len(listinfodata_dict) == 0:
         #    return None
         return listinfodata_dict["win"]
 
@@ -301,7 +300,7 @@ class Quotex(object):
         return self.api.profit_in_operation or 0
 
     async def start_candles_one_stream(self, asset, size):
-        if str(asset + ',' + str(size)) not in self.subscribe_candle:
+        if str(asset + "," + str(size)) not in self.subscribe_candle:
             self.subscribe_candle.append((asset + "," + str(size)))
         start = time.time()
         self.api.candle_generated_check[str(asset)][int(size)] = {}
@@ -346,8 +345,7 @@ class Quotex(object):
         if asset not in self.subscribe_mood:
             self.subscribe_mood.append(asset)
         while True:
-            self.api.subscribe_Traders_mood(
-                asset[asset], instrument)
+            self.api.subscribe_Traders_mood(asset[asset], instrument)
             try:
                 self.api.traders_mood[codes_asset[asset]] = codes_asset[asset]
                 break
@@ -365,9 +363,8 @@ class Quotex(object):
         data["Close_MA"] = data["Close"].rolling(window=periods).mean()
 
         return data["Close_MA"]
-    
+
     async def get_last_candles(self, symbol, interval):
         ticker = yf.Ticker(symbol)
         last_candles = ticker.history(period="1d", interval=interval)
         return last_candles
-
