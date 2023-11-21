@@ -260,10 +260,10 @@ class Quotex(object):
     async def check_win(self, asset, id_number):
         """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
-        #await self.start_remaing_time()
+        await self.start_remaing_time()
         #start_time = time.time()
         #listinfodata_dict = {}
-        while await self.start_remaing_time(): #True: #time.time() - start_time < 5:
+        while True: #await self.start_remaing_time():
             try:
                 listinfodata_dict = self.api.listinfodata.get(asset)
                 if listinfodata_dict and listinfodata_dict["game_state"] == 1:
