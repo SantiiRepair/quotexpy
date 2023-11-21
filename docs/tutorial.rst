@@ -60,7 +60,7 @@ Quickstart: Getting Balance
 
 This tutorial assumes you have QuotexPy either :ref:`installed <installation>` or copied into your project directory. Let's start creating a new client::
 
-    from quotexpy.new import Quotex
+    from quotexpy.stable_api import Quotex
 
     client = Quotex(
         email="YOUR-ACCOUNT-EMAIL",
