@@ -96,7 +96,7 @@ async def trade():
 
 
 lastAction = None
-countSequenceLoss = 0
+countSequenceLoss = 1
 
 async def trade_and_check():
     check_connect, message = await login()
@@ -110,7 +110,7 @@ async def trade_and_check():
             amount = 1
             if countSequenceLoss > 0:
                 #amount = countSequenceLoss + countSequenceLoss #martigale
-                amount = 2            
+                amount = 2
 
             if lastAction is None:
                 action = random.choice(["call", "put"]) # call (green), put (red)
@@ -144,6 +144,74 @@ async def trade_and_check():
                             else:
                                 lastAction = "call"
                             countSequenceLoss = 0
+                        #else:
+                    #else: #error
+                    #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
+                    # lastAction = None
+                else:
+                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")
+                    #erro de tempo incorreto
+                    return
+            else:
+                print(colored("[WARN]: ", "light_red"), "Asset is closed.")
+            print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
+            print(colored("[INFO]: ", "blue"), "Exiting...")
+        if balance >= 1:
+            pass
+        else:
+            print(colored("[WARN]: ", "light_red"), "No balance available :(")
+    client.close()
+
+async def strategy_random():
+    check_connect, message = await login()
+    if check_connect:
+        client.change_account("PRACTICE")  # "REAL"
+        balance = await client.get_balance()
+        print(colored("[INFO]: ", "blue"), "Balance: ", balance)
+        global lastAction
+        global countSequenceLoss
+        while balance >= 1:
+            if countSequenceLoss < 1:
+                countSequenceLoss = 1 #lance minimo garantido 
+
+            amount = countSequenceLoss #aqui a formula do gerenciamento!!!!
+            #if countSequenceLoss > 0:
+            #    #amount = countSequenceLoss + countSequenceLoss #martigale
+            #    amount = 2
+
+            #if lastAction is None:
+            action = random.choice(["call", "put"]) # call (green), put (red)
+            #    lastAction = action
+            #else:
+            #    action = lastAction
+
+            duration = 60  # in seconds
+            global CONST_ASSET
+            asset, asset_open = check_asset(CONST_ASSET)
+
+            if asset_open[2]:
+                print(colored("[INFO]: "), "OK: Asset is open")
+                status, trade_info = await client.trade(action, amount, asset, duration)
+                print(status, trade_info, "\n")
+                if status:
+                    print(colored("[INFO]: ", "blue"), "Waiting for result...")
+                    print(colored("[INFO]: ", "blue"), f"Side: {action}, countSequenceLoss: {countSequenceLoss}")
+                    #print(f"id checking {trade_info[asset]['id']}")
+
+                    if await client.check_win(asset, trade_info[asset]["id"]):
+                        print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
+                        lastAction = action
+                        #countSequenceLoss = 0
+                        countSequenceLoss += 1
+                    else:
+                        print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
+                        countSequenceLoss -= 1
+                        #if countSequenceLoss > 1:
+                        #    if lastAction == "call":
+                        #        lastAction = "put"
+                        #    else:
+                        #        lastAction = "call"
+                        #    countSequenceLoss = 0
                         #else:
                     #else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
@@ -279,7 +347,8 @@ async def main():
     #await get_candle_v2()
     #await get_realtime_candle()
     # await assets_open()
-    await trade_and_check()
+    #await trade_and_check()
+    await strategy_random()
     # await balance_refill()
     # await get_moving_average()
 
