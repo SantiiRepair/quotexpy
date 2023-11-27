@@ -1,11 +1,25 @@
 import time
-import calendar
+import pytz
 from datetime import datetime, timedelta
 
+TIME_ZONE = 'Etc/GMT+3'
+
+
+#def get_timestamp() -> int:
+#    return calendar.timegm(time.gmtime())
 
 def get_timestamp() -> int:
-    return calendar.timegm(time.gmtime())
+    global TIME_ZONE
+    # Obter o objeto de fuso horário para UTC-3
+    tz_utc_minus3 = pytz.timezone(TIME_ZONE)
 
+    # Obter a data e hora atual com o fuso horário UTC-3
+    current_time_utc_minus3 = datetime.now(tz_utc_minus3)
+
+    # Converter a data e hora para um timestamp
+    timestamp = int(current_time_utc_minus3.timestamp())
+
+    return timestamp
 
 def date_to_timestamp(dt):
     return time.mktime(dt.timetuple())
