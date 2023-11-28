@@ -136,7 +136,7 @@ async def trade_and_check():
                 lastAction = action
             else:
                 action = lastAction
-           
+ 
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
 
@@ -256,7 +256,7 @@ async def wait_for_input_exceeding_30_seconds_limit():
     while True:
         now = datetime.datetime.now()
         if now.second < 30:
-            return  # Returns when it's the right time to proceed        
+            return  # Returns when it's the right time to proceed
         await asyncio.sleep(0.5)
 
 async def strategy_random():
@@ -279,7 +279,7 @@ async def strategy_random():
 
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
-            
+
             await wait_for_input_exceeding_30_seconds_limit()
 
             if asset_open[2]:
