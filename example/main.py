@@ -136,7 +136,7 @@ async def trade_and_check():
                 lastAction = action
             else:
                 action = lastAction
- 
+
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
 
