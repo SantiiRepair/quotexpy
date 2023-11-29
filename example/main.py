@@ -16,25 +16,23 @@ shutup.please()
 CONST_ASSET = "AUDCAD"
 
 #vars global parameters
-lastAction = None
-countSequenceLoss = 1
-countGale = 0
+last_action = None
+count_sequence_loss = 1
 #countSequenceLossTrend = 0
 
 #management risk
-entrada = 2 #dollars
-valor_para_reduzir_a_cada_win = 1
-resetar_entrada = 2
-limite_gale = 2
-
-entrada_inicial = entrada
+valor_entrada_em_operacao = 2 #dollars
+valor_entrada_inicial = valor_entrada_em_operacao
+limite_wins_sequencias = 2
+limite_tentativas_recuperacao_loss_gale = 2
+count_gale = 0
+count_win = 0
+count_loss = 0
+count_loss_print = 0
+count_win_print = 0
 lucro = 0
-cont_win = 0
-cont_loss = 0
-loss = 0
-win = 0
-resultado_l = 0
-resultado_w = 0
+valor_total_debito_loss = 0
+valor_total_credito_win = 0
 ##--end management risk--##
 
 def __x__(y):
@@ -99,7 +97,7 @@ async def balance_refill():
 async def trade():
     check_connect, message = await login()
     if check_connect:
-        client.change_account(AccountType.PRACTICE)  # "REAL"
+        client.change_account(AccountType.PRACTICE)
         amount = 1
         action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
         global CONST_ASSET
@@ -120,22 +118,22 @@ async def trade():
 async def trade_and_check():
     check_connect, message = await login()
     if check_connect:
-        client.change_account(AccountType.PRACTICE)  # "REAL"
+        client.change_account(AccountType.PRACTICE)
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
-        global lastAction
-        global countSequenceLoss
+        global last_action
+        global count_sequence_loss
         while balance >= 1:
             amount = 1
-            if countSequenceLoss > 0:
+            if count_sequence_loss > 0:
                 #amount = countSequenceLoss + countSequenceLoss #martigale
                 amount = 2
 
-            if lastAction is None:
+            if last_action is None:
                 action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
-                lastAction = action
+                last_action = action
             else:
-                action = lastAction
+                action = last_action
 
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
@@ -143,32 +141,31 @@ async def trade_and_check():
             if asset_open[2]:
                 print(colored("[INFO]: "), "OK: Asset is open")
                 status, trade_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
-                print(status, trade_info, "\n")
+                #print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                    print(colored("[INFO]: ", "blue"), f"Side: {action}, countSequenceLoss: {countSequenceLoss}")
+                    print(colored("[INFO]: ", "blue"), f"Side: {action}, countSequenceLoss: {count_sequence_loss}")
                     #print(f"id checking {trade_info[asset]['id']}")
 
                     if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
-                        lastAction = action
-                        countSequenceLoss = 0
+                        last_action = action
+                        count_sequence_loss = 0
                     else:
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
-                        countSequenceLoss += 1
-                        if countSequenceLoss > 1:
-                            if lastAction == OperationType.CALL_GREEN:
-                                lastAction = OperationType.PUT_RED
+                        count_sequence_loss += 1
+                        if count_sequence_loss > 1:
+                            if last_action == OperationType.CALL_GREEN:
+                                last_action = OperationType.PUT_RED
                             else:
-                                lastAction = OperationType.CALL_GREEN
-                            countSequenceLoss = 0
+                                last_action = OperationType.CALL_GREEN
+                            count_sequence_loss = 0
                         #else:
                     #else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
                     # lastAction = None
                 else:
-                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")
-                    #erro de tempo incorreto
+                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")                    
                     return
             else:
                 print(colored("[WARN]: ", "light_red"), "Asset is closed.")
@@ -182,75 +179,56 @@ async def trade_and_check():
 
 async def management_risk(result_trade):
 
-    global entrada
-    global resetar_entrada
-    global entrada_inicial
-    global valor_para_reduzir_a_cada_win
+    global valor_entrada_em_operacao
+    global valor_entrada_inicial
+    global limite_wins_sequencias
+    global limite_tentativas_recuperacao_loss_gale
     global lucro
-    global cont_win
-    global cont_loss
-    global loss
-    global win
-    global resultado_l
-    global resultado_w
-    global limite_gale
-    global countGale
+    global count_loss
+    global count_loss_print
+    global count_win
+    global count_win_print
+    global valor_total_credito_win
+    global valor_total_debito_loss
+    global count_gale
 
-    if result_trade:
-        resultado_w = resultado_w + entrada
+    if result_trade: #win
+        valor_total_credito_win = valor_total_credito_win + valor_entrada_em_operacao
+        count_win = count_win + 1
+        count_win_print = count_win_print + 1
+
+        #Se tiver 2 wins seguidos
+        if count_win == limite_wins_sequencias:
+            valor_entrada_em_operacao = valor_entrada_inicial
+            print(f'\nLimite de Wins atual: {count_win} atingido. reinicia a e contador de gales entrada atual: {valor_entrada_em_operacao}!')
+            count_gale = 0
+            count_win = 0
+            lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
+            print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
+        else:
+            count_gale += 1
+            #Qndo der win * 2
+            valor_entrada_em_operacao = valor_entrada_em_operacao * 2
+            print(f'\nWins, gale nro : {count_gale} subindo a entrada para: {valor_entrada_em_operacao}.')
 
         #Verifica se o valor da entrada é menor que o valor inicial
-        if entrada < 1:
-            entrada = entrada_inicial
-            print(f'\nEntrada atual: {entrada} Verifica se o valor da entrada é menor que o valor inicial')
-        #else:
-            #if  countGale == 0 and (entrada - valor_para_reduzir_a_cada_win) > 1:
-            #    entrada -= valor_para_reduzir_a_cada_win
-            #elif countGale == 0:
-            #    entrada = entrada_inicial
+        if valor_entrada_em_operacao < valor_entrada_inicial:
+            valor_entrada_em_operacao = valor_entrada_inicial
+            print(f'\nEntrada em operação atual: {valor_entrada_em_operacao} menor que o valor inicial. resetado valor')
 
-        cont_win = cont_win + 1
-        win = win + 1
-
-        #Reinicia o valor da entrada após tantos wins
-        if cont_win == resetar_entrada:
-            entrada = entrada_inicial
-            cont_win = 0
-            print(f'\nReiniciando entrada para {entrada}\n')
-
-        if cont_win < resetar_entrada:
-            print(f'cenario Win Result_trade {result_trade}\n')
-            #resultado = int(input('\nDeu win ou loss? 1 para win ou 2 para loss?\n'))
-            if result_trade:
-                #balance = balance + entrada
-                resultado_w = resultado_w + entrada
-                #entrada = entrada * 2 #0.8
-                cont_win = cont_win + 1
-                win = win + 1
-                entrada = round(entrada,2)
-                lucro = round (resultado_l + resultado_w,2)
-                print(f'\nPróxima entrada: {entrada}\nLucro atual: {lucro}\nWins: {win}\nLoss: {loss}\n')
-        else:
-            entrada = entrada_inicial
-            cont_win = 0
-
-    if not result_trade:
-        #balance = balance - entrada
-        resultado_l = resultado_l - entrada
-        if countGale < limite_gale:
-            entrada = entrada * 2
-        else:
-            entrada = entrada_inicial
-            countGale = 0
-            cont_win = 0
-
-        cont_loss = cont_loss + 1
-        loss = loss + 1
+    #Qndo der loss mantém o valor
+    #Próxima entrada = entrada inicial
+    if not result_trade: #loss
+        valor_total_debito_loss = valor_total_debito_loss - valor_entrada_em_operacao
+        count_loss = count_loss + 1
+        count_loss_print = count_loss_print + 1
+        valor_entrada_em_operacao = valor_entrada_inicial
+        count_gale = 0
+        count_win = 0
         #Painel de resultados
-        entrada = round(entrada,2)
-        lucro = round (resultado_l + resultado_w,2)
-        print(f'\nPróxima entrada: {entrada}\nLucro atual: {lucro}\nWins: {win}\nLoss: {loss}')
-
+        #entrada_em_operacao = round(entrada_em_operacao,2)
+        lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
+        print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}')
 
 async def wait_for_input_exceeding_30_seconds_limit():
     while True:
@@ -265,17 +243,17 @@ async def strategy_random():
         client.change_account(AccountType.PRACTICE)
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
-        global lastAction
-        global countSequenceLoss
-        global countGale
-        global entrada
+        global last_action
+        global count_sequence_loss
+        global count_gale
+        global valor_entrada_em_operacao
 
         while balance >= 1:
-            if lastAction is None:
+            if last_action is None:
                 action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
-                lastAction = action
+                last_action = action
             else:
-                action = lastAction
+                action = last_action
 
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
@@ -284,7 +262,7 @@ async def strategy_random():
 
             if asset_open[2]:
                 print(colored("[INFO]: "), "OK: Asset is open")
-                status, trade_info = await client.trade(action, entrada, asset, DurationTime.ONE_MINUTE)
+                status, trade_info = await client.trade(action, valor_entrada_em_operacao, asset, DurationTime.ONE_MINUTE)
                 print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
@@ -292,22 +270,21 @@ async def strategy_random():
                     result_trade = await client.check_win(asset, trade_info[asset]["id"])
                     if result_trade:
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
-                        lastAction = action
-                        countSequenceLoss = 0
+                        last_action = action
+                        count_sequence_loss = 0
                     else:
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
-                        countSequenceLoss += 1
-                        countGale += 1
-                        if countSequenceLoss > 1:
-                            if lastAction == OperationType.CALL_GREEN:
-                                lastAction = OperationType.PUT_RED
+                        count_sequence_loss += 1
+                        count_gale += 1
+                        if count_sequence_loss > 1:
+                            if last_action == OperationType.CALL_GREEN:
+                                last_action = OperationType.PUT_RED
                             else:
-                                lastAction = OperationType.CALL_GREEN
-                            countSequenceLoss = 0
+                                last_action = OperationType.CALL_GREEN
+                            count_sequence_loss = 0
                     await management_risk(result_trade=result_trade)
                 else:
                     print(colored("[ERROR]: ", "red"), "Operation failed!!!")
-                    #erro de tempo incorreto
                     return
             else:
                 print(colored("[WARN]: ", "light_red"), "Asset is closed.")
@@ -325,7 +302,6 @@ async def sell_option():
     if check_connect:
         client.change_account(AccountType.PRACTICE)
         amount = 30
-        #asset = "EURUSD_otc"  # "EURUSD_otc"
         global CONST_ASSET
         asset, asset_open = check_asset(CONST_ASSET)
         direction = OperationType.PUT_RED
@@ -350,7 +326,6 @@ async def assets_open():
 async def get_candle():
     check_connect, message = await login()
     if check_connect:
-        #asset = "AUDCAD_otc"
         global CONST_ASSET
         asset, asset_open = check_asset(CONST_ASSET)
         offset = 180  # in seconds
