@@ -12,13 +12,16 @@ from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
 
+
 def nested_dict(n, type):
     if n == 1:
         return defaultdict(type)
     return defaultdict(lambda: nested_dict(n - 1, type))
 
+
 def truncate(f, n):
     return math.floor(f * 10**n) / 10**n
+
 
 class Quotex(object):
     __version__ = "1.40.0"
@@ -251,7 +254,7 @@ class Quotex(object):
         """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        while True: #await self.start_remaing_time():
+        while True:  # await self.start_remaing_time():
             try:
                 listinfodata_dict = self.api.listinfodata.get(asset)
                 if listinfodata_dict and listinfodata_dict["game_state"] == 1:

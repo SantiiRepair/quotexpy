@@ -15,13 +15,13 @@ shutup.please()
 
 CONST_ASSET = "AUDCAD"
 
-#vars global parameters
+# vars global parameters
 last_action = None
 count_sequence_loss = 1
-#countSequenceLossTrend = 0
+# countSequenceLossTrend = 0
 
-#management risk
-valor_entrada_em_operacao = 2 #dollars
+# management risk
+valor_entrada_em_operacao = 2  # dollars
 valor_entrada_inicial = valor_entrada_em_operacao
 limite_wins_sequencias = 2
 limite_tentativas_recuperacao_loss_gale = 2
@@ -35,6 +35,7 @@ valor_total_debito_loss = 0
 valor_total_credito_win = 0
 ##--end management risk--##
 
+
 def __x__(y):
     z = asyncio.get_event_loop().run_until_complete(y)
     return z
@@ -42,6 +43,7 @@ def __x__(y):
 
 client = Quotex(email="your@mail.com", password="yourPassword")
 client.debug_ws_enable = False
+
 
 async def login(attempts=5):
     check, reason = await client.connect()
@@ -66,6 +68,7 @@ async def login(attempts=5):
         await asyncio.sleep(0.5)
     return check, reason
 
+
 def check_asset(asset):
     asset_query = asset_parse(asset)
     asset_open = client.check_asset_open(asset_query)
@@ -76,6 +79,7 @@ def check_asset(asset):
         asset_query = asset_parse(asset)
         asset_open = client.check_asset_open(asset_query)
     return asset, asset_open
+
 
 async def get_balance():
     check_connect, message = await login()
@@ -115,6 +119,7 @@ async def trade():
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
+
 async def trade_and_check():
     check_connect, message = await login()
     if check_connect:
@@ -126,7 +131,7 @@ async def trade_and_check():
         while balance >= 1:
             amount = 1
             if count_sequence_loss > 0:
-                #amount = countSequenceLoss + countSequenceLoss #martigale
+                # amount = countSequenceLoss + countSequenceLoss #martigale
                 amount = 2
 
             if last_action is None:
@@ -141,11 +146,11 @@ async def trade_and_check():
             if asset_open[2]:
                 print(colored("[INFO]: "), "OK: Asset is open")
                 status, trade_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
-                #print(status, trade_info, "\n")
+                # print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
                     print(colored("[INFO]: ", "blue"), f"Side: {action}, countSequenceLoss: {count_sequence_loss}")
-                    #print(f"id checking {trade_info[asset]['id']}")
+                    # print(f"id checking {trade_info[asset]['id']}")
 
                     if await client.check_win(asset, trade_info[asset]["id"]):
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
@@ -160,12 +165,12 @@ async def trade_and_check():
                             else:
                                 last_action = OperationType.CALL_GREEN
                             count_sequence_loss = 0
-                        #else:
-                    #else: #error
+                        # else:
+                    # else: #error
                     #    print(colored("[ERROR]: ", "red"), "Check Win/Loss failed!!!")
                     # lastAction = None
                 else:
-                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")                    
+                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")
                     return
             else:
                 print(colored("[WARN]: ", "light_red"), "Asset is closed.")
@@ -177,8 +182,8 @@ async def trade_and_check():
             print(colored("[WARN]: ", "light_red"), "No balance available :(")
     client.close()
 
-async def management_risk(result_trade):
 
+async def management_risk(result_trade):
     global valor_entrada_em_operacao
     global valor_entrada_inicial
     global limite_wins_sequencias
@@ -192,43 +197,50 @@ async def management_risk(result_trade):
     global valor_total_debito_loss
     global count_gale
 
-    if result_trade: #win
+    if result_trade:  # win
         valor_total_credito_win = valor_total_credito_win + valor_entrada_em_operacao
         count_win = count_win + 1
         count_win_print = count_win_print + 1
 
-        #Se tiver 2 wins seguidos
+        # Se tiver 2 wins seguidos
         if count_win == limite_wins_sequencias:
             valor_entrada_em_operacao = valor_entrada_inicial
-            print(f'\nLimite de Wins atual: {count_win} atingido. reinicia a e contador de gales entrada atual: {valor_entrada_em_operacao}!')
+            print(
+                f"\nLimite de Wins atual: {count_win} atingido. reinicia a e contador de gales entrada atual: {valor_entrada_em_operacao}!"
+            )
             count_gale = 0
             count_win = 0
-            lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
-            print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
+            lucro = round(valor_total_debito_loss + valor_total_credito_win, 2)
+            print(
+                f"\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n"
+            )
         else:
             count_gale += 1
-            #Qndo der win * 2
+            # Qndo der win * 2
             valor_entrada_em_operacao = valor_entrada_em_operacao * 2
-            print(f'\nWins, gale nro : {count_gale} subindo a entrada para: {valor_entrada_em_operacao}.')
+            print(f"\nWins, gale nro : {count_gale} subindo a entrada para: {valor_entrada_em_operacao}.")
 
-        #Verifica se o valor da entrada é menor que o valor inicial
+        # Verifica se o valor da entrada é menor que o valor inicial
         if valor_entrada_em_operacao < valor_entrada_inicial:
             valor_entrada_em_operacao = valor_entrada_inicial
-            print(f'\nEntrada em operação atual: {valor_entrada_em_operacao} menor que o valor inicial. resetado valor')
+            print(f"\nEntrada em operação atual: {valor_entrada_em_operacao} menor que o valor inicial. resetado valor")
 
-    #Qndo der loss mantém o valor
-    #Próxima entrada = entrada inicial
-    if not result_trade: #loss
+    # Qndo der loss mantém o valor
+    # Próxima entrada = entrada inicial
+    if not result_trade:  # loss
         valor_total_debito_loss = valor_total_debito_loss - valor_entrada_em_operacao
         count_loss = count_loss + 1
         count_loss_print = count_loss_print + 1
         valor_entrada_em_operacao = valor_entrada_inicial
         count_gale = 0
         count_win = 0
-        #Painel de resultados
-        #entrada_em_operacao = round(entrada_em_operacao,2)
-        lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
-        print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}')
+        # Painel de resultados
+        # entrada_em_operacao = round(entrada_em_operacao,2)
+        lucro = round(valor_total_debito_loss + valor_total_credito_win, 2)
+        print(
+            f"\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}"
+        )
+
 
 async def wait_for_input_exceeding_30_seconds_limit():
     while True:
@@ -236,6 +248,7 @@ async def wait_for_input_exceeding_30_seconds_limit():
         if now.second < 30:
             return  # Returns when it's the right time to proceed
         await asyncio.sleep(0.5)
+
 
 async def strategy_random():
     check_connect, message = await login()
@@ -262,7 +275,9 @@ async def strategy_random():
 
             if asset_open[2]:
                 print(colored("[INFO]: "), "OK: Asset is open")
-                status, trade_info = await client.trade(action, valor_entrada_em_operacao, asset, DurationTime.ONE_MINUTE)
+                status, trade_info = await client.trade(
+                    action, valor_entrada_em_operacao, asset, DurationTime.ONE_MINUTE
+                )
                 print(status, trade_info, "\n")
                 if status:
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
@@ -295,6 +310,7 @@ async def strategy_random():
         else:
             print(colored("[WARN]: ", "light_red"), "No balance available :(")
     client.close()
+
 
 async def sell_option():
     check_connect, message = await login()
@@ -335,6 +351,7 @@ async def get_candle():
             print(candle)
     client.close()
 
+
 async def get_payment():
     check_connect, message = await login()
     if check_connect:
@@ -344,8 +361,11 @@ async def get_payment():
             print(asset_name, asset_data["payment"], asset_data["open"])
     client.close()
 
+
 import datetime
-#import numpy as np
+
+
+# import numpy as np
 async def get_candle_v2():
     check_connect, message = await login()
     print(check_connect, message)
@@ -355,17 +375,17 @@ async def get_candle_v2():
         global CONST_ASSET
         asset, asset_open = check_asset(CONST_ASSET)
         candles = await client.get_candle_v2(asset, period, size)
-        #data = np.array(candles)
+        # data = np.array(candles)
         ## Adiciona uma nova coluna com os valores convertidos em data
-        #timestamps = data[:, 0]
-        #datas = [datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S') for ts in timestamps]
-        #new_column = np.array(datas).reshape(-1, 1)
-        #data_with_dates = np.hstack((data, new_column))
+        # timestamps = data[:, 0]
+        # datas = [datetime.datetime.fromtimestamp(ts).strftime('%d/%m/%Y %H:%M:%S') for ts in timestamps]
+        # new_column = np.array(datas).reshape(-1, 1)
+        # data_with_dates = np.hstack((data, new_column))
 
         for candle in candles:
             print(candle)
             timestamp = candle[0]
-            data = datetime.datetime.fromtimestamp(timestamp).strftime('%d/%m/%Y %H:%M:%S')
+            data = datetime.datetime.fromtimestamp(timestamp).strftime("%d/%m/%Y %H:%M:%S")
             print(data)
     client.close()
 
@@ -406,11 +426,11 @@ async def main():
     # await get_balance()
     # await get_signal_data()
     # await get_payment()
-    #await get_candle()
-    #await get_candle_v2()
-    #await get_realtime_candle()
+    # await get_candle()
+    # await get_candle_v2()
+    # await get_realtime_candle()
     # await assets_open()
-    #await trade_and_check()
+    # await trade_and_check()
     await strategy_random()
     # await balance_refill()
     # await get_moving_average()
@@ -419,7 +439,8 @@ async def main():
 def run_main():
     __x__(main())
 
-#Agendamentos:
+
+# Agendamentos:
 schedule.every(30).seconds.do(run_main)
 
 while True:

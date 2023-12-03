@@ -2,11 +2,12 @@ import time
 import pytz
 from datetime import datetime, timedelta
 
-TIME_ZONE = 'Etc/GMT+3'
+TIME_ZONE = "Etc/GMT+3"
 
 
-#def get_timestamp() -> int:
+# def get_timestamp() -> int:
 #    return calendar.timegm(time.gmtime())
+
 
 def get_timestamp() -> int:
     global TIME_ZONE
@@ -20,6 +21,7 @@ def get_timestamp() -> int:
     timestamp = int(current_time_utc_minus3.timestamp())
 
     return timestamp
+
 
 def date_to_timestamp(dt):
     return time.mktime(dt.timetuple())
