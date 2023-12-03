@@ -156,8 +156,8 @@ class QuotexAPI(object):
 
     def check_session(self):
         data = {}
-        if os.path.isfile("session.json"):
-            with open("session.json") as file:
+        if os.path.isfile(".session.json"):
+            with open(".session.json") as file:
                 data = json.loads(file.read())
             self.user_agent = data.get("user_agent")
         return data.get("ssid"), data.get("cookies")
@@ -249,8 +249,8 @@ class QuotexAPI(object):
         """
         self.profile.msg = None
         if not global_value.SSID:
-            if os.path.exists(os.path.join("session.json")):
-                os.remove("session.json")
+            if os.path.exists(os.path.join(".session.json")):
+                os.remove(".session.json")
             return False
         self.ssid(global_value.SSID)
         start_time = time.time()

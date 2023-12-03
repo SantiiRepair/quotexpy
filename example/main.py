@@ -57,8 +57,8 @@ async def login(attempts=5):
                 break
             print(colored("[INFO]: ", "blue"), "Error reconnecting")
             attempt += 1
-            if os.path.isfile("session.json"):
-                os.remove("session.json")
+            if os.path.isfile(".session.json"):
+                os.remove(".session.json")
         elif not check:
             attempt += 1
         else:
