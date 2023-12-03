@@ -5,7 +5,6 @@ import time
 import math
 import asyncio
 import logging
-import yfinance as yf
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -26,7 +25,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.40.3"
+    __version__ = "1.40.3+1"
 
     def __init__(self, email, password):
         self.size = [
@@ -355,11 +354,6 @@ class Quotex(object):
 
         return data["Close_MA"]
 
-    async def get_last_candles(self, symbol, interval):
-        ticker = yf.Ticker(symbol)
-        last_candles = ticker.history(period="1d", interval=interval)
-        return last_candles
-
 
 logging.basicConfig(
     filename=".quotexpy.log",
@@ -369,5 +363,3 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
-
-__author__ = "Santiago Ramirez"

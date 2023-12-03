@@ -340,19 +340,6 @@ async def assets_open():
     client.close()
 
 
-async def get_candle():
-    check_connect, message = await login()
-    if check_connect:
-        global CONST_ASSET
-        asset, asset_open = check_asset(CONST_ASSET)
-        offset = 180  # in seconds
-        period = 3600  # in seconds / opcional
-        candles = await client.get_candles(asset, offset, period)
-        for candle in candles["data"]:
-            print(candle)
-    client.close()
-
-
 async def get_payment():
     check_connect, message = await login()
     if check_connect:
