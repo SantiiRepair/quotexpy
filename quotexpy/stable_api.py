@@ -3,7 +3,6 @@ import time
 import math
 import asyncio
 import logging
-import yfinance as yf
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -349,8 +348,4 @@ class Quotex(object):
         data["Close_MA"] = data["Close"].rolling(window=periods).mean()
 
         return data["Close_MA"]
-
-    async def get_last_candles(self, symbol, interval):
-        ticker = yf.Ticker(symbol)
-        last_candles = ticker.history(period="1d", interval=interval)
-        return last_candles
+    

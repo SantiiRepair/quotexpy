@@ -29,4 +29,4 @@ websockets==11.0.3
 zipp==3.17.0
 setuptools
 schedule
-yfinance
+xlwings==0.30.5

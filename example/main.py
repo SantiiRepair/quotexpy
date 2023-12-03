@@ -392,16 +392,6 @@ async def get_signal_data():
             time.sleep(1)
     client.close()
 
-
-async def get_moving_average():
-    periods = 21
-    interval = "1m"
-    symbol = "AUDCAD=X"
-    await client.get_moving_average(symbol=symbol, interval=interval, periods=periods)
-    lastCandles = await client.get_last_candles(symbol=symbol, interval=interval)
-    print(lastCandles)
-
-
 async def main():
     # await get_balance()
     # await get_signal_data()
@@ -413,8 +403,6 @@ async def main():
     #await trade_and_check()
     await strategy_random()
     # await balance_refill()
-    # await get_moving_average()
-
 
 def run_main():
     __x__(main())
