@@ -10,7 +10,8 @@ dist
 .session.json
 
 # Codesandbox Development
-.devcontainer/
+# .codesandbox/
+# .devcontainer/
 
 # vscode
 .vscode/launch.json

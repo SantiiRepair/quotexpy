@@ -360,6 +360,7 @@ class Quotex(object):
         last_candles = ticker.history(period="1d", interval=interval)
         return last_candles
 
+
 logging.basicConfig(
     filename=".quotexpy.log",
     format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s",
