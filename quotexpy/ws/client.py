@@ -84,8 +84,6 @@ class WebsocketClient(object):
                 elif message.get("ticket"):
                     self.api.sold_options_respond = message
                 if message.get("deals"):
-                    # print("messagem client")
-                    # print(message["deals"])
                     for get_m in message["deals"]:
                         self.api.profit_in_operation = get_m["profit"]
                         get_m["win"] = True if get_m["profit"] > 0 else False
@@ -96,12 +94,9 @@ class WebsocketClient(object):
                 if message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
-                    # print(message)
                     self.logger.error(message)
                     pass
             except Exception as e:
-                # print("Exception in on_message (code 1)", e)
-                self.logger.error("on_message: ")
                 self.logger.error(e)
                 pass
             if "51-" in str(message):
@@ -115,7 +110,6 @@ class WebsocketClient(object):
                 ans = {"time": message[0][1], "price": message[0][2]}
                 self.api.realtime_price[message[0][0]].append(ans)
         except Exception as e:
-            # print("Exception in on_message (code 2)", e)
             self.logger.error("on_message: ")
             self.logger.error(e)
             pass
@@ -125,7 +119,6 @@ class WebsocketClient(object):
     def on_error(self, wss, error):
         """Method to process websocket errors."""
         logger = logging.getLogger(__name__)
-        # print("on_error: " , error)
         logger.error(error)
         global_value.websocket_error_reason = str(error)
         global_value.check_websocket_if_error = True

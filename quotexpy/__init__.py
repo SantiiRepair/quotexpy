@@ -212,7 +212,7 @@ class Quotex(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                print(f"\rWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="")
+                self.logger.info(f"Waiting for trade operation... Elapsed time: {round(elapsed_time)} seconds.")
                 previous_second = current_second
             if elapsed_time >= 3:
                 break
@@ -245,10 +245,10 @@ class Quotex(object):
                 remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
             while remaing_time >= 0:
                 remaing_time -= 1
-                print(f"\rWaiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.", end="")
+                self.logger.info(f"Waiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.")
                 await asyncio.sleep(1)
         except Exception as e:
-            print(e)
+            self.logger.error(e)
         return True
 
     async def check_win(self, asset, id_number):
