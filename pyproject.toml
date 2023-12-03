@@ -7,6 +7,9 @@ repository = "https://github.com/SantiiRepair/quotexpy"
 readme = ["README.md"]
 keywords = ["quotex", "quotexpy"]
 license = "LGPL-2.1"
+packages = [
+  {include = "quotexpy"}
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.13"

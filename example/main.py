@@ -5,6 +5,7 @@ import random
 import asyncio
 import schedule
 from termcolor import colored
+
 from quotexpy import Quotex
 from quotexpy.utils import asset_parse
 from quotexpy.utils.account_type import AccountType
