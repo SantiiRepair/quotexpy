@@ -17,8 +17,7 @@ class ListInfoData(Base):
         self.list_info_data_dict.update(
             {asset: {"win": win, "profit": profit, "game_state": game_state, "asset": asset}}
         )
-        # TODO implementar keepalive ids dead by long time
-        # print(self.list_info_data_dict)
+        # TODO: implementar keepalive ids dead by long time
 
     def delete(self, keyId):
         try:
