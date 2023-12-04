@@ -5,4 +5,3 @@ class DurationTime:
     FIFTEEN_MINUTES = 900
     THIRTY_MINUTES = 1800
     ONE_HOUR = 3600
-    

@@ -9,9 +9,9 @@ dist
 # Credentials
 .session.json
 
-# Codesandbox
-.codesandbox/
-.devcontainer/
+# Codesandbox Development
+# .codesandbox/
+# .devcontainer/
 
 # vscode
 .vscode/launch.json
