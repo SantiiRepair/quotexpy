@@ -27,3 +27,6 @@ urllib3>=2.0.5
 websocket-client==1.6.3
 websockets==11.0.3
 zipp==3.17.0
+setuptools
+schedule
+xlwings==0.30.5
