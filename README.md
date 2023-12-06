@@ -44,4 +44,8 @@ If you feel like showing your love and/or appreciation for this project, then ho
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/SantiiRepair)
 
 ### Acknowledgements
-Thanks to [@ricardospinoza](https://github.com/ricardospinoza) for solving the `trade` error in the code 🚀
+- Thanks to [@cleitonleonel](https://github.com/cleitonleonel) for the initial base implementation of the project 🔥
+- Thanks to [@ricardospinoza](https://github.com/ricardospinoza) for solving the `trade` error in the code 🚀
+
+### Notice 
+This project is a clone of the [original](https://github.com/cleitonleonel/pyquotex) project, because the original project was discontinued, I updated it with the help of [collaborators](https://github.com/SantiiRepair/quotexpy/graphs/contributors) in the community so that it is accessible to everyone.
