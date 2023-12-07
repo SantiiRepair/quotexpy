@@ -4,7 +4,7 @@
 ## <img src="https://github.com/SantiiRepair/quotexpy/blob/main/.github/images/quotex-logo.png?raw=true" height="56"/>
 
 
-**📈 QuotexPy is a library for interact with qxbroker easily.**
+**📈 QuotexPy is a library to easily interact with qxbroker.**
 
 ______________________________________________________________________
 
