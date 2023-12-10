@@ -19,6 +19,7 @@ CONST_ASSET = "AUDCAD"
 # vars global parameters
 last_action = None
 count_sequence_loss = 1
+is_trade_open = False
 # countSequenceLossTrend = 0
 
 # management risk
@@ -261,7 +262,7 @@ async def strategy_random():
         global count_sequence_loss
         global count_gale
         global valor_entrada_em_operacao
-        is_trade_open = False
+        global is_trade_open
 
         while balance >= 1:
             if last_action is None:
