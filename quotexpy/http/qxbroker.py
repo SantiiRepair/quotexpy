@@ -47,7 +47,8 @@ class Browser(object):
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
         except:
-            print("Erro ao carregar script. verifique se o usuário e senha estão corretos")
+            print("Erro ao carregar script. verifique se o usuário e senha estão corretos?")
+            print("Error loading script. check if the username and password are correct?")
             exit()
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
