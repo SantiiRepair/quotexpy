@@ -1,6 +1,7 @@
 import re
 import json
 import requests
+import sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
@@ -49,7 +50,7 @@ class Browser(object):
         except:
             print("Erro ao carregar script. verifique se o usuário e senha estão corretos?")
             print("Error loading script. check if the username and password are correct?")
-            exit()
+            sys.exit(1)
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
