@@ -215,7 +215,7 @@ async def management_risk(result_trade):
             print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
         else:
             count_gale += 1
-            
+
             valor_entrada_em_operacao = round(valor_entrada_em_operacao * 1,2)
             lucro = round (valor_total_debito_loss + valor_total_credito_win,2) #new
             print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
