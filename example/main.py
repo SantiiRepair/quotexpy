@@ -261,6 +261,7 @@ async def strategy_random():
         global count_sequence_loss
         global count_gale
         global valor_entrada_em_operacao
+        is_trade_open = False
 
         while balance >= 1:
             if last_action is None:
@@ -274,21 +275,24 @@ async def strategy_random():
 
             await wait_for_input_exceeding_30_seconds_limit()
 
-            if asset_open[2]:
+            if asset_open[2] and not is_trade_open:
                 print(colored("[INFO]: "), "OK: Asset is open")
                 status, trade_info = await client.trade(
                     action, valor_entrada_em_operacao, asset, DurationTime.ONE_MINUTE
                 )
                 print(status, trade_info, "\n")
                 if status:
+                    is_trade_open = True
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
                     print(colored("[INFO]: ", "blue"), f"Side: {action}")
                     result_trade = await client.check_win(asset, trade_info[asset]["id"])
                     if result_trade:
+                        is_trade_open = False
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                         last_action = action
                         count_sequence_loss = 0
                     else:
+                        is_trade_open = False
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
                         count_sequence_loss += 1
                         count_gale += 1
@@ -300,10 +304,10 @@ async def strategy_random():
                             count_sequence_loss = 0
                     await management_risk(result_trade=result_trade)
                 else:
-                    print(colored("[ERROR]: ", "red"), "Operation failed!!!")
-                    return
-            else:
-                print(colored("[WARN]: ", "light_red"), "Asset is closed.")
+                    if is_trade_open:
+                        print(colored("[INFO]: ", "blue"), "Trade in progress. Not permited open new trade. waiting current operation.")
+                    else:
+                        print(colored("[WARN]: ", "light_red"), "Asset is closed.")
             print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
             print(colored("[INFO]: ", "blue"), "Exiting...")
         if balance >= 1:
