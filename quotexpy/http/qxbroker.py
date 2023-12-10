@@ -44,7 +44,12 @@ class Browser(object):
         soup = BeautifulSoup(source, "html.parser")
         user_agent = await page.evaluate("() => navigator.userAgent;")
         self.api.user_agent = user_agent
-        script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
+        try:
+            script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
+        except:
+            print("Erro ao carregar script. verifique se o usuário e senha estão corretos?")
+            print("Error loading script. check if the username and password are correct?")
+            exit()
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
