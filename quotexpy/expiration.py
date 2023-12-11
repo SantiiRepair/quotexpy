@@ -2,7 +2,7 @@ import time
 import pytz
 from datetime import datetime, timedelta
 
-TIME_ZONE = "Etc/GMT+3"
+TIME_ZONE = "Etc/GMT+0"
 
 
 # def get_timestamp() -> int:
