@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "quotexpy"
 version = "1.40.3+1"
-description = "📈 QuotexPy is a library for interact with qxbroker easily."
+description = "📈 QuotexPy is a library to easily interact with qxbroker."
 authors = [
     "Santiago Ramirez <santiirepair@gmail.com>",
     "Ricardo Spinoza <ricardospinoza@gmail.com>",

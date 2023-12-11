@@ -4,7 +4,7 @@
 ## <img src="https://github.com/SantiiRepair/quotexpy/blob/main/.github/images/quotex-logo.png?raw=true" height="56"/>
 
 
-**📈 QuotexPy is a library for interact with qxbroker easily.**
+**📈 QuotexPy is a library to easily interact with qxbroker.**
 
 ______________________________________________________________________
 
@@ -30,18 +30,22 @@ git clone https://github.com/SantiiRepair/quotexpy.git
 pip install -e .
 ```
 
-### Import
+## Import
 ```python
 from quotexpy import Quotex
 ```
 
-### Examples
+## Examples
 For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main/example/main.py) found in the `example` directory.
 
-### Donations
+## Donations
 If you feel like showing your love and/or appreciation for this project, then how about shouting us a coffee ;)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/SantiiRepair)
 
-### Acknowledgements
-Thanks to [@ricardospinoza](https://github.com/ricardospinoza) for solving the `trade` error in the code 🚀
+## Acknowledgements
+- Thanks to [@cleitonleonel](https://github.com/cleitonleonel) for the initial base implementation of the project 🔥
+- Thanks to [@ricardospinoza](https://github.com/ricardospinoza) for solving the `trade` error in the code 🚀
+
+## Notice 
+This project is a clone of the [original](https://github.com/cleitonleonel/pyquotex) project, because the original project was discontinued, I updated it with the help of [collaborators](https://github.com/SantiiRepair/quotexpy/graphs/contributors) in the community so that it is accessible to everyone.

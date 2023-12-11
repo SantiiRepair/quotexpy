@@ -421,6 +421,7 @@ async def get_signal_data():
             time.sleep(1)
     client.close()
 
+
 async def main():
     # await get_balance()
     # await get_signal_data()
@@ -431,6 +432,7 @@ async def main():
     # await trade_and_check()
     await strategy_random()
     # await balance_refill()
+
 
 def run_main():
     __x__(main())
