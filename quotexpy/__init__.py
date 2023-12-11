@@ -171,7 +171,7 @@ class Quotex(object):
         return check, reason
 
     def change_account(self, mode="PRACTICE"):
-        """Change active account `real` or `practice`"""
+        """Change active account `REAL` or `PRACTICE`"""
         if mode.upper() == "REAL":
             self.api.account_type = 0
         elif mode.upper() == "PRACTICE":
