@@ -2,6 +2,7 @@ import os
 import time
 import shutup
 import random
+import sys
 import asyncio
 import schedule
 from termcolor import colored
@@ -329,6 +330,7 @@ async def strategy_random():
             pass
         else:
             print(colored("[WARN]: ", "light_red"), "No balance available :(")
+            sys.exit(2)
     client.close()
 
 
