@@ -48,8 +48,7 @@ class Browser(object):
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
         except:
-            raise QuotexAuthError("check if the username and password are correct")
-            sys.exit(1)
+            raise QuotexAuthError("incorrect username or password")
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
