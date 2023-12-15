@@ -45,7 +45,7 @@ def __x__(y):
     return z
 
 
-client = Quotex(email="buture@gmail.com", password="17012012")
+client = Quotex(email="your@email.com", password="yourPassord")
 client.debug_ws_enable = False
 
 
@@ -209,8 +209,7 @@ async def management_risk():
         #if count_win == 0:
         #    valor_entrada_em_operacao = valor_entrada_inicial
         count_win = count_win + 1
-        count_win_print = count_win_print + 1
-        count_loss = 0
+        count_win_print = count_win_print + 1        
 
         #Se tiver 2 wins seguidos reseta entrada
         if count_win == limite_wins_sequencial:
@@ -218,10 +217,14 @@ async def management_risk():
             print(f'\nLimite de Wins atingido: {count_win}\nReinicia o valor de entrada --> Entrada atual: {valor_entrada_em_operacao}')
             count_gale = 0
             count_win  = 0
+            count_loss = 0
             lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
         #    print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
         else:
             count_gale += 1
+            if count_loss > 0:
+                valor_entrada_em_operacao = valor_entrada_inicial
+            count_loss = 0
             valor_entrada_em_operacao = valor_entrada_em_operacao + (valor_entrada_em_operacao * 0.8)
             lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
 
@@ -239,7 +242,6 @@ async def management_risk():
         valor_total_debito_loss = valor_total_debito_loss - valor_entrada_em_operacao
         count_loss = count_loss + 1
         count_loss_print = count_loss_print + 1
-        count_win = 0
         #if count_loss == 0:
         #    valor_entrada_em_operacao = valor_entrada_inicial
 
@@ -250,10 +252,14 @@ async def management_risk():
             print(f'\nLimite de Loss atingido: {count_loss}\nReinicia o valor de entrada --> Entrada atual: {valor_entrada_em_operacao}')
             count_gale = 0
             count_loss = 0
+            count_win = 0
             lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
             #print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
         else:
             count_gale += 1
+            if count_win > 0:
+                valor_entrada_em_operacao = valor_entrada_inicial
+            count_win = 0
             valor_entrada_em_operacao = valor_entrada_em_operacao + (valor_entrada_em_operacao * 1.4) #Dobra quando da loss
             lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
         
