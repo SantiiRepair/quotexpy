@@ -46,8 +46,8 @@ class Browser(object):
         self.api.user_agent = user_agent
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
-        except Exception as exec:
-            raise QuotexAuthError("incorrect username or password") from exec
+        except Exception as exc:
+            raise QuotexAuthError("incorrect username or password") from exc
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
