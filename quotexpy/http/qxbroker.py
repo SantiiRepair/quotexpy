@@ -1,10 +1,11 @@
 import re
+import sys
 import json
 import requests
-import sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
+from quotexpy.exceptions import QuotexAuthError
 from quotexpy.utils.playwright_install import install
 from playwright.async_api import Playwright, async_playwright
 
@@ -31,9 +32,8 @@ class Browser(object):
             await page.wait_for_timeout(15000)
             soup = BeautifulSoup(await page.content(), "html.parser")
             if "Insira o código PIN que acabamos de enviar para o seu e-mail" in soup.get_text():
-                code = input("Insira o código PIN que acabamos de enviar para o seu e-mail: ")
-                """await page.evaluate(
-                    f'() => {{ document.querySelector("input[name=\\"code\\"]").value = {int(code)}; }}')"""
+                code = input("Enter the PIN code we just sent to your email: ")
+                # await page.evaluate(f'() => {{ document.querySelector("input[name=\\"code\\"]").value = {int(code)}; }}')
                 await page.get_by_placeholder("Digite o código de 6 dígitos...").click()
                 await page.get_by_placeholder("Digite o código de 6 dígitos...").fill(code)
                 await page.get_by_role("button", name="Entrar").click()
@@ -48,8 +48,7 @@ class Browser(object):
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
         except:
-            print("Erro ao carregar script. verifique se o usuário e senha estão corretos?")
-            print("Error loading script. check if the username and password are correct?")
+            raise QuotexAuthError("check if the username and password are correct")
             sys.exit(1)
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
