@@ -134,7 +134,7 @@ async def trade_and_check():
         global count_sequence_loss
         while balance >= 1:
             amount = 1
-            #if count_sequence_loss > 0:
+            # if count_sequence_loss > 0:
             #    # amount = countSequenceLoss + countSequenceLoss #martigale
             #    amount = 2
 
@@ -208,45 +208,57 @@ async def management_risk():
         count_loss = 0
         count_win_print = count_win_print + 1
 
-        #Se tiver 2 wins seguidos reseta entrada
+        # Se tiver 2 wins seguidos reseta entrada
         if count_win == limite_wins_sequencias:
             valor_entrada_em_operacao = valor_entrada_inicial
-            print(f'\nLimite de Wins atingido: {count_win}\nReinicia o valor de entrada --> Entrada atual: {valor_entrada_em_operacao}')
+            print(
+                f"\nLimite de Wins atingido: {count_win}\nReinicia o valor de entrada --> Entrada atual: {valor_entrada_em_operacao}"
+            )
             count_gale = 0
             count_win = 0
-            lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
-            print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
+            lucro = round(valor_total_debito_loss + valor_total_credito_win, 2)
+            print(
+                f"\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n"
+            )
         else:
             count_gale += 1
 
-            valor_entrada_em_operacao = round(valor_entrada_em_operacao * 1,2)
-            lucro = round (valor_total_debito_loss + valor_total_credito_win,2) #new
-            print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
-            print(f'\nSequencia de gale no win: {count_gale} --> Repetindo o valor da entrada: {valor_entrada_em_operacao}\n')
+            valor_entrada_em_operacao = round(valor_entrada_em_operacao * 1, 2)
+            lucro = round(valor_total_debito_loss + valor_total_credito_win, 2)  # new
+            print(
+                f"\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n"
+            )
+            print(
+                f"\nSequencia de gale no win: {count_gale} --> Repetindo o valor da entrada: {valor_entrada_em_operacao}\n"
+            )
 
-        #Verifica se o valor da entrada é menor que o valor inicial
+        # Verifica se o valor da entrada é menor que o valor inicial
         if valor_entrada_em_operacao < valor_entrada_inicial:
             valor_entrada_em_operacao = valor_entrada_inicial
-            print(f'\nReiniciando o valor da entrada para: {valor_entrada_em_operacao} --> MOTIVO: Entrada atual < Entrada inicial')
+            print(
+                f"\nReiniciando o valor da entrada para: {valor_entrada_em_operacao} --> MOTIVO: Entrada atual < Entrada inicial"
+            )
 
-    #Qndo der loss mantém o valor
-    #Próxima entrada = entrada inicial
-    if result_trade is not None and not result_trade: #loss
+    # Qndo der loss mantém o valor
+    # Próxima entrada = entrada inicial
+    if result_trade is not None and not result_trade:  # loss
         valor_total_debito_loss = valor_total_debito_loss - valor_entrada_em_operacao
         count_loss = count_loss + 1
         count_loss_print = count_loss_print + 1
-        #valor_entrada_em_operacao = valor_entrada_inicial (reinicia entrada apos loss)
-        valor_entrada_em_operacao = round(valor_entrada_em_operacao * 1.5,2) #Dobra quando da loss
+        # valor_entrada_em_operacao = valor_entrada_inicial (reinicia entrada apos loss)
+        valor_entrada_em_operacao = round(valor_entrada_em_operacao * 1.5, 2)  # Dobra quando da loss
         count_gale = count_gale + 1
         count_win = 0
-        #Painel de resultados
-        #entrada_em_operacao = round(entrada_em_operacao,2)
-        lucro = round (valor_total_debito_loss + valor_total_credito_win,2)
+        # Painel de resultados
+        # entrada_em_operacao = round(entrada_em_operacao,2)
+        lucro = round(valor_total_debito_loss + valor_total_credito_win, 2)
 
-        print(f'\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n')
+        print(
+            f"\nPróxima entrada: {valor_entrada_em_operacao}\nLucro atual: {lucro}\nWins: {count_win_print}\nLoss: {count_loss_print}\n"
+        )
 
     balance = await client.get_balance()
-    #valida disponibilidade de saldo para entrada
+    # valida disponibilidade de saldo para entrada
     if balance <= valor_entrada_em_operacao:
         print(colored("[INFO]: ", "blue"), "Balance: ", balance, " <= ", valor_entrada_em_operacao)
 
@@ -255,7 +267,7 @@ async def management_risk():
             valor_entrada_em_operacao = valor_entrada_inicial
         if balance < valor_entrada_inicial:
             print(colored("[INFO]: ", "blue"), "Balance: ", balance, " < ", valor_entrada_inicial)
-            valor_entrada_em_operacao = 1 #minimo de entrada
+            valor_entrada_em_operacao = 1  # minimo de entrada
 
 
 async def wait_for_input_exceeding_x_seconds_limit(secounds=30):
@@ -273,7 +285,7 @@ async def strategy_random():
         balance = await client.get_balance()
         print(colored("[INFO]: ", "blue"), "Balance: ", balance)
         global last_action
-        #global count_sequence_loss
+        # global count_sequence_loss
         global count_gale
         global valor_entrada_em_operacao
         global is_trade_open
@@ -289,7 +301,7 @@ async def strategy_random():
             global CONST_ASSET
             asset, asset_open = check_asset(CONST_ASSET)
 
-            await wait_for_input_exceeding_x_seconds_limit(30) #waiting for secounds
+            await wait_for_input_exceeding_x_seconds_limit(30)  # waiting for secounds
 
             if asset_open[2] and not is_trade_open:
                 print(colored("[INFO]: "), "OK: Asset is open")
@@ -307,21 +319,24 @@ async def strategy_random():
                         is_trade_open = False
                         print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                         last_action = action
-                        #count_sequence_loss = 0
+                        # count_sequence_loss = 0
                     else:
                         is_trade_open = False
                         print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
-                        #count_sequence_loss += 1
+                        # count_sequence_loss += 1
                         count_gale += 1
-                        #if count_sequence_loss > 1:
+                        # if count_sequence_loss > 1:
                         if last_action == OperationType.CALL_GREEN:
                             last_action = OperationType.PUT_RED
                         else:
                             last_action = OperationType.CALL_GREEN
-                        #count_sequence_loss = 0
+                        # count_sequence_loss = 0
                 else:
                     if is_trade_open:
-                        print(colored("[INFO]: ", "blue"), "Trade in progress. Not permited open new trade. waiting current operation.")
+                        print(
+                            colored("[INFO]: ", "blue"),
+                            "Trade in progress. Not permited open new trade. waiting current operation.",
+                        )
                     else:
                         print(colored("[WARN]: ", "light_red"), "Asset is closed.")
             print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
