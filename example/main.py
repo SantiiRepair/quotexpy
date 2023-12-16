@@ -187,6 +187,42 @@ async def trade_and_check():
     client.close()
 
 
+def calcular_resultado(result_trade=True, entrada_atual = None, numero_operacao_atual=1, numero_wins_atual=0, payout=90, banca=68.91):
+    
+    operacoes_dict = {}
+
+    fator_progressivo_entrada_dict = [0.02983, 1.6, 2.4, 3.57, 5.25, 7.6999, 12.00209]
+    percentualPayout = payout / 100
+
+    # entrada nro 1
+    percentualEntradaBanca = fator_progressivo_entrada_dict[0]
+    entrada_operacao = banca * percentualEntradaBanca
+    lucro_operacao = entrada_operacao * percentualPayout
+    operacoes_dict[1] = {
+        1: [entrada_operacao, lucro_operacao],
+        2: [entrada_operacao + lucro_operacao, (entrada_operacao + lucro_operacao) * percentualPayout]
+    }
+
+    # entradas nro 2 a nro 7
+    for i in range(2, 8):
+        entrada_operacao = operacoes_dict[1][1][0] * (fator_progressivo_entrada_dict[i - 1])
+        lucro_operacao = entrada_operacao * percentualPayout
+
+        operacoes_dict[i] = {
+            1: [entrada_operacao, lucro_operacao],
+            2: [entrada_operacao + lucro_operacao, (entrada_operacao + lucro_operacao) * percentualPayout]
+        }
+
+    # Imprimir os resultados
+    for chave, valores in operacoes_dict.items():
+        entrada1 = valores[1][0]
+        lucro1 = valores[1][1]  # Corrigido para acessar o lucro da entrada
+
+        entrada2 = valores[2][0]
+        lucro2 = valores[2][1]  # Corrigido para acessar o lucro da entrada
+        print(f'Operação {chave}:  Entrada(1): {entrada1} Lucro(1): {lucro1} Entrada(2): {entrada2} Lucro(2): {lucro2}')
+
+
 async def management_risk():
     global valor_entrada_em_operacao
     global valor_entrada_inicial
@@ -477,16 +513,16 @@ async def main():
     # await get_realtime_candle()
     # await assets_open()
     # await trade_and_check()
-    await strategy_random()
+    # await strategy_random()
     # await balance_refill()
-    #await test_gerenciamento_risco()
+    await calcular_resultado()
 
 def run_main():
     __x__(main())
 
 
 # Agendamentos:
-schedule.every(30).seconds.do(run_main)
+schedule.every(1).seconds.do(run_main)
 
 while True:
     schedule.run_pending()
