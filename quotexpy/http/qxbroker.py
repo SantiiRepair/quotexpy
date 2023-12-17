@@ -1,5 +1,6 @@
 import re
 import json
+import shutil
 import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -63,7 +64,9 @@ class Browser(object):
 
     async def main(self) -> Tuple[Any, str]:
         async with async_playwright() as playwright:
-            install(playwright.firefox, with_deps=True)
+            browser = playwright.firefox
+            if not shutil.which(browser.name):
+                install(browser, with_deps=True)
             return await self.run(playwright)
 
     async def get_cookies_and_ssid(self):

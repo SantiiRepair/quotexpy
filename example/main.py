@@ -77,9 +77,9 @@ def check_asset(asset):
     asset_query = asset_parse(asset)
     asset_open = client.check_asset_open(asset_query)
     if not asset_open[2]:
-        print(colored("[WARN]: ", "blue"), "Asset is closed.")
+        print(colored("[WARN]: ", "yellow"), "Asset is closed.")
         asset = f"{asset}_otc"
-        print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
+        print(colored("[WARN]: ", "yellow"), "Try OTC Asset -> " + asset)
         asset_query = asset_parse(asset)
         asset_open = client.check_asset_open(asset_query)
     return asset, asset_open
@@ -113,12 +113,11 @@ async def trade():
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
             try:
-                status, buy_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
-                print(status, buy_info)
+                await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
             except:
                 pass
         else:
-            print(colored("[WARN]: ", "blue"), "Asset is closed.")
+            print(colored("[WARN]: ", "yellow"), "Asset is closed.")
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
@@ -148,7 +147,7 @@ async def trade_and_check():
             asset, asset_open = check_asset(CONST_ASSET)
 
             if asset_open[2]:
-                print(colored("[INFO]: "), "OK: Asset is open")
+                print(colored("[INFO]: ", "blue"), "Asset is open")
                 status, trade_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
                 # print(status, trade_info, "\n")
                 if status:
@@ -177,13 +176,13 @@ async def trade_and_check():
                     print(colored("[ERROR]: ", "red"), "Operation failed!!!")
                     return
             else:
-                print(colored("[WARN]: ", "light_red"), "Asset is closed.")
+                print(colored("[WARN]: ", "yellow"), "Asset is closed.")
             print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
             print(colored("[INFO]: ", "blue"), "Exiting...")
         if balance >= 1:
             pass
         else:
-            print(colored("[WARN]: ", "light_red"), "No balance available :(")
+            print(colored("[WARN]: ", "yellow"), "No balance available :(")
     client.close()
 
 
@@ -304,12 +303,12 @@ async def strategy_random():
             await wait_for_input_exceeding_x_seconds_limit(30)  # waiting for secounds
 
             if asset_open[2] and not is_trade_open:
-                print(colored("[INFO]: "), "OK: Asset is open")
+                print(colored("[INFO]: ", "blue"), "Asset is open")
                 await management_risk()
                 status, trade_info = await client.trade(
                     action, valor_entrada_em_operacao, asset, DurationTime.ONE_MINUTE
                 )
-                print(status, trade_info, "\n")
+                # print(status, trade_info, "\n")
                 if status:
                     is_trade_open = True
                     print(colored("[INFO]: ", "blue"), "Waiting for result...")
@@ -450,7 +449,11 @@ async def main():
 
 
 def run_main():
-    __x__(main())
+    try:
+        __x__(main())
+    except KeyboardInterrupt:
+        print("Aborted!")
+        sys.exit(0)
 
 
 # Agendamentos:
