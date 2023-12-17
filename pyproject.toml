@@ -18,7 +18,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.10, <3.13"
 beautifulsoup4 = "4.11.2"
-certifi = "2022.12.7"
+certifi = ">=2022.12.7"
 greenlet = ">=2.0.1"
 playwright = ">=1.39.0"
 pyOpenSSL = ">=23.1.1"
@@ -26,8 +26,8 @@ pytz = ">=2023.3"
 requests = ">=2.31.0"
 requests-toolbelt = ">=1.0.0"
 urllib3 = ">=2.0.5"
-websocket-client = "1.6.3"
-websockets = "11.0.3"
+websocket-client = ">=1.6.3"
+websockets = ">=11.0.3"
 
 [tool.poetry.dev-dependencies]
 black = "^23.9.1"
