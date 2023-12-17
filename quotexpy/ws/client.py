@@ -96,8 +96,7 @@ class WebsocketClient(object):
                 elif message.get("error"):
                     self.logger.error(message)
                     pass
-            except Exception as e:
-                self.logger.error(e)
+            except Exception:
                 pass
             if "51-" in str(message):
                 self.api._temp_status = str(message)
@@ -109,9 +108,7 @@ class WebsocketClient(object):
             elif isinstance(message, list) and len(message[0]) == 4:
                 ans = {"time": message[0][1], "price": message[0][2]}
                 self.api.realtime_price[message[0][0]].append(ans)
-        except Exception as e:
-            self.logger.error("on_message: ")
-            self.logger.error(e)
+        except Exception:
             pass
         global_value.ssl_Mutual_exclusion = False
         self.wss.send('42["tick"]')
@@ -124,15 +121,15 @@ class WebsocketClient(object):
         global_value.check_websocket_if_error = True
 
     def on_open(self, wss):
-        """Method to process websocket open"""
+        """Method to process websocket open."""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket client connected")
+        logger.info("Websocket client connected.")
         global_value.check_websocket_if_connect = 1
 
     def on_close(self, wss, close_status_code, close_msg):
         """Method to process websocket close."""
         logger = logging.getLogger(__name__)
-        logger.debug("Websocket connection closed.")
+        logger.info("Websocket connection closed.")
         global_value.check_websocket_if_connect = 0
 
     def on_ping(self, wss, ping_msg):

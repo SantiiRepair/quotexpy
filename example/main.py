@@ -1,8 +1,8 @@
 import os
+import sys
 import time
 import shutup
 import random
-import sys
 import asyncio
 import schedule
 from termcolor import colored
