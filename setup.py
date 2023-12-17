@@ -14,33 +14,17 @@ packages = [
 package_data = {"": ["*"]}
 
 install_requires = [
-    "appdirs==1.4.4",
     "beautifulsoup4==4.11.2",
     "certifi==2022.12.7",
-    "cffi==1.15.1",
-    "charset-normalizer==3.2.0",
-    "cloudscraper==1.2.71",
-    "cryptography==40.0.1",
     "greenlet>=2.0.1",
-    "h11==0.14.0",
-    "httpcore==0.17.0",
-    "importlib-metadata==6.2.0",
     "playwright>=1.39.0",
     "pyOpenSSL>=23.1.1",
-    "pycparser>=2.21",
-    "pyparsing>=3.1.1",
     "pytz>=2023.3",
     "requests-toolbelt>=1.0.0",
     "requests>=2.31.0",
-    "simplejson>=3.18.3",
-    "sniffio>=1.3.0",
-    "soupsieve>=2.4",
-    "tqdm>=4.65.0",
-    "typing_extensions==4.5.0",
     "urllib3>=2.0.5",
     "websocket-client==1.6.3",
     "websockets==11.0.3",
-    "zipp==3.17.0",
 ]
 
 setup_kwargs = {
