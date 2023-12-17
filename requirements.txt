@@ -13,6 +13,7 @@ playwright==1.39.0
 pycparser>=2.21
 pyOpenSSL==23.1.1
 pyparsing==3.1.1
+pytz>=2023.3
 requests==2.31.0
 requests-toolbelt==1.0.0
 simplejson==3.18.3
