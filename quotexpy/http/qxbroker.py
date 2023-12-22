@@ -1,10 +1,11 @@
 import re
 import json
+import shutil
 import requests
-import sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
+from quotexpy.exceptions import QuotexAuthError
 from quotexpy.utils.playwright_install import install
 from playwright.async_api import Playwright, async_playwright
 
@@ -53,10 +54,8 @@ class Browser(object):
         self.api.user_agent = user_agent
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
-        except:
-            print("Erro ao carregar script. verifique se o usuário e senha estão corretos?")
-            print("Error loading script. check if the username and password are correct?")
-            sys.exit(1)
+        except Exception as exc:
+            raise QuotexAuthError("incorrect username or password") from exc
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
@@ -72,7 +71,9 @@ class Browser(object):
 
     async def main(self) -> Tuple[Any, str]:
         async with async_playwright() as playwright:
-            install(playwright.firefox, with_deps=True)
+            browser = playwright.firefox
+            if not shutil.which(browser.name):
+                install(browser, with_deps=True)
             return await self.run(playwright)
 
     async def get_cookies_and_ssid(self):

@@ -13,7 +13,7 @@ def install(
     *,
     with_deps: bool = False,
 ) -> bool:
-    """install playwright and deps if needed
+    """Install playwright and deps if needed
 
     Args:
         browser_type (SyncBrowserType | AsyncBrowserType): `BrowserType` object. Example: `p.chrome`
