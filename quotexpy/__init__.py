@@ -141,10 +141,10 @@ class Quotex(object):
                 await self.connect()
         return self.api.candles.candles_data
 
-    async def get_candle_v2(self, asset, period, size=10):
+    async def get_candle_v2(self, asset, period):
         self.api.candle_v2_data[asset] = None
         self.stop_candles_stream(asset)
-        self.api.subscribe_realtime_candle(asset, size, period)
+        self.api.subscribe_realtime_candle(asset, period)
         while self.api.candle_v2_data[asset] is None:
             await asyncio.sleep(1)
         return self.api.candle_v2_data[asset]
@@ -198,24 +198,21 @@ class Quotex(object):
         )
         return float(f"{truncate(balance + self.get_profit(), 2):.2f}")
 
-    async def trade(self, action: str, amount, asset: str, duration):
+    async def trade(self, action: str, amount, asset: str, duration):        
         """Trade Binary option"""
-        status_trade = False
-        self.duration = duration - 1
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
+        self.api.subscribe_realtime_candle(asset, duration)                       
         self.api.trade(action, amount, asset, duration, request_id)
-        start_time = time.time()
-        previous_second = -1
-        while not self.api.trade_id:
-            time.sleep(0.1)
-            elapsed_time = time.time() - start_time
-            current_second = int(elapsed_time)
-            if current_second != previous_second:
-                self.logger.info(f"Waiting for trade operation... Elapsed time: {round(elapsed_time)} seconds.")
-                previous_second = current_second
-            if elapsed_time >= 3:
+        count = 0.1
+        while self.api.trade_id is None:
+            count += 0.1
+            if count > duration:
+                status_trade = False
                 break
+            await asyncio.sleep(0.1)
+            if global_value.check_websocket_if_error:
+                return False, global_value.websocket_error_reason
         else:
             status_trade = True
         return status_trade, self.api.trade_successful
@@ -251,24 +248,18 @@ class Quotex(object):
             self.logger.error(e)
         return True
 
-    async def check_win(self, asset, id_number):
+    async def check_win(self, id_number):
         """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        while True:  # await self.start_remaing_time():
+        while True:
             try:
-                listinfodata_dict = self.api.listinfodata.get(asset)
-                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
-                    break
                 listinfodata_dict = self.api.listinfodata.get(id_number)
-                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
+                if listinfodata_dict["game_state"] == 1:
                     break
             except:
                 pass
-            time.sleep(0.1)
-        self.logger.debug("end check wind")
         self.api.listinfodata.delete(id_number)
-        self.api.listinfodata.delete(asset)
         return listinfodata_dict["win"]
 
     def start_candles_stream(self, asset, size, period=0):

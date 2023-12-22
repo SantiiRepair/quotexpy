@@ -199,21 +199,19 @@ class Quotex(object):
     async def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
         status_trade = False
-        self.duration = duration - 1
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
+        self.api.subscribe_realtime_candle(asset, duration)
         self.api.trade(action, amount, asset, duration, request_id)
-        start_time = time.time()
-        previous_second = -1
-        while not self.api.trade_id:
-            time.sleep(0.1)
-            elapsed_time = time.time() - start_time
-            current_second = int(elapsed_time)
-            if current_second != previous_second:
-                print(f"\rWaiting for trade operation... Elapsed time: {round(elapsed_time)} seconds", end="")
-                previous_second = current_second
-            if elapsed_time >= 3:
+        count = 0.1
+        while self.api.trade_id is None:
+            count += 0.1
+            if count > duration:
+                status_trade = False
                 break
+            await asyncio.sleep(0.1)
+            if global_value.check_websocket_if_error:
+                return False, global_value.websocket_error_reason
         else:
             status_trade = True
         return status_trade, self.api.trade_successful
