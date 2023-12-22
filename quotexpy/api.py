@@ -21,32 +21,33 @@ from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
 from quotexpy.ws.objects.listinfodata import ListInfoData
 from quotexpy.ws.client import WebsocketClient
-
-
-def nested_dict(n, typeof):
-    if n == 1:
-        return collections.defaultdict(typeof)
-    return collections.defaultdict(lambda: nested_dict(n - 1, typeof))
-
+from collections import defaultdict
 
 urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
 cert_path = certifi.where()
-os.environ["SSL_CERT_FILE"] = cert_path
-os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
-cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
+os.environ['SSL_CERT_FILE'] = cert_path
+os.environ['WEBSOCKET_CLIENT_CA_BUNDLE'] = cert_path
+cacert = os.environ.get('WEBSOCKET_CLIENT_CA_BUNDLE')
+
+
+def nested_dict(n, type):
+    if n == 1:
+        return defaultdict(type)
+    else:
+        return defaultdict(lambda: nested_dict(n - 1, type))
 
 
 class QuotexAPI(object):
     """Class for communication with Quotex API"""
 
     socket_option_opened = {}
-    trade_id = {}
+    trade_id = None
     trace_ws = False
     buy_expiration = None
     current_asset = None
-    trade_successful = {}
+    trade_successful = None
     account_balance = None
     account_type = None
     instruments = None
@@ -99,9 +100,12 @@ class QuotexAPI(object):
         data = f'451-["history/list/v2", {json.dumps(payload)}]'
         return self.send_websocket_request(data)
 
-    def subscribe_realtime_candle(self, asset, size, period):
-        self.realtime_price[asset] = collections.deque([], size)
-        payload = {"asset": asset, "period": period}
+    def subscribe_realtime_candle(self, asset, period):
+        self.realtime_price[asset] = []
+        payload = {
+            "asset": asset,
+            "period": period
+        }
         data = f'42["instruments/update", {json.dumps(payload)}]'
         return self.send_websocket_request(data)
 
