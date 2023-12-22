@@ -1,9 +1,9 @@
 import os
+import sys
 import time
 import datetime
 import shutup
 import random
-import sys
 import asyncio
 import schedule
 from termcolor import colored
@@ -30,9 +30,9 @@ def check_asset(asset):
     asset_query = asset_parse(asset)
     asset_open = client.check_asset_open(asset_query)
     if not asset_open[2]:
-        print(colored("[WARN]: ", "blue"), "Asset is closed.")
+        print(colored("[WARN]: ", "yellow"), "Asset is closed.")
         asset = f"{asset}_otc"
-        print(colored("[WARN]: ", "blue"), "try OTC Asset -> " + asset)
+        print(colored("[WARN]: ", "yellow"), "Try OTC Asset -> " + asset)
         asset_query = asset_parse(asset)
         asset_open = client.check_asset_open(asset_query)
     return asset, asset_open
@@ -66,12 +66,11 @@ async def trade():
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
             try:
-                status, buy_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
-                print(status, buy_info)
+                await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
             except:
                 pass
         else:
-            print(colored("[WARN]: ", "blue"), "Asset is closed.")
+            print(colored("[WARN]: ", "yellow"), "Asset is closed.")
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     prepare_connection.close()
@@ -210,7 +209,11 @@ async def main():
     # await balance_refill()    
 
 def run_main():
-    __x__(main())
+    try:
+        __x__(main())
+    except KeyboardInterrupt:
+        print("Aborted!")
+        sys.exit(0)
 
 # Agendamentos:
 schedule.every(1).seconds.do(run_main)
