@@ -106,7 +106,7 @@ class Quotex(object):
                 while self.api.instruments is None and time.time() - start < 10:
                     await asyncio.sleep(0.1)
             except:
-                self.logger.error("**error** api.get_instruments need reconnect")
+                self.logger.error("api.get_instruments need reconnect")
                 await self.connect()
         return self.api.instruments
 
@@ -137,14 +137,14 @@ class Quotex(object):
                 if self.api.candles.candles_data is not None:
                     break
             except:
-                self.logger.error("**error** get_candles need reconnect")
+                self.logger.error("get_candles need reconnect")
                 await self.connect()
         return self.api.candles.candles_data
 
     async def get_candle_v2(self, asset, period, size=10):
         self.api.candle_v2_data[asset] = None
         self.stop_candles_stream(asset)
-        self.api.subscribe_realtime_candle(asset, size, period)
+        self.api.subscribe_realtime_candle(asset, period)
         while self.api.candle_v2_data[asset] is None:
             await asyncio.sleep(1)
         return self.api.candle_v2_data[asset]
@@ -268,8 +268,8 @@ class Quotex(object):
         self.api.listinfodata.delete(asset)
         return listinfodata_dict["win"]
 
-    def start_candles_stream(self, asset, size, period=0):
-        self.api.subscribe_realtime_candle(asset, size, period)
+    def start_candles_stream(self, asset, period=0):
+        self.api.subscribe_realtime_candle(asset, period)
 
     def stop_candles_stream(self, asset):
         self.api.unsubscribe_realtime_candle(asset)
@@ -293,7 +293,7 @@ class Quotex(object):
         self.api.candle_generated_check[str(asset)][int(size)] = {}
         while True:
             if time.time() - start > 20:
-                self.logger.error("**error** start_candles_one_stream late for 20 sec")
+                self.logger.error("start_candles_one_stream late for 20 sec")
                 return False
             try:
                 if self.api.candle_generated_check[str(asset)][int(size)]:
