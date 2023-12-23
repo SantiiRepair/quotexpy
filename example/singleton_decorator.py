@@ -1,7 +1,3 @@
-import os
-from pathlib import Path
-
-
 class SingletonDecorator:
     """
     A decorator that turns a class into a singleton.

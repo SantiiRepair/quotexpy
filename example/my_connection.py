@@ -23,12 +23,11 @@ class MyConnection:
                     if check:
                         print("Reconectado com sucesso!!!")
                         break
-                    else:
-                        print("Erro ao reconectar.")
-                        attempt += 1
-                        if Path(os.path.join(".", "session.json")).is_file():
-                            Path(os.path.join(".", "session.json")).unlink()
-                        print(f"Tentando reconectar, tentativa {attempt} de {attempts}")
+                    print("Erro ao reconectar.")
+                    attempt += 1
+                    if Path(os.path.join(".", "session.json")).is_file():
+                        Path(os.path.join(".", "session.json")).unlink()
+                    print(f"Tentando reconectar, tentativa {attempt} de {attempts}")
                 elif not check:
                     attempt += 1
                 else:

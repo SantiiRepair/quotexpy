@@ -1,4 +1,3 @@
-import os
 import sys
 import time
 import datetime
@@ -107,7 +106,7 @@ async def trade_and_check_win():
             print(status, trade_info, "\n")
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                if await client.check_win(trade_info["id"]):
+                if await client.check_win(asset, trade_info["id"]):
                     print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                 else:
                     print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
