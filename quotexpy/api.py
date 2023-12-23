@@ -167,7 +167,7 @@ class QuotexAPI(object):
         :param bool no_force_send: Default None.
         """
         if global_value.check_websocket_if_connect == 0:
-            logger.info("Websocket connection closed.")
+            self.logger.info("Websocket connection closed.")
             return
 
         while (global_value.ssl_Mutual_exclusion or global_value.ssl_Mutual_exclusion_write) and no_force_send:
@@ -177,8 +177,7 @@ class QuotexAPI(object):
         self.websocket.send('42["indicator/list"]')
         self.websocket.send('42["drawing/load"]')
         self.websocket.send('42["pending/list"]')
-        self.websocket.send(
-            '42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
+        self.websocket.send('42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
         self.websocket.send('42["chart_notification/get"]')
         self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
@@ -228,11 +227,11 @@ class QuotexAPI(object):
                 if global_value.check_websocket_if_error:
                     return False, global_value.websocket_error_reason
                 if global_value.check_websocket_if_connect == 0:
-                    logger.info("Websocket connection closed.")
-                    logger.debug("Websocket connection closed.")
+                    self.logger.info("Websocket connection closed.")
+                    self.logger.debug("Websocket connection closed.")
                     return False, "Websocket connection closed."
                 if global_value.check_websocket_if_connect == 1:
-                    logger.debug("Websocket successfully connected!!!")
+                    self.logger.debug("Websocket successfully connected!!!")
                     return True, "Websocket successfully connected!!!"
             except:
                 pass
@@ -256,14 +255,12 @@ class QuotexAPI(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                self.logger.info(f"Waiting for authorization... Elapsed time: {
-                                 round(elapsed_time)} seconds.")
+                self.logger.info(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds.")
                 previous_second = current_second
             if elapsed_time >= max_attemps:  # Verifica se o tempo limite de segundos foi atingido
                 # raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-                msg = f"Sending authorization with SSID '{
-                    global_value.SSID}' took too long to respond"
-                logger.error(msg)
+                msg = f"Sending authorization with SSID '{global_value.SSID}' took too long to respond"
+                self.logger.error(msg)
                 return False
         if not self.profile.msg:
             return False

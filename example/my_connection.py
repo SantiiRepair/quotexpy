@@ -1,4 +1,6 @@
+import os
 import asyncio
+from pathlib import Path
 from singleton_decorator import SingletonDecorator
 
 
@@ -26,8 +28,7 @@ class MyConnection:
                         attempt += 1
                         if Path(os.path.join(".", "session.json")).is_file():
                             Path(os.path.join(".", "session.json")).unlink()
-                        print(f"Tentando reconectar, tentativa {
-                              attempt} de {attempts}")
+                        print(f"Tentando reconectar, tentativa {attempt} de {attempts}")
                 elif not check:
                     attempt += 1
                 else:
