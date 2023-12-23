@@ -245,7 +245,7 @@ class Quotex(object):
                 remaing_time -= 1
                 await asyncio.sleep(1)
         except Exception as e:
-            logger.error(e)
+            self.logger.error(e)
         return True
 
     async def check_win(self, asset, id_number):

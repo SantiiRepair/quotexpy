@@ -7,7 +7,6 @@ import certifi
 import logging
 import urllib3
 import threading
-import collections
 
 from quotexpy import global_value
 from quotexpy.http.login import Login
@@ -35,8 +34,7 @@ cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
 def nested_dict(n, type):
     if n == 1:
         return defaultdict(type)
-    else:
-        return defaultdict(lambda: nested_dict(n - 1, type))
+    return defaultdict(lambda: nested_dict(n - 1, type))
 
 
 class QuotexAPI(object):
@@ -179,7 +177,8 @@ class QuotexAPI(object):
         self.websocket.send('42["indicator/list"]')
         self.websocket.send('42["drawing/load"]')
         self.websocket.send('42["pending/list"]')
-        self.websocket.send('42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
+        self.websocket.send(
+            '42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
         self.websocket.send('42["chart_notification/get"]')
         self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
@@ -257,11 +256,13 @@ class QuotexAPI(object):
             elapsed_time = time.time() - start_time
             current_second = int(elapsed_time)
             if current_second != previous_second:
-                self.logger.info(f"Waiting for authorization... Elapsed time: {round(elapsed_time)} seconds.")
+                self.logger.info(f"Waiting for authorization... Elapsed time: {
+                                 round(elapsed_time)} seconds.")
                 previous_second = current_second
             if elapsed_time >= max_attemps:  # Verifica se o tempo limite de segundos foi atingido
                 # raise QuotexTimeout(f"Sending authorization with SSID '{global_value.SSID}' took too long to respond")
-                msg = f"Sending authorization with SSID '{global_value.SSID}' took too long to respond"
+                msg = f"Sending authorization with SSID '{
+                    global_value.SSID}' took too long to respond"
                 logger.error(msg)
                 return False
         if not self.profile.msg:
