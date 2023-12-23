@@ -19,12 +19,15 @@ shutup.please()
 
 asset_current = "AUDCAD"
 
+
 def __x__(y):
     z = asyncio.get_event_loop().run_until_complete(y)
     return z
 
+
 client = Quotex(email="your@email.com", password="yourPassord")
 client.debug_ws_enable = False
+
 
 def check_asset(asset):
     asset_query = asset_parse(asset)
@@ -37,6 +40,7 @@ def check_asset(asset):
         asset_open = client.check_asset_open(asset_query)
     return asset, asset_open
 
+
 async def get_balance():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
@@ -46,6 +50,7 @@ async def get_balance():
         print(colored("[INFO]: ", "blue"), "Exiting...")
     prepare_connection.close()
 
+
 async def balance_refill():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
@@ -53,6 +58,7 @@ async def balance_refill():
         result = await client.edit_practice_balance(100)
         print(result)
     prepare_connection.close()
+
 
 async def trade():
     prepare_connection = MyConnection(client)
@@ -76,7 +82,6 @@ async def trade():
     prepare_connection.close()
 
 
-
 async def wait_for_input_exceeding_x_seconds_limit(secounds=30):
     while True:
         now = datetime.datetime.now()
@@ -84,22 +89,21 @@ async def wait_for_input_exceeding_x_seconds_limit(secounds=30):
             return  # Returns when it's the right time to proceed
         await asyncio.sleep(0.5)
 
+
 async def trade_and_check_win():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
-    #check_connect, message = await connect()
+    # check_connect, message = await connect()
     if check_connect:
         client.change_account(AccountType.PRACTICE)
-        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())        
+        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         amount = 50
         asset, asset_open = check_asset(asset_current)
-        await wait_for_input_exceeding_x_seconds_limit(30) #waiting for seconds
+        await wait_for_input_exceeding_x_seconds_limit(30)  # waiting for seconds
         if asset_open[2]:
             print("OK: Asset está aberto.")
             action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
-            status, trade_info = await client.trade(
-                   action, amount, asset, DurationTime.ONE_MINUTE
-                )
+            status, trade_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
             print(status, trade_info, "\n")
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
@@ -113,7 +117,8 @@ async def trade_and_check_win():
             print(colored("[WARN]: ", "light_red"), "Asset is closed.")
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
     print(colored("[INFO]: ", "blue"), "Exiting...")
-    print("Saindo...")        
+    print("Saindo...")
+
 
 async def sell_option():
     prepare_connection = MyConnection(client)
@@ -154,12 +159,13 @@ async def get_payment():
             print(asset_name, asset_data["payment"], asset_data["open"])
     prepare_connection.close()
 
+
 # import numpy as np
 async def get_candle_v2():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
     print(check_connect, message)
-    period = 100    
+    period = 100
     if check_connect:
         global asset_current
         asset, asset_open = check_asset(asset_current)
@@ -197,16 +203,18 @@ async def get_signal_data():
             time.sleep(1)
     prepare_connection.close()
 
+
 async def main():
     # await get_balance()
     # await get_signal_data()
-    #await get_payment()
-    #await get_payments_payout_more_than()
-    #await get_candle_v2()
+    # await get_payment()
+    # await get_payments_payout_more_than()
+    # await get_candle_v2()
     # await get_realtime_candle()
-    #await assets_open()
-    await trade_and_check_win()    
-    # await balance_refill()    
+    # await assets_open()
+    await trade_and_check_win()
+    # await balance_refill()
+
 
 def run_main():
     try:
@@ -214,6 +222,7 @@ def run_main():
     except KeyboardInterrupt:
         print("Aborted!")
         sys.exit(0)
+
 
 # Agendamentos:
 schedule.every(1).seconds.do(run_main)

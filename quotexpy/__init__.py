@@ -25,7 +25,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.40.4"
+    __version__ = "1.40.0"
 
     def __init__(self, email, password):
         self.size = [
@@ -141,10 +141,10 @@ class Quotex(object):
                 await self.connect()
         return self.api.candles.candles_data
 
-    async def get_candle_v2(self, asset, period):
+    async def get_candle_v2(self, asset, period, size=10):
         self.api.candle_v2_data[asset] = None
         self.stop_candles_stream(asset)
-        self.api.subscribe_realtime_candle(asset, period)
+        self.api.subscribe_realtime_candle(asset, size, period)
         while self.api.candle_v2_data[asset] is None:
             await asyncio.sleep(1)
         return self.api.candle_v2_data[asset]
@@ -171,7 +171,7 @@ class Quotex(object):
         return check, reason
 
     def change_account(self, mode="PRACTICE"):
-        """Change active account `REAL` or `PRACTICE`"""
+        """Change active account `real` or `practice`"""
         if mode.upper() == "REAL":
             self.api.account_type = 0
         elif mode.upper() == "PRACTICE":
@@ -198,11 +198,12 @@ class Quotex(object):
         )
         return float(f"{truncate(balance + self.get_profit(), 2):.2f}")
 
-    async def trade(self, action: str, amount, asset: str, duration):        
+    async def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
+        status_trade = False
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
-        self.api.subscribe_realtime_candle(asset, duration)                       
+        self.api.subscribe_realtime_candle(asset, duration)
         self.api.trade(action, amount, asset, duration, request_id)
         count = 0.1
         while self.api.trade_id is None:
@@ -242,24 +243,29 @@ class Quotex(object):
                 remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
             while remaing_time >= 0:
                 remaing_time -= 1
-                self.logger.info(f"Waiting for completion in {remaing_time if remaing_time > 0 else 0} seconds.")
                 await asyncio.sleep(1)
         except Exception as e:
-            self.logger.error(e)
+            logger.error(e)
         return True
 
-    async def check_win(self, id_number):
+    async def check_win(self, asset, id_number):
         """Check win based id"""
         self.logger.debug(f"begin check wind {id_number}")
         await self.start_remaing_time()
-        while True:
+        while True:  # await self.start_remaing_time():
             try:
+                listinfodata_dict = self.api.listinfodata.get(asset)
+                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
+                    break
                 listinfodata_dict = self.api.listinfodata.get(id_number)
-                if listinfodata_dict["game_state"] == 1:
+                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
                     break
             except:
                 pass
+            time.sleep(0.1)
+        self.logger.debug("end check wind")
         self.api.listinfodata.delete(id_number)
+        self.api.listinfodata.delete(asset)
         return listinfodata_dict["win"]
 
     def start_candles_stream(self, asset, size, period=0):
@@ -297,7 +303,7 @@ class Quotex(object):
             try:
                 self.api.subscribe(codes_asset[asset], size)
             except:
-                self.logger.error("**error** start_candles_stream reconnect")
+                self.logger.error("start_candles_stream reconnect")
                 await self.connect()
             await asyncio.sleep(1)
 
@@ -308,7 +314,7 @@ class Quotex(object):
         start = time.time()
         while True:
             if time.time() - start > 20:
-                self.logger.error(f"**error** fail {asset} start_candles_all_size_stream late for 10 sec")
+                self.logger.error(f"fail {asset} start_candles_all_size_stream late for 10 sec")
                 return False
             try:
                 if self.api.candle_generated_all_size_check[str(asset)]:
@@ -318,7 +324,7 @@ class Quotex(object):
             try:
                 self.api.subscribe_all_size(codes_asset[asset])
             except:
-                self.logger.error("**error** start_candles_all_size_stream reconnect")
+                self.logger.error("start_candles_all_size_stream reconnect")
                 await self.connect()
             await asyncio.sleep(1)
 

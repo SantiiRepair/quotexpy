@@ -13,6 +13,7 @@ from quotexpy.http.user_agents import agents
 user_agent_list = agents.split("\n")
 logger = logging.getLogger(__name__)
 
+
 class WebsocketClient(object):
     """Class for work with Quotex API websocket."""
 
@@ -64,7 +65,7 @@ class WebsocketClient(object):
                 logger.debug(message)
                 message = json.loads(message)
                 self.api.wss_message = message
-                if "call" in str(message) or 'put' in str(message):
+                if "call" in str(message) or "put" in str(message):
                     self.api.instruments = message
                 if message.get("signals"):
                     time_in = message.get("time")
@@ -94,9 +95,7 @@ class WebsocketClient(object):
                         self.api.profit_in_operation = get_m["profit"]
                         get_m["win"] = True if message["profit"] > 0 else False
                         get_m["game_state"] = 1
-                        self.api.listinfodata.set(
-                            get_m["win"], get_m["game_state"], get_m["id"]
-                        )
+                        self.api.listinfodata.set(get_m["win"], get_m["game_state"], get_m["id"])
                 elif message.get("isDemo") and message.get("balance"):
                     self.api.training_balance_edit_request = message
                 elif message.get("error"):
@@ -120,26 +119,15 @@ class WebsocketClient(object):
             elif self.api._temp_status == """451-["history/list/v2",{"_placeholder":true,"num":0}]""":
                 self.api.candles.candles_data = message["candles"]
                 self.api.candle_v2_data[message["asset"]] = message
-                self.api.candle_v2_data[message["asset"]]["candles"] = [{
-                        "time": candle[0],
-                        "open": candle[1],
-                        "close": candle[2],
-                        "high": candle[3],
-                        "low": candle[4]
-                    } for candle in message["candles"]]
+                self.api.candle_v2_data[message["asset"]]["candles"] = [
+                    {"time": candle[0], "open": candle[1], "close": candle[2], "high": candle[3], "low": candle[4]}
+                    for candle in message["candles"]
+                ]
             elif len(message[0]) == 4:
-                result = {
-                    "time": message[0][1],
-                    "price": message[0][2]
-                }
+                result = {"time": message[0][1], "price": message[0][2]}
                 self.api.realtime_price[message[0][0]].append(result)
             elif len(message[0]) == 2:
-                result = {
-                    "sentiment": {
-                        "sell": 100 - int(message[0][1]),
-                        "buy": int(message[0][1])
-                    }
-                }
+                result = {"sentiment": {"sell": 100 - int(message[0][1]), "buy": int(message[0][1])}}
                 self.api.realtime_sentiment[message[0][0]] = result
         except:
             pass

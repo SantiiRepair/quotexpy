@@ -11,8 +11,8 @@ from playwright.async_api import Playwright, async_playwright
 
 
 class Browser(object):
-    base_url = 'qxbroker.com'
-    https_base_url = f'https://{base_url}'
+    base_url = "qxbroker.com"
+    https_base_url = f"https://{base_url}"
     email = None
     password = None
 

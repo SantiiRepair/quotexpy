@@ -27,9 +27,9 @@ urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
 cert_path = certifi.where()
-os.environ['SSL_CERT_FILE'] = cert_path
-os.environ['WEBSOCKET_CLIENT_CA_BUNDLE'] = cert_path
-cacert = os.environ.get('WEBSOCKET_CLIENT_CA_BUNDLE')
+os.environ["SSL_CERT_FILE"] = cert_path
+os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
+cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
 
 
 def nested_dict(n, type):
@@ -102,10 +102,7 @@ class QuotexAPI(object):
 
     def subscribe_realtime_candle(self, asset, period):
         self.realtime_price[asset] = []
-        payload = {
-            "asset": asset,
-            "period": period
-        }
+        payload = {"asset": asset, "period": period}
         data = f'42["instruments/update", {json.dumps(payload)}]'
         return self.send_websocket_request(data)
 

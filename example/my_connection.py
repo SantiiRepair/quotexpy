@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from singleton_decorator import SingletonDecorator
 
+
 @SingletonDecorator
 class MyConnection:
     """
@@ -36,7 +37,7 @@ class MyConnection:
             return check, reason
         print(reason)
         return check, reason
-    
+
     def close(self):
         """
         Closes the client connection.
