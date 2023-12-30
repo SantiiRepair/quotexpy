@@ -62,7 +62,7 @@ class WebsocketClient(object):
                 global_value.started_listen_instruments = True
             try:
                 message = message[1:].decode()
-                logger.debug(message)
+                self.logger.debug(message)
                 message = json.loads(message)
                 self.api.wss_message = message
                 if "call" in str(message) or "put" in str(message):
@@ -147,9 +147,8 @@ class WebsocketClient(object):
         self.wss.send('42["indicator/list"]')
         self.wss.send('42["drawing/load"]')
         self.wss.send('42["pending/list"]')
-        # self.wss.send('42["instruments/update",{"asset":"EURUSD","period":60}]')
         self.wss.send('42["chart_notification/get"]')
-               
+
     def on_close(self, wss, close_status_code, close_msg):
         """Method to process websocket close."""
         logger.info("Websocket connection closed.")
