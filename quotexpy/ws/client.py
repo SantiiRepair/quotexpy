@@ -149,9 +149,7 @@ class WebsocketClient(object):
         self.wss.send('42["pending/list"]')
         # self.wss.send('42["instruments/update",{"asset":"EURUSD","period":60}]')
         self.wss.send('42["chart_notification/get"]')
-        # self.wss.send('42["depth/follow","EURUSD"]')
-        self.wss.send('42["tick"]')
-
+               
     def on_close(self, wss, close_status_code, close_msg):
         """Method to process websocket close."""
         logger.info("Websocket connection closed.")
