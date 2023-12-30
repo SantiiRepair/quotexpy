@@ -34,7 +34,7 @@ class Browser(object):
                 await page.wait_for_timeout(5000)
                 soup = BeautifulSoup(await page.content(), "html.parser")
                 if "Insira o código PIN que acabamos de enviar para o seu e-mail" in soup.get_text():
-                    code = input("Insira o código PIN que acabamos de enviar para o seu e-mail: ")
+                    code = input("Enter the PIN code we just sent to your email: ")
                     """await page.evaluate(
                         f'() => {{ document.querySelector("input[name=\\"code\\"]").value = {int(code)}; }}')"""
                     try:
@@ -59,7 +59,7 @@ class Browser(object):
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         ssid = json.loads(match).get("token")
-        output_file = Path("session.json")
+        output_file = Path(".session.json")
         output_file.parent.mkdir(exist_ok=True, parents=True)
         cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
         cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
@@ -69,12 +69,9 @@ class Browser(object):
 
         return ssid, cookie_string
 
-    async def main(self) -> Tuple[Any, str]:
+    async def get_cookies_and_ssid(self) -> Tuple[Any, str]:
         async with async_playwright() as playwright:
             browser = playwright.firefox
             if not shutil.which(browser.name):
                 install(browser, with_deps=True)
             return await self.run(playwright)
-
-    async def get_cookies_and_ssid(self):
-        return await self.main()

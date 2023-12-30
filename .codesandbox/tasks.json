@@ -1,7 +1,18 @@
 {
   // These tasks will run in order when initializing your CodeSandbox project.
-  "setupTasks": [],
+  "setupTasks": [
+    "pip install -r requirements-dev.txt",
+    "pip install -e .",
+    "playwright install",
+    "playwright install-deps"
+  ],
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
-  "tasks": {}
+  "tasks": {
+    "run": {
+      "name": "Run",
+      "command": "python example/main.py",
+      "runAtStart": false
+    }
+  }
 }

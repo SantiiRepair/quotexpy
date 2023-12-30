@@ -34,7 +34,6 @@ class MyConnection:
                     break
                 await asyncio.sleep(5)
             return check, reason
-        print(reason)
         return check, reason
 
     def close(self):

@@ -24,7 +24,7 @@ def __x__(y):
     return z
 
 
-client = Quotex(email="your@email.com", password="yourPassord")
+client = Quotex(email="user@email.com", password="password")
 client.debug_ws_enable = False
 
 
@@ -100,10 +100,9 @@ async def trade_and_check_win():
         asset, asset_open = check_asset(asset_current)
         await wait_for_input_exceeding_x_seconds_limit(30)  # waiting for seconds
         if asset_open[2]:
-            print("OK: Asset está aberto.")
+            print(colored("[INFO]: ", "blue"), "Asset is open.")
             action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
             status, trade_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
-            print(status, trade_info, "\n")
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
                 if await client.check_win(asset, trade_info["id"]):
@@ -116,13 +115,12 @@ async def trade_and_check_win():
             print(colored("[WARN]: ", "light_red"), "Asset is closed.")
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
     print(colored("[INFO]: ", "blue"), "Exiting...")
-    print("Saindo...")
 
 
 async def sell_option():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
-    print(check_connect, message)
+    # print(check_connect, message)
     if check_connect:
         client.change_account(AccountType.PRACTICE)
         amount = 30
@@ -131,7 +129,6 @@ async def sell_option():
         direction = OperationType.PUT_RED
         duration = 1000  # in seconds
         status, buy_info = await client.trade(amount, asset, direction, duration)
-        print(status, buy_info)
         await client.sell_option(buy_info["id"])
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
@@ -142,7 +139,6 @@ async def assets_open():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
     if check_connect:
-        print("Check Asset Open")
         for i in client.get_all_asset_name():
             print(i, client.check_asset_open(i))
     prepare_connection.close()
@@ -163,18 +159,17 @@ async def get_payment():
 async def get_candle_v2():
     prepare_connection = MyConnection(client)
     check_connect, message = await prepare_connection.connect()
-    print(check_connect, message)
     period = 100
     if check_connect:
         global asset_current
         asset, asset_open = check_asset(asset_current)
         if asset_open[2]:
-            print("OK: Asset está aberto.")
+            print(colored("[INFO]: ", "blue"), "Asset is open.")
             # 60 at 180 seconds
             candles = await client.get_candle_v2(asset, period)
             print(candles)
         else:
-            print("ERRO: Asset está fechado.")
+            print(colored("[INFO]: ", "blue"), "Asset is closed.")
     prepare_connection.close()
 
 
