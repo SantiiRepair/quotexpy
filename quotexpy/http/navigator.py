@@ -1,7 +1,6 @@
 import random
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
@@ -30,9 +29,6 @@ class Navigator(object):
         self.api.user_agent = self.headers["User-Agent"]
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
-
-        if self.api.proxy:
-            self.session.proxies.update({urlparse(self.api.proxy).scheme: self.api.proxy["server"]})
 
     def get_headers(self):
         self.headers = {

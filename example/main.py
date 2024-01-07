@@ -24,7 +24,11 @@ def __x__(y):
     return z
 
 
-client = Quotex(email="email@gmail.com", password="password")
+client = Quotex(
+    email="user@email.com",
+    password="password",
+)
+
 client.debug_ws_enable = False
 
 

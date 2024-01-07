@@ -17,13 +17,11 @@ class Browser(object):
     base_url = "qxbroker.com"
     https_base_url = f"https://{base_url}"
 
-    proxy = None
-
     def __init__(self, api):
         self.api = api
 
     async def run(self, playwright: Playwright) -> Tuple[Any, str]:
-        browser = await playwright.firefox.launch(headless=True, proxy=self.proxy)
+        browser = await playwright.firefox.launch(headless=True)
         context = await browser.new_context()
         page = await context.new_page()
 

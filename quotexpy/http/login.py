@@ -1,4 +1,3 @@
-from typing import Union, Dict
 from quotexpy.http.qxbroker import Browser
 
 
@@ -11,7 +10,7 @@ class Login(Browser):
     base_url = "qxbroker.com"
     https_base_url = f"https://{base_url}"
 
-    async def __call__(self, email, password, proxy: Union[Dict, None]=None):
+    async def __call__(self, email, password):
         """
         Method to get Quotex API login http request.
         :param str username: The username of a Quotex server.
@@ -21,7 +20,6 @@ class Login(Browser):
 
         self.email = email
         self.password = password
-        self.proxy = proxy
 
         self.ssid, self.cookies = await self.get_cookies_and_ssid()
         return self.ssid, self.cookies

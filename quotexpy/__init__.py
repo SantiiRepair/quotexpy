@@ -5,7 +5,6 @@ import time
 import math
 import asyncio
 import logging
-from typing import Union, Dict
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -28,12 +27,10 @@ def truncate(f, n):
 class Quotex(object):
     __version__ = "1.40.3"
 
-    def __init__(self, email, password, proxy: Union[Dict, None]=None):
-    
+    def __init__(self, email, password):
         self.api = None
         self.email = email
         self.password = password
-        self.proxy = proxy
         self.set_ssid = None
         self.duration = None
         self.suspend = 0.5
@@ -134,7 +131,11 @@ class Quotex(object):
     async def connect(self):
         if global_value.check_websocket_if_connect:
             self.close()
-        self.api = QuotexAPI("qxbroker.com", self.email, self.password, self.proxy)
+        self.api = QuotexAPI(
+            "qxbroker.com",
+            self.email,
+            self.password,
+        )
         self.api.trace_ws = self.debug_ws_enable
         check, reason = await self.api.connect()
         if check:
