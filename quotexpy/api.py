@@ -7,6 +7,7 @@ import certifi
 import logging
 import urllib3
 import threading
+from urllib.parse import urlparse
 
 from quotexpy import global_value
 from quotexpy.http.login import Login
@@ -57,17 +58,23 @@ class QuotexAPI(object):
     timesync = TimeSync()
     candles = Candles()
 
-    def __init__(self, host, email, password, proxies=None):
+    def __init__(self, host, email, password, proxy=None):
         """
         :param str host: The hostname or ip address of a Quotex server.
         :param str email: The email of a Quotex server.
         :param str password: The password of a Quotex server.
         :param proxies: The proxies of a Quotex server.
         """
-        self._temp_status = ""
-        self.settings_list = {}
         self.email = email
         self.password = password
+
+        if proxy is not None and proxy is not "":
+            if urlparse(proxy).scheme == "":
+                raise ValueError("Proxy URL does not specify a supported protocol.")
+
+        self.proxy = proxy
+        self._temp_status = ""
+        self.settings_list = {}
         self.signal_data = nested_dict(2, dict)
         self.get_candle_data = {}
         self.candle_v2_data = {}
@@ -79,7 +86,6 @@ class QuotexAPI(object):
         self.set_ssid = None
         self.user_agent = None
         self.token_login2fa = None
-        self.proxies = proxies
         self.realtime_price = {}
         self.profile = Profile()
 

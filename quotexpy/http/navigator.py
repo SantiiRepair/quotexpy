@@ -1,8 +1,10 @@
 import random
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
+
 from quotexpy.http.user_agents import agents
 
 retry_strategy = Retry(
@@ -15,15 +17,22 @@ adapter = HTTPAdapter(max_retries=retry_strategy)
 user_agent_list = agents.split("\n")
 
 
-class Browser(object):
+class Navigator(object):
     def __init__(self, api):
+        """
+        Tools for quotexpy navigation.
+        :param object api: The instance of :class:`quotexpy.api.QuotexAPI`.
+        """
         self.api = api
         self.response = None
         self.headers = self.get_headers()
         self.session = requests.Session()
         self.api.user_agent = self.headers["User-Agent"]
-        self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
+
+        if self.api.proxy:
+            self.session.proxies.update({urlparse(self.api.proxy).scheme: self.api.proxy["server"]})
 
     def get_headers(self):
         self.headers = {

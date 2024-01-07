@@ -1,9 +1,9 @@
 """Module for Quotex http login resource."""
 
-from quotexpy.http.navigator import Browser
+from quotexpy.http.navigator import Navigator
 
 
-class Logout(Browser):
+class Logout(Navigator):
     """Class for Quotex login resource."""
 
     base_url = "qxbroker.com"

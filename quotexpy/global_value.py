@@ -1,4 +1,3 @@
-# python
 SSID = None
 check_websocket_if_connect = None
 ssl_Mutual_exclusion = False

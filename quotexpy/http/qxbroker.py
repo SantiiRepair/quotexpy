@@ -11,18 +11,22 @@ from playwright.async_api import Playwright, async_playwright
 
 
 class Browser(object):
-    base_url = "qxbroker.com"
-    https_base_url = f"https://{base_url}"
     email = None
     password = None
+
+    base_url = "qxbroker.com"
+    https_base_url = f"https://{base_url}"
+
+    proxy = None
 
     def __init__(self, api):
         self.api = api
 
     async def run(self, playwright: Playwright) -> Tuple[Any, str]:
-        browser = await playwright.firefox.launch(headless=True)
+        browser = await playwright.firefox.launch(headless=True, proxy=self.proxy)
         context = await browser.new_context()
         page = await context.new_page()
+
         await page.goto(f"{self.https_base_url}/pt/sign-in")
         if page.url != f"{self.https_base_url}/pt/trade":
             await page.get_by_role("textbox", name="E-mail").click()
