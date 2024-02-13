@@ -7,7 +7,6 @@ import certifi
 import logging
 import urllib3
 import threading
-from urllib.parse import urlparse
 
 from quotexpy import global_value
 from quotexpy.http.login import Login
