@@ -1,4 +1,5 @@
 """Module for Quotex websocket"""
+
 import os
 import ssl
 import time

@@ -1,4 +1,5 @@
 """Module for Quotex websocket."""
+
 import os
 import json
 import random
@@ -25,9 +26,11 @@ class WebsocketClient(object):
         """
         self.api = api
         self.headers = {
-            "User-Agent": self.api.user_agent
-            if self.api.user_agent
-            else user_agent_list[random.randint(0, len(user_agent_list) - 1)],
+            "User-Agent": (
+                self.api.user_agent
+                if self.api.user_agent
+                else user_agent_list[random.randint(0, len(user_agent_list) - 1)]
+            ),
         }
         websocket.enableTrace(self.api.trace_ws)
         self.wss = websocket.WebSocketApp(
