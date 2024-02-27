@@ -8,7 +8,7 @@ from typing import Tuple, Any
 from quotexpy.exceptions import QuotexAuthError
 from quotexpy.utils.playwright_install import install
 from playwright.async_api import Playwright, async_playwright
-
+from playwright_stealth import stealth_async
 
 class Browser(object):
     email = None
@@ -21,10 +21,10 @@ class Browser(object):
         self.api = api
 
     async def run(self, playwright: Playwright) -> Tuple[Any, str]:
-        browser = await playwright.firefox.launch(headless=True)
+        browser = await playwright.firefox.launch(headless=False)
         context = await browser.new_context()
         page = await context.new_page()
-
+        await stealth_async(page)
         await page.goto(f"{self.https_base_url}/pt/sign-in")
         if page.url != f"{self.https_base_url}/pt/trade":
             await page.get_by_role("textbox", name="E-mail").click()
