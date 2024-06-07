@@ -58,7 +58,7 @@ class QuotexAPI(object):
     timesync = TimeSync()
     candles = Candles()
 
-    def __init__(self, host, email, password):
+    def __init__(self, email: str, password: str, headless: bool):
         """
         :param str host: The hostname or ip address of a Quotex server.
         :param str email: The email of a Quotex server.
@@ -67,6 +67,7 @@ class QuotexAPI(object):
         """
         self.email = email
         self.password = password
+        self.headless = headless
         self._temp_status = ""
         self.settings_list = {}
         self.signal_data = nested_dict(2, dict)
@@ -75,7 +76,7 @@ class QuotexAPI(object):
         self.cookies = None
         self.profile = None
         self.websocket_thread = None
-        self.wss_url = f"wss://ws2.{host}/socket.io/?EIO=3&transport=websocket"
+        self.wss_url = f"wss://ws2.qxbroker.com/socket.io/?EIO=3&transport=websocket"
         self.websocket_client = None
         self.set_ssid = None
         self.user_agent = None

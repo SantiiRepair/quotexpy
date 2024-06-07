@@ -27,10 +27,11 @@ def truncate(f, n):
 class Quotex(object):
     __version__ = "1.40.3"
 
-    def __init__(self, email, password):
+    def __init__(self, email: str, password: str, headless=True):
         self.api = None
         self.email = email
         self.password = password
+        self.headless = headless
         self.set_ssid = None
         self.duration = None
         self.suspend = 0.5
@@ -131,11 +132,7 @@ class Quotex(object):
     async def connect(self):
         if global_value.check_websocket_if_connect:
             self.close()
-        self.api = QuotexAPI(
-            "qxbroker.com",
-            self.email,
-            self.password,
-        )
+        self.api = QuotexAPI(self.email, self.password, self.headless)
         self.api.trace_ws = self.debug_ws_enable
         check, reason = await self.api.connect()
         if check:

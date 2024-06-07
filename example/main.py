@@ -1,10 +1,8 @@
 import sys
 import time
 import datetime
-import shutup
 import random
 import asyncio
-import schedule
 from termcolor import colored
 
 from quotexpy import Quotex
@@ -14,19 +12,19 @@ from quotexpy.utils.operation_type import OperationType
 from quotexpy.utils.duration_time import DurationTime
 from my_connection import MyConnection
 
-shutup.please()
-
-asset_current = "AUDCAD"
+asset_current = "EURUSD"
 
 
-def __x__(y):
-    z = asyncio.get_event_loop().run_until_complete(y)
+def run(y):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    z = loop.run_until_complete(y)
     return z
 
 
 client = Quotex(
-    email="user@email.com",
-    password="password",
+    email="miguelsantiago1940@gmail.com",
+    password="Santiago2024",
 )
 
 client.debug_ws_enable = False
@@ -214,17 +212,9 @@ async def main():
     # await balance_refill()
 
 
-def run_main():
+if __name__ == "__main__":
     try:
-        __x__(main())
+        run(main())
     except KeyboardInterrupt:
         print("Aborted!")
         sys.exit(0)
-
-
-# Agendamentos:
-schedule.every(1).seconds.do(run_main)
-
-while True:
-    schedule.run_pending()
-    time.sleep(5)

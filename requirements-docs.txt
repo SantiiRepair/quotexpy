@@ -1,5 +1,0 @@
-bottle==0.12.25
-furo==2023.9.10
-sphinx==7.2.6
-sphinx-intl==2.1.0
-transifex-client==0.12.5

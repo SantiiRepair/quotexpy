@@ -3,8 +3,6 @@
   "setupTasks": [
     "pip install -r requirements-dev.txt",
     "pip install -e .",
-    "playwright install",
-    "playwright install-deps"
   ],
 
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
