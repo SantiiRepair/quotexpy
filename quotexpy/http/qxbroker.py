@@ -34,7 +34,7 @@ class Browser(object):
         cookies = browser.get_cookies()
         self.api.cookies = cookies
         soup = BeautifulSoup(browser.page_source, "html.parser")
-        user_agent = browser.execute_script("() => navigator.userAgent;")
+        user_agent = browser.execute_script("return navigator.userAgent;")
         self.api.user_agent = user_agent
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()

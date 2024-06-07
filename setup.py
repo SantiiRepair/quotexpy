@@ -17,7 +17,7 @@ install_requires = [
     "beautifulsoup4==4.11.2",
     "certifi==2022.12.7",
     "greenlet>=2.0.1",
-    "playwright>=1.39.0",
+    "undetected-chromedriver>=3.5.5",
     "pyOpenSSL>=23.1.1",
     "pytz>=2023.3",
     "requests-toolbelt>=1.0.0",

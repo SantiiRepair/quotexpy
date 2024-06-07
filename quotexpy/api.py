@@ -193,10 +193,7 @@ class QuotexAPI(object):
         ssid, cookies = self.check_session()
         if not ssid:
             self.logger.info("Authenticating user...")
-            ssid, cookies = await self.login(
-                self.email,
-                self.password,
-            )
+            ssid, cookies = await self.login(self.email, self.password, self.headless)
             self.logger.info("Login successful!!!")
         return ssid, cookies
 

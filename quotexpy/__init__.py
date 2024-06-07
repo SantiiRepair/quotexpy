@@ -25,7 +25,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.40.3"
+    __version__ = "1.40.5"
 
     def __init__(self, email: str, password: str, headless=True):
         self.api = None

@@ -22,10 +22,7 @@ def run(y):
     return z
 
 
-client = Quotex(
-    email="miguelsantiago1940@gmail.com",
-    password="Santiago2024",
-)
+client = Quotex(email="", password="", headless=False)
 
 client.debug_ws_enable = False
 
