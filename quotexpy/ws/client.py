@@ -121,7 +121,7 @@ class WebsocketClient(object):
                 self.api._temp_status = ""
             elif self.api._temp_status == """451-["history/list/v2",{"_placeholder":true,"num":0}]""":
                 self.api.candles.candles_data = message["candles"]
-                self.api.candle_v2_data[message["asset"]] = message
+                self.api.candle_v2_data[message["asset"]] = message["candles"]
                 self.api.candle_v2_data[message["asset"]]["candles"] = [
                     {"time": candle[0], "open": candle[1], "close": candle[2], "high": candle[3], "low": candle[4]}
                     for candle in message["candles"]
