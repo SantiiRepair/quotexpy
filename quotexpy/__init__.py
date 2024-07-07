@@ -54,9 +54,9 @@ class Quotex(object):
 
     @staticmethod
     def check_connect():
-        if global_value.check_websocket_if_connect == 0:
-            return False
-        return True
+        if global_value.check_websocket_if_connect == 1:
+            return True
+        return False
 
     async def re_subscribe_stream(self):
         try:
