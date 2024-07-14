@@ -1,18 +1,72 @@
+import os
 import sys
 import time
-import datetime
 import random
 import asyncio
+import datetime
+from pathlib import Path
 from termcolor import colored
 
 from quotexpy import Quotex
 from quotexpy.utils import asset_parse
 from quotexpy.utils.account_type import AccountType
 from quotexpy.utils.operation_type import OperationType
-from quotexpy.utils.duration_time import DurationTime
-from my_connection import MyConnection
 
 asset_current = "EURUSD"
+
+
+class SingletonDecorator:
+    """
+    A decorator that turns a class into a singleton.
+    """
+
+    def __init__(self, cls):
+        self.cls = cls
+        self.instance = None
+
+    def __call__(self, *args, **kwargs):
+        if self.instance is None:
+            self.instance = self.cls(*args, **kwargs)
+        return self.instance
+
+
+@SingletonDecorator
+class MyConnection:
+    """
+    This class represents a connection object and provides methods for connecting to a client.
+    """
+
+    def __init__(self, client_instance: Quotex):
+        self.client = client_instance
+
+    async def connect(self, attempts=5):
+        check = await self.client.connect()
+        if not check:
+            attempt = 0
+            while attempt <= attempts:
+                if not self.client.check_connect():
+                    check = await self.client.connect()
+                    if check:
+                        print("Reconectado com sucesso!!!")
+                        break
+                    print("Erro ao reconectar.")
+                    attempt += 1
+                    if Path(os.path.join(".", "session.json")).is_file():
+                        Path(os.path.join(".", "session.json")).unlink()
+                    print(f"Tentando reconectar, tentativa {attempt} de {attempts}")
+                elif not check:
+                    attempt += 1
+                else:
+                    break
+                await asyncio.sleep(5)
+            return check
+        return check
+
+    def close(self):
+        """
+        Closes the client connection.
+        """
+        self.client.close()
 
 
 def run(y):
@@ -23,7 +77,6 @@ def run(y):
 
 
 client = Quotex(email="", password="", headless=False)
-
 client.debug_ws_enable = False
 
 
@@ -41,7 +94,7 @@ def check_asset(asset):
 
 async def get_balance():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         client.change_account(AccountType.PRACTICE)  # "REAL"
         print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
@@ -51,7 +104,7 @@ async def get_balance():
 
 async def balance_refill():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         result = await client.edit_practice_balance(100)
         print(result)
@@ -60,7 +113,7 @@ async def balance_refill():
 
 async def trade():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         client.change_account(AccountType.PRACTICE)
         amount = 1
@@ -70,7 +123,7 @@ async def trade():
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
             try:
-                await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
+                await client.trade(action, amount, asset, 60)
             except:
                 pass
         else:
@@ -84,14 +137,13 @@ async def wait_for_input_exceeding_x_seconds_limit(secounds=30):
     while True:
         now = datetime.datetime.now()
         if now.second < secounds:
-            return  # Returns when it's the right time to proceed
+            return
         await asyncio.sleep(0.5)
 
 
 async def trade_and_check_win():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
-    # check_connect, message = await connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         client.change_account(AccountType.PRACTICE)
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
@@ -101,10 +153,10 @@ async def trade_and_check_win():
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
             action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
-            status, trade_info = await client.trade(action, amount, asset, DurationTime.ONE_MINUTE)
+            status, trade_info = await client.trade(action, amount, asset, 30)
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                if await client.check_win(asset, trade_info["id"]):
+                if await client.check_win(trade_info["id"]):
                     print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                 else:
                     print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
@@ -118,7 +170,7 @@ async def trade_and_check_win():
 
 async def sell_option():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     # print(check_connect, message)
     if check_connect:
         client.change_account(AccountType.PRACTICE)
@@ -136,7 +188,7 @@ async def sell_option():
 
 async def assets_open():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         for i in client.get_all_asset_name():
             print(i, client.check_asset_open(i))
@@ -145,7 +197,7 @@ async def assets_open():
 
 async def get_payment():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         all_data = client.get_payment()
         for asset_name in all_data:
@@ -157,7 +209,7 @@ async def get_payment():
 # import numpy as np
 async def get_candle_v2():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     period = 100
     if check_connect:
         global asset_current
@@ -174,7 +226,7 @@ async def get_candle_v2():
 
 async def get_realtime_candle():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         list_size = 10
         global asset_current
@@ -189,7 +241,7 @@ async def get_realtime_candle():
 
 async def get_signal_data():
     prepare_connection = MyConnection(client)
-    check_connect, message = await prepare_connection.connect()
+    check_connect = await prepare_connection.connect()
     if check_connect:
         while True:
             print(client.get_signal_data())

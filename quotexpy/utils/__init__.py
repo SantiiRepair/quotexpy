@@ -1,3 +1,4 @@
+import json
 import time
 
 
@@ -12,3 +13,11 @@ def asset_parse(asset):
 
 def unix_time() -> int:
     return int(time.time())
+
+
+def is_valid_json(mj):
+    try:
+        json.loads(mj)
+    except ValueError as _:
+        return False
+    return True

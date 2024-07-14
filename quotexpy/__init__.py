@@ -129,22 +129,17 @@ class Quotex(object):
             await asyncio.sleep(1)
         return self.api.candle_v2_data[asset]
 
-    async def connect(self):
+    async def connect(self) -> bool:
         if global_value.check_websocket_if_connect:
             self.close()
         self.api = QuotexAPI(self.email, self.password, self.headless)
         self.api.trace_ws = self.debug_ws_enable
-        check, reason = await self.api.connect()
+        check = await self.api.connect()
         if check:
             self.api.send_ssid(max_attemps=10)
             if global_value.check_accepted_connection == 0:
-                check, reason = await self.connect()
-                if not check:
-                    check, reason = (
-                        False,
-                        "Access denied, session does not exist!!!",
-                    )
-        return check, reason
+                check = await self.connect()
+        return check
 
     def change_account(self, mode="PRACTICE"):
         """Change active account `real` or `practice`"""
@@ -220,29 +215,28 @@ class Quotex(object):
             while remaing_time >= 0:
                 remaing_time -= 1
                 await asyncio.sleep(1)
-        except Exception as e:
-            self.logger.error(e)
+        except Exception as err:
+            self.logger.error(err)
         return True
 
-    async def check_win(self, asset, id_number):
+    async def check_win(self, id_number, revisions=5) -> bool:
         """Check win based id"""
-        self.logger.debug(f"begin check wind {id_number}")
+        crevisions = 0
+        self.logger.debug(f"begin check win {id_number}")
         await self.start_remaing_time()
-        while True:  # await self.start_remaing_time():
+        while crevisions < revisions:
             try:
-                listinfodata_dict = self.api.listinfodata.get(asset)
-                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
-                    break
-                listinfodata_dict = self.api.listinfodata.get(id_number)
-                if listinfodata_dict and listinfodata_dict["game_state"] == 1:
-                    break
-            except:
-                pass
-            time.sleep(0.1)
-        self.logger.debug("end check wind")
-        self.api.listinfodata.delete(id_number)
-        self.api.listinfodata.delete(asset)
-        return listinfodata_dict["win"]
+                crevisions += 1
+                await asyncio.sleep(0.1)  
+                result = self.api.listinfodata.get(id_number)
+                if isinstance(result, dict) and "win" in result:
+                    self.logger.debug("end check win")
+                    self.api.listinfodata.delete(id_number)
+                    return result["win"]
+                if crevisions == revisions:
+                    return False
+            except Exception as err:
+                raise err
 
     def start_candles_stream(self, asset, period=0):
         self.api.subscribe_realtime_candle(asset, period)
