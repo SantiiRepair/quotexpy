@@ -79,7 +79,7 @@ class QuotexAPI(object):
         self.cookies = None
         self.profile = None
         self.websocket_thread = None
-        self.wss_url = f"wss://ws2.qxbroker.com/socket.io/?EIO=3&transport=websocket"
+        self.wss_url = "wss://ws2.qxbroker.com/socket.io/?EIO=3&transport=websocket"
         self.websocket_client = None
         self.set_ssid = None
         self.user_agent = None

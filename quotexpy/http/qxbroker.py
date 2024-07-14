@@ -1,4 +1,5 @@
-import re, json
+import re
+import json
 import time, requests
 from pathlib import Path
 from bs4 import BeautifulSoup
