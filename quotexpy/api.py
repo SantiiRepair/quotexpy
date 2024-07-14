@@ -60,7 +60,7 @@ class QuotexAPI(object):
     timesync = TimeSync()
     candles = Candles()
     wss_message = None
-    
+
     def __init__(self, email: str, password: str, headless: bool):
         """
         :param str host: The hostname or ip address of a Quotex server.

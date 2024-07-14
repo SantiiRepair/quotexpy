@@ -227,7 +227,7 @@ class Quotex(object):
         while crevisions < revisions:
             try:
                 crevisions += 1
-                await asyncio.sleep(0.1)  
+                await asyncio.sleep(0.1)
                 result = self.api.listinfodata.get(id_number)
                 if isinstance(result, dict) and "win" in result:
                     self.logger.debug("end check win")

@@ -72,51 +72,52 @@ class WebsocketClient(object):
                 if is_valid_json(wm):
                     message = json.loads(wm)
                     self.api.wss_message = message
-                    if "call" in wm or "put" in wm:
-                        self.api.instruments = message
-                    if isinstance(message, dict):
-                        if message.get("signals"):
-                            time_in = message.get("time")
-                            for i in message["signals"]:
-                                try:
-                                    self.api.signal_data[i[0]] = {}
-                                    self.api.signal_data[i[0]][i[2]] = {}
-                                    self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
-                                    self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
-                                except:
-                                    self.api.signal_data[i[0]] = {}
-                                    self.api.signal_data[i[0]][time_in] = {}
-                                    self.api.signal_data[i[0]][time_in]["dir"] = i[1][0][1]
-                                    self.api.signal_data[i[0]][time_in]["duration"] = i[1][0][0]
-                        elif message.get("liveBalance") or message.get("demoBalance"):
-                            self.api.account_balance = message
-                        elif message.get("index"):
-                            self.api.candles.candles_data = message
-                        elif message.get("id"):
-                            self.api.trade_successful = message
-                            self.api.trade_id = message["id"]
-                            self.api.timesync.server_timestamp = message["closeTimestamp"]
-                        elif message.get("ticket"):
-                            self.api.sold_options_respond = message
-                        elif message.get("profit") and message.get("deals"):
-                            for get_m in message["deals"]:
-                                self.api.profit_in_operation = get_m["profit"]
-                                get_m["win"] = True if message["profit"] > 0 else False
-                                get_m["game_state"] = 1
-                                self.api.listinfodata.set(get_m["id"], get_m["win"], get_m["game_state"])
-                                break
-                        elif message.get("isDemo") and message.get("balance"):
-                            self.api.training_balance_edit_request = message
-                        elif message.get("error"):
-                            global_value.websocket_error_reason = message.get("error")
-                            global_value.check_websocket_if_error = True
-                            if global_value.websocket_error_reason == "not_money":
-                                self.api.account_balance = {"liveBalance": 0}
-                        elif not message.get("list") == []:
-                            self.api.wss_message = message
+                if isinstance(self.api.wss_message, dict):
+                    if self.api.wss_message.get("signals"):
+                        time_in = self.api.wss_message.get("time")
+                        for i in self.api.wss_message["signals"]:
+                            try:
+                                self.api.signal_data[i[0]] = {}
+                                self.api.signal_data[i[0]][i[2]] = {}
+                                self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
+                                self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
+                            except:
+                                self.api.signal_data[i[0]] = {}
+                                self.api.signal_data[i[0]][time_in] = {}
+                                self.api.signal_data[i[0]][time_in]["dir"] = i[1][0][1]
+                                self.api.signal_data[i[0]][time_in]["duration"] = i[1][0][0]
+                    elif self.api.wss_message.get("liveBalance") or self.api.wss_message.get("demoBalance"):
+                        self.api.account_balance = self.api.wss_message
+                    elif self.api.wss_message.get("index"):
+                        self.api.candles.candles_data = self.api.wss_message
+                    elif self.api.wss_message.get("id"):
+                        self.api.trade_successful = self.api.wss_message
+                        self.api.trade_id = self.api.wss_message["id"]
+                        self.api.timesync.server_timestamp = self.api.wss_message["closeTimestamp"]
+                    elif self.api.wss_message.get("ticket"):
+                        self.api.sold_options_respond = self.api.wss_message
+                    elif self.api.wss_message.get("isDemo") and self.api.wss_message.get("balance"):
+                        self.api.training_balance_edit_request = self.api.wss_message
+                    elif self.api.wss_message.get("error"):
+                        global_value.websocket_error_reason = self.api.wss_message.get("error")
+                        global_value.check_websocket_if_error = True
+                        if global_value.websocket_error_reason == "not_money":
+                            self.api.account_balance = {"liveBalance": 0}
             except Exception as err:
                 self.logger.error(err)
             if self.api.wss_message and not isinstance(self.api.wss_message, int):
+                if "call" in wm or "put" in wm:
+                    self.api.instruments = self.api.wss_message
+                if isinstance(self.api.wss_message, list):
+                    for item in self.api.wss_message:
+                        if "amount" in item and "profit" in item:
+                            params = {}
+                            last = self.api.wss_message[0]
+                            self.api.profit_in_operation = last["profit"]
+                            params["win"] = True if last["profit"] > 0 else False
+                            params["game_state"] = 1
+                            self.api.listinfodata.set(last["id"], params["win"], params["game_state"])
+                            break
                 if str(self.api.wss_message) == "41":
                     self.logger.info("disconnection event triggered by the platform, running automatic reconnection")
                     global_value.check_websocket_if_connect = 0
