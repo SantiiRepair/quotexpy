@@ -1,6 +1,7 @@
 import re
 import json
-import time, requests
+import time
+import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from typing import Tuple, Any
