@@ -86,8 +86,28 @@ class WebsocketClient(object):
                                 self.api.signal_data[i[0]][time_in] = {}
                                 self.api.signal_data[i[0]][time_in]["dir"] = i[1][0][1]
                                 self.api.signal_data[i[0]][time_in]["duration"] = i[1][0][0]
-                    elif self.api.wss_message.get("liveBalance") or self.api.wss_message.get("demoBalance"):
-                        self.api.account_balance = self.api.wss_message
+                    elif (
+                        self.api.wss_message.get("liveBalance")
+                        or self.api.wss_message.get("demoBalance")
+                        or self.api.wss_message.get("balance")
+                        and self.api.wss_message.get("isDemo")
+                    ):
+                        if self.api.wss_message.get("balance") and self.api.wss_message.get("isDemo"):
+                            self.api.account_balance = {
+                                "liveBalance": (
+                                    self.api.wss_message.get("balance")
+                                    if self.api.wss_message.get("isDemo") != 1
+                                    else 0
+                                ),
+                                "demoBalance": (
+                                    self.api.wss_message.get("balance")
+                                    if self.api.wss_message.get("isDemo") == 1
+                                    else 0
+                                ),
+                                "tournamentsBalances": {},
+                            }
+                        else:
+                            self.api.account_balance = self.api.wss_message
                     elif self.api.wss_message.get("index"):
                         self.api.candles.candles_data = self.api.wss_message
                     elif self.api.wss_message.get("id"):

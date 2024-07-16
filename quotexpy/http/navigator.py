@@ -12,6 +12,7 @@ retry_strategy = Retry(
     status_forcelist=[429, 500, 502, 503, 504, 104],
     allowed_methods=["HEAD", "POST", "PUT", "GET", "OPTIONS"],
 )
+
 adapter = HTTPAdapter(max_retries=retry_strategy)
 user_agent_list = agents.split("\n")
 
@@ -34,6 +35,7 @@ class Navigator(object):
         self.headers = {
             "User-Agent": user_agent_list[random.randint(0, len(user_agent_list) - 1)],
         }
+
         return self.headers
 
     def get_soup(self):

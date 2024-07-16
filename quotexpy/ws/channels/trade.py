@@ -9,12 +9,11 @@ class Trade(Base):
     name = "trade"
 
     def __call__(self, action: str, amount, asset: str, duration: int, request_id: int):
-        """exp, idx = get_expiration_time(
-        int(self.api.timesync.server_timestamp), duration)"""
         option_type = 100
         if "_otc" not in asset.strip().lower():
             option_type = 1
             duration = get_expiration_time_quotex(int(self.api.timesync.server_timestamp), duration)
+
         payload = {
             "chartId": "graph",
             "settings": {
@@ -39,6 +38,7 @@ class Trade(Base):
                 "downColor": "#FF6251",
             },
         }
+
         data = f'42["settings/store",{json.dumps(payload)}]'
         self.send_websocket_request(data)
 
@@ -52,5 +52,6 @@ class Trade(Base):
             "requestId": request_id,
             "optionType": option_type,
         }
+
         data = f'42["orders/open",{json.dumps(payload)}]'
         self.send_websocket_request(data)

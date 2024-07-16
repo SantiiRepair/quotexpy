@@ -162,12 +162,14 @@ class Quotex(object):
     async def get_balance(self):
         while not self.api.account_balance:
             await asyncio.sleep(0.1)
+
         balance = (
             self.api.account_balance.get("demoBalance")
             if self.api.account_type > 0
             else self.api.account_balance.get("liveBalance")
         )
-        return float(f"{truncate(balance + self.get_profit(), 2):.2f}")
+
+        return balance
 
     async def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
