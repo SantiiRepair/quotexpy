@@ -50,6 +50,7 @@ class QuotexAPI(object):
     current_asset = None
     trade_successful = None
     account_balance = None
+    last_operation = {}
     account_type = None
     instruments = None
     training_balance_edit_request = None
@@ -225,6 +226,7 @@ class QuotexAPI(object):
 
         self.websocket_thread.daemon = True
         self.websocket_thread.start()
+
         while True:
             try:
                 if global_value.check_websocket_if_error:

@@ -173,22 +173,20 @@ class Quotex(object):
 
     async def trade(self, action: str, amount, asset: str, duration):
         """Trade Binary option"""
+        count = 0.1
         status_trade = False
+        self.api.trade_id = None
+        self.duration = duration
         request_id = expiration.get_timestamp()
         self.api.current_asset = asset
         self.api.subscribe_realtime_candle(asset, duration)
         self.api.trade(action, amount, asset, duration, request_id)
-        count = 0.1
         while self.api.trade_id is None:
-            count += 0.1
-            if count > duration:
-                status_trade = False
-                break
             await asyncio.sleep(0.1)
             if global_value.check_websocket_if_error:
                 return False, global_value.websocket_error_reason
-        else:
-            status_trade = True
+
+        status_trade = True
         return status_trade, self.api.trade_successful
 
     async def sell_option(self, options_ids):
@@ -206,35 +204,45 @@ class Quotex(object):
             assets_data[i[2]] = {"turbo_payment": i[18], "payment": i[5], "open": i[14]}
         return assets_data
 
-    async def start_remaing_time(self):
+    async def start_remaining_time(self):
         try:
             now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
             expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
-            remaing_time = int((expiration_stamp - now_stamp).total_seconds())
-            if remaing_time < 0:
+            remaining_time = int((expiration_stamp - now_stamp).total_seconds())
+            if remaining_time < 0:
                 now_stamp_ajusted = now_stamp - timedelta(seconds=self.duration)
-                remaing_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaing_time)
-            while remaing_time >= 0:
-                remaing_time -= 1
+                remaining_time = int((expiration_stamp - now_stamp_ajusted).total_seconds()) + abs(remaining_time)
+            while remaining_time >= 0:
+                remaining_time -= 1
                 await asyncio.sleep(1)
         except Exception as err:
             self.logger.error(err)
+
+        self.duration = None
         return True
 
-    async def check_win(self, id_number, revisions=5) -> bool:
+    async def check_win(self, id_number: str, revisions=5) -> bool:
         """Check win based id"""
         crevisions = 0
         self.logger.debug(f"begin check win {id_number}")
-        await self.start_remaing_time()
-        while crevisions < revisions:
+        await self.start_remaining_time()
+        while crevisions < revisions or not self.api.last_operation:
             try:
                 crevisions += 1
                 await asyncio.sleep(0.1)
+                if self.api.last_operation.get("id") == id_number:
+                    params = {}
+                    self.api.profit_in_operation = self.api.last_operation.get("profit")
+                    params["win"] = True if self.api.last_operation.get("profit") > 0 else False
+                    params["game_state"] = 1
+                    self.api.listinfodata.set(id_number, params["win"], params["game_state"])
+
                 result = self.api.listinfodata.get(id_number)
                 if isinstance(result, dict) and "win" in result:
                     self.logger.debug("end check win")
                     self.api.listinfodata.delete(id_number)
                     return result["win"]
+
                 if crevisions == revisions:
                     return False
             except Exception as err:

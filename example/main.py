@@ -12,7 +12,7 @@ from quotexpy.utils import asset_parse
 from quotexpy.utils.account_type import AccountType
 from quotexpy.utils.operation_type import OperationType
 
-asset_current = "AUDJPY"
+asset_current = "EURUSD_otc"
 
 
 class SingletonDecorator:
@@ -156,7 +156,7 @@ async def trade_and_check_win():
             status, trade_info = await client.trade(action, amount, asset, 60)
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                if await client.check_win(trade_info["id"]):
+                if await client.check_win(trade_info.get("id")):
                     print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                 else:
                     print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
@@ -164,6 +164,7 @@ async def trade_and_check_win():
                 print(colored("[WARN]: ", "light_red"), "Operation not realized.")
         else:
             print(colored("[WARN]: ", "light_red"), "Asset is closed.")
+        time.sleep(2)
         print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
     print(colored("[INFO]: ", "blue"), "Exiting...")
 

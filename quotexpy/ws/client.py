@@ -58,85 +58,106 @@ class WebsocketClient(object):
         self.logger.info(wm)
         if current_time.tm_sec in [0, 20, 40]:
             self.wss.send('42["tick"]')
+        if "authorization/reject" in wm:
+            if os.path.isfile(".session.json"):
+                os.remove(".session.json")
+            global_value.SSID = None
+            global_value.check_rejected_connection = 1
+        elif "s_authorization" in wm:
+            global_value.check_accepted_connection = 1
+        elif "instruments/list" in wm:
+            global_value.started_listen_instruments = True
         try:
-            if "authorization/reject" in wm:
-                if os.path.isfile(".session.json"):
-                    os.remove(".session.json")
-                global_value.SSID = None
-                global_value.check_rejected_connection = 1
-            elif "s_authorization" in wm:
-                global_value.check_accepted_connection = 1
-            elif "instruments/list" in wm:
-                global_value.started_listen_instruments = True
-            try:
-                if is_valid_json(wm):
-                    message = json.loads(wm)
-                    self.api.wss_message = message
-                if isinstance(self.api.wss_message, dict):
-                    if self.api.wss_message.get("signals"):
-                        time_in = self.api.wss_message.get("time")
-                        for i in self.api.wss_message["signals"]:
-                            try:
-                                self.api.signal_data[i[0]] = {}
-                                self.api.signal_data[i[0]][i[2]] = {}
-                                self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
-                                self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
-                            except:
-                                self.api.signal_data[i[0]] = {}
-                                self.api.signal_data[i[0]][time_in] = {}
-                                self.api.signal_data[i[0]][time_in]["dir"] = i[1][0][1]
-                                self.api.signal_data[i[0]][time_in]["duration"] = i[1][0][0]
-                    elif (
-                        self.api.wss_message.get("liveBalance")
-                        or self.api.wss_message.get("demoBalance")
-                        or self.api.wss_message.get("balance")
-                        and self.api.wss_message.get("isDemo")
+            if is_valid_json(wm):
+                message = json.loads(wm)
+                self.api.wss_message = message
+            if isinstance(self.api.wss_message, dict):
+                if self.api.wss_message.get("signals"):
+                    time_in = self.api.wss_message.get("time")
+                    for i in self.api.wss_message["signals"]:
+                        try:
+                            self.api.signal_data[i[0]] = {}
+                            self.api.signal_data[i[0]][i[2]] = {}
+                            self.api.signal_data[i[0]][i[2]]["dir"] = i[1][0]["signal"]
+                            self.api.signal_data[i[0]][i[2]]["duration"] = i[1][0]["timeFrame"]
+                        except:
+                            self.api.signal_data[i[0]] = {}
+                            self.api.signal_data[i[0]][time_in] = {}
+                            self.api.signal_data[i[0]][time_in]["dir"] = i[1][0][1]
+                            self.api.signal_data[i[0]][time_in]["duration"] = i[1][0][0]
+                elif (
+                    (
+                        self.api.wss_message.get("accountBalance") is not None
+                        and self.api.wss_message.get("isDemo") is not None
+                    )
+                    or (
+                        self.api.wss_message.get("balance") is not None
+                        and self.api.wss_message.get("isDemo") is not None
+                    )
+                    or (
+                        self.api.wss_message.get("liveBalance") is not None
+                        or self.api.wss_message.get("demoBalance") is not None
+                    )
+                    or self.api.wss_message.get("id") is not None
+                ):
+                    if (
+                        self.api.wss_message.get("accountBalance") is not None
+                        and self.api.wss_message.get("isDemo") is not None
                     ):
-                        if self.api.wss_message.get("balance") and self.api.wss_message.get("isDemo"):
-                            self.api.account_balance = {
-                                "liveBalance": (
-                                    self.api.wss_message.get("balance")
-                                    if self.api.wss_message.get("isDemo") != 1
-                                    else 0
-                                ),
-                                "demoBalance": (
-                                    self.api.wss_message.get("balance")
-                                    if self.api.wss_message.get("isDemo") == 1
-                                    else 0
-                                ),
-                                "tournamentsBalances": {},
-                            }
-                        else:
-                            self.api.account_balance = self.api.wss_message
-                    elif self.api.wss_message.get("index"):
-                        self.api.candles.candles_data = self.api.wss_message
-                    elif self.api.wss_message.get("id"):
-                        self.api.trade_successful = self.api.wss_message
-                        self.api.trade_id = self.api.wss_message["id"]
-                        self.api.timesync.server_timestamp = self.api.wss_message["closeTimestamp"]
-                    elif self.api.wss_message.get("ticket"):
-                        self.api.sold_options_respond = self.api.wss_message
-                    elif self.api.wss_message.get("isDemo") and self.api.wss_message.get("balance"):
+                        self.api.account_balance = {
+                            "liveBalance": (
+                                self.api.wss_message.get("accountBalance")
+                                if self.api.wss_message.get("isDemo") != 1
+                                else 0
+                            ),
+                            "demoBalance": (
+                                self.api.wss_message.get("accountBalance")
+                                if self.api.wss_message.get("isDemo") == 1
+                                else 0
+                            ),
+                        }
+                    elif (
+                        self.api.wss_message.get("balance") is not None
+                        and self.api.wss_message.get("isDemo") is not None
+                    ):
                         self.api.training_balance_edit_request = self.api.wss_message
-                    elif self.api.wss_message.get("error"):
-                        global_value.websocket_error_reason = self.api.wss_message.get("error")
-                        global_value.check_websocket_if_error = True
-                        if global_value.websocket_error_reason == "not_money":
-                            self.api.account_balance = {"liveBalance": 0}
-            except Exception as err:
-                self.logger.error(err)
+                        self.api.account_balance = {
+                            "liveBalance": (
+                                self.api.wss_message.get("balance") if self.api.wss_message.get("isDemo") != 1 else 0
+                            ),
+                            "demoBalance": (
+                                self.api.wss_message.get("balance") if self.api.wss_message.get("isDemo") == 1 else 0
+                            ),
+                        }
+                    elif (
+                        self.api.wss_message.get("liveBalance") is not None
+                        or self.api.wss_message.get("demoBalance") is not None
+                    ):
+                        self.api.account_balance = self.api.wss_message
+                    if self.api.wss_message.get("id"):
+                        self.api.trade_id = self.api.wss_message.get("id")
+                        self.api.trade_successful = self.api.wss_message
+                elif self.api.wss_message.get("index"):
+                    self.api.candles.candles_data = self.api.wss_message
+                    self.api.timesync.server_timestamp = self.api.wss_message.get("closeTimestamp")
+                elif self.api.wss_message.get("ticket"):
+                    self.api.sold_options_respond = self.api.wss_message
+                elif self.api.wss_message.get("error"):
+                    global_value.websocket_error_reason = self.api.wss_message.get("error")
+                    global_value.check_websocket_if_error = True
+                    if global_value.websocket_error_reason == "not_money":
+                        self.api.account_balance = {"liveBalance": 0, "demoBalance": 0}
+        except Exception as err:
+            self.logger.error(err)
+
+        try:
             if self.api.wss_message and not isinstance(self.api.wss_message, int):
                 if "call" in wm or "put" in wm:
                     self.api.instruments = self.api.wss_message
                 if isinstance(self.api.wss_message, list):
                     for item in self.api.wss_message:
                         if "amount" in item and "profit" in item:
-                            params = {}
-                            last = self.api.wss_message[0]
-                            self.api.profit_in_operation = last["profit"]
-                            params["win"] = True if last["profit"] > 0 else False
-                            params["game_state"] = 1
-                            self.api.listinfodata.set(last["id"], params["win"], params["game_state"])
+                            self.api.last_operation = self.api.wss_message[0]
                             break
                 if str(self.api.wss_message) == "41":
                     self.logger.info("disconnection event triggered by the platform, running automatic reconnection")
@@ -167,17 +188,17 @@ class WebsocketClient(object):
                     self.api.realtime_sentiment[self.api.wss_message[0][0]] = result
         except Exception as err:
             self.logger.error(err)
+
         global_value.ssl_Mutual_exclusion = False
 
-    def on_error(self, wss, error):
+    def on_error(self, _, error):
         """Method to process websocket errors."""
-        logger.error(error)
         global_value.websocket_error_reason = str(error)
         global_value.check_websocket_if_error = True
 
-    def on_open(self, wss):
+    def on_open(self, _):
         """Method to process websocket open."""
-        logger.info("websocket client connected")
+        self.logger.info("from ws client, websocket client connected")
         global_value.check_websocket_if_connect = 1
         self.wss.send('42["tick"]')
         self.wss.send('42["indicator/list"]')
@@ -187,7 +208,7 @@ class WebsocketClient(object):
 
     def on_close(self, wss, close_status_code, close_msg):
         """Method to process websocket close."""
-        logger.info("websocket connection closed")
+        self.logger.info("from ws client, websocket connection closed")
         global_value.check_websocket_if_connect = 0
 
     def on_ping(self, wss, ping_msg):
