@@ -127,7 +127,7 @@ disable=missing-docstring,
         unnecessary-pass,
         too-many-nested-blocks,
         global-variable-not-assigned,
-        global-statement
+        global-statement,
         too-many-boolean-expressions
 
 # Enable the message, report, category or checker with the given id(s). You can
