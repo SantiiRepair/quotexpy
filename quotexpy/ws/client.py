@@ -8,7 +8,6 @@ import time
 import asyncio
 
 import websocket
-from quotexpy import global_value
 from quotexpy.http.user_agents import agents
 from quotexpy.utils import is_valid_json
 
@@ -51,7 +50,7 @@ class WebsocketClient(object):
 
     def on_message(self, wss, wm):
         """Method to process websocket messages."""
-        global_value.ssl_Mutual_exclusion = True
+        self.api.ssl_Mutual_exclusion = True
         current_time = time.localtime()
         if isinstance(wm, bytes):
             wm = wm[1:].decode()
@@ -61,12 +60,12 @@ class WebsocketClient(object):
         if "authorization/reject" in wm:
             if os.path.isfile(".session.json"):
                 os.remove(".session.json")
-            global_value.SSID = None
-            global_value.check_rejected_connection = 1
+            self.api.SSID = None
+            self.api.check_rejected_connection = 1
         elif "s_authorization" in wm:
-            global_value.check_accepted_connection = 1
+            self.api.check_accepted_connection = 1
         elif "instruments/list" in wm:
-            global_value.started_listen_instruments = True
+            self.api.started_listen_instruments = True
         try:
             if is_valid_json(wm):
                 message = json.loads(wm)
@@ -143,9 +142,9 @@ class WebsocketClient(object):
                 elif self.api.wss_message.get("ticket"):
                     self.api.sold_options_respond = self.api.wss_message
                 elif self.api.wss_message.get("error"):
-                    global_value.websocket_error_reason = self.api.wss_message.get("error")
-                    global_value.check_websocket_if_error = True
-                    if global_value.websocket_error_reason == "not_money":
+                    self.api.websocket_error_reason = self.api.wss_message.get("error")
+                    self.api.check_websocket_if_error = True
+                    if self.api.websocket_error_reason == "not_money":
                         self.api.account_balance = {"liveBalance": 0, "demoBalance": 0}
         except Exception as err:
             self.logger.error(err)
@@ -161,7 +160,7 @@ class WebsocketClient(object):
                             break
                 if str(self.api.wss_message) == "41":
                     self.logger.info("disconnection event triggered by the platform, running automatic reconnection")
-                    global_value.check_websocket_if_connect = 0
+                    self.api.check_websocket_if_connect = 0
                     asyncio.run(self.api.reconnect())
                 if "51-" in str(self.api.wss_message):
                     self.api._temp_status = str(self.api.wss_message)
@@ -189,17 +188,17 @@ class WebsocketClient(object):
         except Exception as err:
             self.logger.error(err)
 
-        global_value.ssl_Mutual_exclusion = False
+        self.api.ssl_Mutual_exclusion = False
 
     def on_error(self, _, error):
         """Method to process websocket errors."""
-        global_value.websocket_error_reason = str(error)
-        global_value.check_websocket_if_error = True
+        self.api.websocket_error_reason = str(error)
+        self.api.check_websocket_if_error = True
 
     def on_open(self, _):
         """Method to process websocket open."""
         self.logger.info("from ws client, websocket client connected")
-        global_value.check_websocket_if_connect = 1
+        self.api.check_websocket_if_connect = 1
         self.wss.send('42["tick"]')
         self.wss.send('42["indicator/list"]')
         self.wss.send('42["drawing/load"]')
@@ -209,7 +208,7 @@ class WebsocketClient(object):
     def on_close(self, wss, close_status_code, close_msg):
         """Method to process websocket close."""
         self.logger.info("from ws client, websocket connection closed")
-        global_value.check_websocket_if_connect = 0
+        self.api.check_websocket_if_connect = 0
 
     def on_ping(self, wss, ping_msg):
         pass

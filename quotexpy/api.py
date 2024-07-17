@@ -10,7 +10,6 @@ import urllib3
 import typing
 import threading
 
-from quotexpy import global_value
 from quotexpy.exceptions import QuotexTimeout
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
@@ -60,7 +59,18 @@ class QuotexAPI(object):
     listinfodata = ListInfoData()
     timesync = TimeSync()
     candles = Candles()
+    
+    SSID = None
     wss_message = None
+    check_websocket_if_connect = None
+    ssl_Mutual_exclusion = False
+    ssl_Mutual_exclusion_write = False
+    started_listen_instruments = True
+    check_rejected_connection = False
+    check_accepted_connection = False
+    check_websocket_if_error = False
+    websocket_error_reason = None
+    balance_id = None
 
     def __init__(self, email: str, password: str, headless: bool):
         """
@@ -172,14 +182,14 @@ class QuotexAPI(object):
         :param str data: The websocket request data.
         :param bool no_force_send: Default None.
         """
-        if global_value.check_websocket_if_connect == 0:
+        if self.check_websocket_if_connect == 0:
             self.logger.info("websocket connection closed")
             return
 
-        while (global_value.ssl_Mutual_exclusion or global_value.ssl_Mutual_exclusion_write) and no_force_send:
+        while (self.ssl_Mutual_exclusion or self.ssl_Mutual_exclusion_write) and no_force_send:
             pass
 
-        global_value.ssl_Mutual_exclusion_write = True
+        self.ssl_Mutual_exclusion_write = True
         self.websocket.send('42["tick"]')
         self.websocket.send('42["indicator/list"]')
         self.websocket.send('42["drawing/load"]')
@@ -189,7 +199,7 @@ class QuotexAPI(object):
         self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
         self.websocket.send(data)
         self.logger.debug(data)
-        global_value.ssl_Mutual_exclusion_write = False
+        self.ssl_Mutual_exclusion_write = False
 
     def edit_training_balance(self, amount) -> None:
         data = f'42["demo/refill",{json.dumps(amount)}]'
@@ -204,9 +214,9 @@ class QuotexAPI(object):
         return ssid, cookies
 
     def start_websocket(self) -> bool:
-        global_value.check_websocket_if_connect = None
-        global_value.check_websocket_if_error = False
-        global_value.websocket_error_reason = None
+        self.check_websocket_if_connect = None
+        self.check_websocket_if_error = False
+        self.websocket_error_reason = None
         self.websocket_client = WebsocketClient(self)
         self.websocket_thread = threading.Thread(
             target=self.websocket.run_forever,
@@ -229,13 +239,13 @@ class QuotexAPI(object):
 
         while True:
             try:
-                if global_value.check_websocket_if_error:
-                    self.logger.error(global_value.websocket_error_reason)
+                if self.check_websocket_if_error:
+                    self.logger.error(self.websocket_error_reason)
                     return False
-                if global_value.check_websocket_if_connect == 0:
+                if self.check_websocket_if_connect == 0:
                     self.logger.debug("websocket connection closed")
                     return False
-                if global_value.check_websocket_if_connect == 1:
+                if self.check_websocket_if_connect == 1:
                     self.logger.debug("websocket successfully connected")
                     return True
             except:
@@ -247,12 +257,12 @@ class QuotexAPI(object):
             max_attemps - time to wait for authorization in seconds
         """
         self.profile.msg = None
-        if not global_value.SSID:
+        if not self.SSID:
             if os.path.exists(os.path.join(".session.json")):
                 os.remove(".session.json")
             return False
 
-        self.ssid(global_value.SSID)
+        self.ssid(self.SSID)
         start_time = time.time()
         previous_second = -1
 
@@ -262,21 +272,21 @@ class QuotexAPI(object):
             if current_second != previous_second:
                 previous_second = current_second
             if elapsed_time >= max_attemps:
-                raise QuotexTimeout(f"sending authorization with SSID {global_value.SSID} took too long to respond")
+                raise QuotexTimeout(f"sending authorization with SSID {self.SSID} took too long to respond")
         return True
 
     async def connect(self) -> bool:
         """Method for connection to Quotex API"""
-        global_value.ssl_Mutual_exclusion = False
-        global_value.ssl_Mutual_exclusion_write = False
-        if global_value.check_websocket_if_connect:
+        self.ssl_Mutual_exclusion = False
+        self.ssl_Mutual_exclusion_write = False
+        if self.check_websocket_if_connect:
             self.close()
         ssid, self.cookies = await self.get_ssid()
         check_websocket = self.start_websocket()
         if not check_websocket:
             return check_websocket
-        if not global_value.SSID:
-            global_value.SSID = ssid
+        if not self.SSID:
+            self.SSID = ssid
         return check_websocket
 
     def close(self) -> None:

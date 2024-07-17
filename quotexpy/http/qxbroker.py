@@ -45,6 +45,8 @@ class Browser(object):
             script: str = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
         except Exception as exc:
             raise QuotexAuthError("incorrect username or password") from exc
+        finally:
+            self.close()
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
         dx: dict = json.loads(match)
@@ -54,7 +56,6 @@ class Browser(object):
         cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
         cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
         output_file.write_text(json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4))
-        self.close()
 
         return ssid, cookie_string
 

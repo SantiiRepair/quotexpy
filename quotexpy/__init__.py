@@ -9,7 +9,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 from quotexpy import expiration
-from quotexpy import global_value
 from quotexpy.api import QuotexAPI
 from quotexpy.constants import codes_asset
 
@@ -53,8 +52,8 @@ class Quotex(object):
         return self.websocket_client.wss
 
     @staticmethod
-    def check_connect():
-        if global_value.check_websocket_if_connect == 1:
+    def check_connect(self):
+        if self.api and self.api.check_websocket_if_connect == 1:
             return True
         return False
 
@@ -102,7 +101,6 @@ class Quotex(object):
 
     async def get_candles(self, asset, offset, period=None):
         index = expiration.get_timestamp()
-        # index - offset
         if period:
             period = expiration.get_period_time(period)
         else:
@@ -130,14 +128,14 @@ class Quotex(object):
         return self.api.candle_v2_data[asset]
 
     async def connect(self) -> bool:
-        if global_value.check_websocket_if_connect:
+        if self.api and self.api.check_websocket_if_connect:
             self.close()
         self.api = QuotexAPI(self.email, self.password, self.headless)
         self.api.trace_ws = self.debug_ws_enable
         check = await self.api.connect()
         if check:
             self.api.send_ssid(max_attemps=10)
-            if global_value.check_accepted_connection == 0:
+            if self.api.check_accepted_connection == 0:
                 check = await self.connect()
         return check
 
@@ -183,8 +181,8 @@ class Quotex(object):
         self.api.trade(action, amount, asset, duration, request_id)
         while self.api.trade_id is None:
             await asyncio.sleep(0.1)
-            if global_value.check_websocket_if_error:
-                return False, global_value.websocket_error_reason
+            if self.api.check_websocket_if_error:
+                return False, self.api.websocket_error_reason
 
         status_trade = True
         return status_trade, self.api.trade_successful
