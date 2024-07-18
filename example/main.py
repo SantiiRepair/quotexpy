@@ -15,6 +15,11 @@ from quotexpy.utils.operation_type import OperationType
 asset_current = "EURUSD_otc"
 
 
+def pin_code_handler() -> str:
+    code = input("Enter the code sent to your email: ")
+    return code
+
+
 class SingletonDecorator:
     """
     A decorator that turns a class into a singleton.
@@ -76,7 +81,13 @@ def run(y):
     return z
 
 
-client = Quotex(email="", password="", headless=False)
+client = Quotex(
+    email="",
+    password="",
+    on_pin_code=pin_code_handler,
+    headless=False,
+)
+
 client.debug_ws_enable = False
 
 

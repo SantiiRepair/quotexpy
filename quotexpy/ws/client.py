@@ -58,8 +58,8 @@ class WebsocketClient(object):
         if current_time.tm_sec in [0, 20, 40]:
             self.wss.send('42["tick"]')
         if "authorization/reject" in wm:
-            if os.path.isfile(".session.json"):
-                os.remove(".session.json")
+            if os.path.isfile(".session.pkl"):
+                os.remove(".session.pkl")
             self.api.SSID = None
             self.api.check_rejected_connection = 1
         elif "s_authorization" in wm:

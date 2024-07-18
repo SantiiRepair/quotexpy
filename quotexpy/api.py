@@ -4,10 +4,11 @@ import os
 import ssl
 import time
 import json
+import pickle
+import typing
 import certifi
 import logging
 import urllib3
-import typing
 import threading
 
 from quotexpy.exceptions import QuotexTimeout
@@ -72,16 +73,14 @@ class QuotexAPI(object):
     websocket_error_reason = None
     balance_id = None
 
-    def __init__(self, email: str, password: str, headless: bool):
+    def __init__(self, email: str, password: str, **kwargs):
         """
-        :param str host: The hostname or ip address of a Quotex server.
         :param str email: The email of a Quotex server.
         :param str password: The password of a Quotex server.
-        :param proxies: The proxies of a Quotex server.
         """
         self.email = email
         self.password = password
-        self.headless = headless
+        self.kwargs = kwargs
         self._temp_status = ""
         self.settings_list = {}
         self.signal_data = nested_dict(2, dict)
@@ -178,11 +177,14 @@ class QuotexAPI(object):
 
     def check_session(self) -> typing.Tuple[str, str]:
         data = {}
-        if os.path.isfile(".session.json"):
-            with open(".session.json") as file:
-                data = json.loads(file.read())
-            self.user_agent = data.get("user_agent")
-        return data.get("ssid"), data.get("cookies")
+        if os.path.isfile(".session.pkl"):
+            with open(".session.pkl", "rb") as file:
+                data = pickle.load(file)
+
+            sessions = data.get(self.email, [])
+            for session in sessions:
+                return session.get("ssid", ""), session.get("cookies", "")
+        return "", ""
 
     def send_websocket_request(self, data, no_force_send=True) -> None:
         """Send websocket request to Quotex server.
@@ -216,7 +218,7 @@ class QuotexAPI(object):
         self.logger.info("authenticating user")
         ssid, cookies = self.check_session()
         if not ssid:
-            ssid, cookies = await self.login(self.email, self.password, self.headless)
+            ssid, cookies = await self.login(self.email, self.password, **self.kwargs)
             self.logger.info("login successful")
         return ssid, cookies
 
@@ -265,8 +267,8 @@ class QuotexAPI(object):
         """
         self.profile.msg = None
         if not self.SSID:
-            if os.path.exists(os.path.join(".session.json")):
-                os.remove(".session.json")
+            if os.path.exists(os.path.join(".session.pkl")):
+                os.remove(".session.pkl")
             return False
 
         self.ssid(self.SSID)

@@ -1,6 +1,7 @@
 import re
 import json
 import time
+import pickle
 import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -12,6 +13,7 @@ from quotexpy.exceptions import QuotexAuthError
 class Browser(object):
     email = None
     password = None
+    on_ping_code = None
     headless = None
 
     base_url = "qxbroker.com"
@@ -36,6 +38,17 @@ class Browser(object):
             )
 
             time.sleep(5)
+
+        try:
+            code_input = self.browser.find_element(uc.By.NAME, "code")
+            if code_input.is_displayed():
+                code = self.on_ping_code()
+                code_input.send_keys(code)
+                btn = self.browser.find_element(uc.By.XPATH, "//button[@type='submit']")
+                btn.click()
+        except:
+            pass
+
         cookies = self.browser.get_cookies()
         self.api.cookies = cookies
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
@@ -51,11 +64,20 @@ class Browser(object):
 
         dx: dict = json.loads(match)
         ssid = dx.get("token")
-        output_file = Path(".session.json")
-        output_file.parent.mkdir(exist_ok=True, parents=True)
+
         cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
         cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
-        output_file.write_text(json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4))
+        output_file = Path(".session.pkl")
+        output_file.parent.mkdir(exist_ok=True, parents=True)
+
+        data = {}
+        if output_file.is_file():
+            with output_file.open("rb") as file:
+                data = pickle.load(file)
+
+        data[self.email] = [{"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}]
+        with output_file.open("wb") as file:
+            pickle.dump(data, file)
 
         return ssid, cookie_string
 
