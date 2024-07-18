@@ -125,7 +125,7 @@ class QuotexAPI(object):
         payload = {"asset": asset, "version": "1.0.0"}
         data = f'42["chart_notification/get", {json.dumps(payload)}]'
         self.send_websocket_request(data)
-        return self.send_websocket_request(f'42["tick"]')
+        return self.send_websocket_request('42["tick"]')
 
     def unsubscribe_realtime_candle(self, asset):
         data = f'42["subfor", {json.dumps(asset)}]'
