@@ -59,7 +59,7 @@ class QuotexAPI(object):
     listinfodata = ListInfoData()
     timesync = TimeSync()
     candles = Candles()
-    
+
     SSID = None
     wss_message = None
     check_websocket_if_connect = None

@@ -51,7 +51,7 @@ class Quotex(object):
         """
         return self.websocket_client.wss
 
-    @staticmethod
+    @property
     def check_connect(self):
         if self.api and self.api.check_websocket_if_connect == 1:
             return True
