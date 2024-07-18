@@ -141,6 +141,20 @@ class WebsocketClient(object):
                     self.api.timesync.server_timestamp = self.api.wss_message.get("closeTimestamp")
                 elif self.api.wss_message.get("ticket"):
                     self.api.sold_options_respond = self.api.wss_message
+                elif all(key in self.api.wss_message for key in ["asset", "candles"]):
+                    asset = self.api.wss_message.get("asset")
+                    candles = self.api.wss_message.get("candles")
+                    self.api.candles.candles_data = candles
+                    self.api.candle_v2_data[asset] = [
+                        {
+                            "time": candle[0],
+                            "open": candle[1],
+                            "close": candle[2],
+                            "high": candle[3],
+                            "low": candle[4],
+                        }
+                        for candle in candles
+                    ]
                 elif self.api.wss_message.get("error"):
                     self.api.websocket_error_reason = self.api.wss_message.get("error")
                     self.api.check_websocket_if_error = True
@@ -167,13 +181,6 @@ class WebsocketClient(object):
                 elif self.api._temp_status == """451-["settings/list",{"_placeholder":true,"num":0}]""":
                     self.api.settings_list = self.api.wss_message
                     self.api._temp_status = ""
-                elif self.api._temp_status == """451-["history/list/v2",{"_placeholder":true,"num":0}]""":
-                    self.api.candles.candles_data = self.api.wss_message["candles"]
-                    self.api.candle_v2_data[self.api.wss_message["asset"]] = self.api.wss_message["candles"]
-                    self.api.candle_v2_data[self.api.wss_message["asset"]]["candles"] = [
-                        {"time": candle[0], "open": candle[1], "close": candle[2], "high": candle[3], "low": candle[4]}
-                        for candle in self.api.wss_message["candles"]
-                    ]
                 elif len(self.api.wss_message[0]) == 4:
                     result = {"time": self.api.wss_message[0][1], "price": self.api.wss_message[0][2]}
                     self.api.realtime_price[self.api.wss_message[0][0]].append(result)

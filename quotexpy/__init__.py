@@ -24,7 +24,7 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.40.5"
+    __version__ = "1.40.7"
 
     def __init__(self, email: str, password: str, headless=True):
         self.api = None
@@ -99,17 +99,14 @@ class Quotex(object):
                 if instrument == i[2]:
                     return i[0], i[2], i[14]
 
-    async def get_candles(self, asset, offset, period=None):
+    async def get_candles(self, asset: str, offset: int, period: int):
         index = expiration.get_timestamp()
-        if period:
-            period = expiration.get_period_time(period)
-        else:
-            period = index
         self.api.current_asset = asset
         self.api.candles.candles_data = None
         while True:
             try:
-                self.api.get_candles(codes_asset[asset], offset, period, index)
+                tm = expiration.get_timestamp()
+                self.api.get_candles(asset, index, offset, period, tm)
                 while self.check_connect and self.api.candles.candles_data is None:
                     await asyncio.sleep(0.1)
                 if self.api.candles.candles_data is not None:
@@ -119,7 +116,7 @@ class Quotex(object):
                 await self.connect()
         return self.api.candles.candles_data
 
-    async def get_candle_v2(self, asset, period, size=10):
+    async def get_candle_v2(self, asset: str, period: int):
         self.api.candle_v2_data[asset] = None
         self.stop_candles_stream(asset)
         self.api.subscribe_realtime_candle(asset, period)

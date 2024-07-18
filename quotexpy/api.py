@@ -114,11 +114,18 @@ class QuotexAPI(object):
         data = f'451-["history/list/v2", {json.dumps(payload)}]'
         return self.send_websocket_request(data)
 
-    def subscribe_realtime_candle(self, asset, period):
+    def subscribe_realtime_candle(self, asset: str, period: int):
         self.realtime_price[asset] = []
         payload = {"asset": asset, "period": period}
         data = f'42["instruments/update", {json.dumps(payload)}]'
-        return self.send_websocket_request(data)
+        self.send_websocket_request(data)
+        payload = {"asset": asset, "period": period}
+        data = f'42["depth/follow", "{asset}"]'
+        self.send_websocket_request(data)
+        payload = {"asset": asset, "version": "1.0.0"}
+        data = f'42["chart_notification/get", {json.dumps(payload)}]'
+        self.send_websocket_request(data)
+        return self.send_websocket_request(f'42["tick"]')
 
     def unsubscribe_realtime_candle(self, asset):
         data = f'42["subfor", {json.dumps(asset)}]'
