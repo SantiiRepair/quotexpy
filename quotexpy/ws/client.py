@@ -33,6 +33,7 @@ class WebsocketClient(object):
             ),
         }
 
+        websocket.enableTrace(self.api.trace_ws)
         self.wss = websocket.WebSocketApp(
             self.api.wss_url,
             on_message=self.on_message,
@@ -44,16 +45,6 @@ class WebsocketClient(object):
             header=self.headers,
             cookie=self.api.cookies,
         )
-
-        if self.api.trace_ws:
-
-            def on_trace(msg: typing.Union[bytes, str]):
-                with open(log_file_path, "a") as f:
-                    if isinstance(msg, bytes):
-                        msg = msg[1:].decode()
-                    f.write(f"{msg}\n")
-
-            self.wss.on_trace = on_trace
 
         self.logger = logging.getLogger(__name__)
 

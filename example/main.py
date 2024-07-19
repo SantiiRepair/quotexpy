@@ -88,7 +88,7 @@ client = Quotex(
     headless=True,
 )
 
-client.debug_ws_enable = True
+client.debug_ws_enable = False
 
 
 def check_asset(asset):
