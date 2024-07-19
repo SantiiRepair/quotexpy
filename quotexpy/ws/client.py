@@ -3,14 +3,13 @@
 import os
 import json
 import time
-import typing
 import random
 import logging
 import asyncio
 
 import websocket
 from quotexpy.http.user_agents import agents
-from quotexpy.utils import is_valid_json, log_file_path, sessions_file_path
+from quotexpy.utils import is_valid_json, sessions_file_path
 
 user_agent_list = agents.split("\n")
 
