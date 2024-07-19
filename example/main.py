@@ -8,11 +8,11 @@ from pathlib import Path
 from termcolor import colored
 
 from quotexpy import Quotex
-from quotexpy.utils import asset_parse
 from quotexpy.utils.account_type import AccountType
 from quotexpy.utils.operation_type import OperationType
+from quotexpy.utils import asset_parse, sessions_file_path
 
-asset_current = "EURUSD_otc"
+asset_current = "EURUSD"
 
 
 def pin_code_handler() -> str:
@@ -56,8 +56,8 @@ class MyConnection:
                         break
                     print("Erro ao reconectar.")
                     attempt += 1
-                    if Path(os.path.join(".", "session.json")).is_file():
-                        Path(os.path.join(".", "session.json")).unlink()
+                    if Path(sessions_file_path).is_file():
+                        Path(sessions_file_path).unlink()
                     print(f"Tentando reconectar, tentativa {attempt} de {attempts}")
                 elif not check:
                     attempt += 1
@@ -94,7 +94,7 @@ client.debug_ws_enable = False
 def check_asset(asset):
     asset_query = asset_parse(asset)
     asset_open = client.check_asset_open(asset_query)
-    if not asset_open[2]:
+    if not asset_open or not asset_open[2]:
         print(colored("[WARN]: ", "yellow"), "Asset is closed.")
         asset = f"{asset}_otc"
         print(colored("[WARN]: ", "yellow"), "Try OTC Asset -> " + asset)

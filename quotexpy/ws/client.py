@@ -142,7 +142,7 @@ class WebsocketClient(object):
                     self.api.sold_options_respond = self.api.wss_message
                 elif all(key in self.api.wss_message for key in ["asset", "candles"]):
                     asset = self.api.wss_message.get("asset")
-                    candles = self.api.wss_message.get("candles")
+                    candles: list = self.api.wss_message.get("candles")
                     self.api.candles.candles_data = candles
                     self.api.candle_v2_data[asset] = [
                         {

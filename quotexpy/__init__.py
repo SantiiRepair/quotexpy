@@ -1,8 +1,8 @@
 """A python wrapper for Quotex API"""
 
-import sys
 import time
 import math
+import typing
 import asyncio
 import logging
 from collections import defaultdict
@@ -12,6 +12,7 @@ from quotexpy import expiration
 from quotexpy.api import QuotexAPI
 from quotexpy.utils import log_file_path
 from quotexpy.constants import codes_asset
+from quotexpy.utils.account_type import AccountType
 
 
 def nested_dict(n, type):
@@ -25,8 +26,6 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    __version__ = "1.40.7"
-
     def __init__(self, email: str, password: str, **kwargs):
         self.api = None
         self.email = email
@@ -53,7 +52,7 @@ class Quotex(object):
         return self.websocket_client.wss
 
     def check_connect(self):
-        if self.api and self.api.check_websocket_if_connect == 1:
+        if self.api.check_websocket_if_connect == 1:
             return True
         return False
 
@@ -93,13 +92,15 @@ class Quotex(object):
         if self.api.instruments:
             return [instrument[2].replace("\n", "") for instrument in self.api.instruments]
 
-    def check_asset_open(self, instrument):
-        if self.api.instruments:
+    def check_asset_open(self, asset: str) -> typing.Union[typing.Tuple[int, str, bool], None]:
+        if isinstance(self.api, QuotexAPI) and self.api.instruments:
             for i in self.api.instruments:
-                if instrument == i[2]:
+                if asset == i[2]:
                     return i[0], i[2], i[14]
 
-    async def get_candles(self, asset: str, offset: int, period: int):
+        return None
+
+    async def get_candles(self, asset: str, offset: int, period: int) -> typing.List[typing.Union[typing.List, None]]:
         index = expiration.get_timestamp()
         self.api.current_asset = asset
         self.api.candles.candles_data = None
@@ -114,38 +115,42 @@ class Quotex(object):
             except:
                 self.logger.error("get_candles need reconnect")
                 await self.connect()
+
         return self.api.candles.candles_data
 
-    async def get_candle_v2(self, asset: str, period: int):
+    async def get_candle_v2(self, asset: str, period: int) -> typing.List[typing.Union[typing.Dict, None]]:
         self.api.candle_v2_data[asset] = None
         self.stop_candles_stream(asset)
         self.api.subscribe_realtime_candle(asset, period)
         while self.api.candle_v2_data[asset] is None:
             await asyncio.sleep(1)
+
         return self.api.candle_v2_data[asset]
 
     async def connect(self) -> bool:
-        if self.api and self.api.check_websocket_if_connect:
-            self.close()
         self.api = QuotexAPI(self.email, self.password, **self.kwargs)
         self.api.trace_ws = self.debug_ws_enable
-        check = await self.api.connect()
-        if check:
+        ok = await self.api.connect()
+        if ok:
             self.api.send_ssid(max_attemps=10)
             if self.api.check_accepted_connection == 0:
-                check = await self.connect()
-        return check
+                ok = await self.connect()
 
-    def change_account(self, mode="PRACTICE"):
+        return ok
+
+    def change_account(self, mode=AccountType.PRACTICE) -> None:
         """Change active account `real` or `practice`"""
-        if mode.upper() == "REAL":
+        if mode.upper() == AccountType.REAL:
             self.api.account_type = 0
-        elif mode.upper() == "PRACTICE":
+        elif mode.upper() == AccountType.PRACTICE:
             self.api.account_type = 1
         else:
-            self.logger.error(f"{mode} does not exist")
-            sys.exit(1)
+            raise ValueError(f"{mode} does not exist")
         self.api.send_ssid()
+
+    @property
+    def account_type(self):
+        return AccountType.PRACTICE if self.api.account_type == 1 else AccountType.REAL
 
     async def edit_practice_balance(self, amount=None):
         self.api.training_balance_edit_request = None
@@ -154,7 +159,7 @@ class Quotex(object):
             await asyncio.sleep(0.1)
         return self.api.training_balance_edit_request
 
-    async def get_balance(self):
+    async def get_balance(self) -> float:
         while not self.api.account_balance:
             await asyncio.sleep(0.1)
 
@@ -166,9 +171,10 @@ class Quotex(object):
 
         return balance
 
-    async def trade(self, action: str, amount, asset: str, duration):
+    async def trade(
+        self, action: str, amount, asset: str, duration
+    ) -> typing.Tuple[bool, typing.Union[typing.Dict, None]]:
         """Trade Binary option"""
-        count = 0.1
         status_trade = False
         self.api.trade_id = None
         self.duration = duration
@@ -199,7 +205,7 @@ class Quotex(object):
             assets_data[i[2]] = {"turbo_payment": i[18], "payment": i[5], "open": i[14]}
         return assets_data
 
-    async def start_remaining_time(self):
+    async def __start_remaining_time(self):
         try:
             now_stamp = datetime.fromtimestamp(expiration.get_timestamp())
             expiration_stamp = datetime.fromtimestamp(self.api.timesync.server_timestamp)
@@ -220,7 +226,7 @@ class Quotex(object):
         """Check win based id"""
         crevisions = 0
         self.logger.debug(f"begin check win {id_number}")
-        await self.start_remaining_time()
+        await self.__start_remaining_time()
         while crevisions < revisions or not self.api.last_operation:
             try:
                 crevisions += 1
@@ -258,7 +264,7 @@ class Quotex(object):
     def get_signal_data(self):
         return self.api.signal_data
 
-    def get_profit(self):
+    def get_profit(self) -> float:
         return self.api.profit_in_operation or 0
 
     async def start_candles_one_stream(self, asset, size):

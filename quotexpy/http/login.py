@@ -19,7 +19,7 @@ class Login(Browser):
 
         self.email = email
         self.password = password
-        self.headless = kwargs.get("headless", False)
+        self.headless = kwargs.get("headless", True)
         self.on_pin_code = kwargs.get("on_pin_code", None)
 
         self.ssid, self.cookies = self.get_cookies_and_ssid()
