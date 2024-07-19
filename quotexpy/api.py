@@ -23,6 +23,7 @@ from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
 from quotexpy.ws.objects.listinfodata import ListInfoData
 from quotexpy.ws.client import WebsocketClient
+from quotexpy.utils import sessions_file_path
 from collections import defaultdict
 
 urllib3.disable_warnings()
@@ -177,8 +178,8 @@ class QuotexAPI(object):
 
     def check_session(self) -> typing.Tuple[str, str]:
         data = {}
-        if os.path.isfile(".session.pkl"):
-            with open(".session.pkl", "rb") as file:
+        if os.path.isfile(sessions_file_path):
+            with open(sessions_file_path, "rb") as file:
                 data = pickle.load(file)
 
             sessions = data.get(self.email, [])
@@ -267,8 +268,8 @@ class QuotexAPI(object):
         """
         self.profile.msg = None
         if not self.SSID:
-            if os.path.exists(os.path.join(".session.pkl")):
-                os.remove(".session.pkl")
+            if os.path.exists(os.path.join(sessions_file_path)):
+                os.remove(sessions_file_path)
             return False
 
         self.ssid(self.SSID)

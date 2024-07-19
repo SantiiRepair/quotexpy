@@ -85,10 +85,10 @@ client = Quotex(
     email="",
     password="",
     on_pin_code=pin_code_handler,
-    headless=False,
+    headless=True,
 )
 
-client.debug_ws_enable = False
+client.debug_ws_enable = True
 
 
 def check_asset(asset):

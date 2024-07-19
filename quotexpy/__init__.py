@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 
 from quotexpy import expiration
 from quotexpy.api import QuotexAPI
+from quotexpy.utils import log_file_path
 from quotexpy.constants import codes_asset
 
 
@@ -51,7 +52,6 @@ class Quotex(object):
         """
         return self.websocket_client.wss
 
-    @property
     def check_connect(self):
         if self.api and self.api.check_websocket_if_connect == 1:
             return True
@@ -319,7 +319,7 @@ class Quotex(object):
 
 
 logging.basicConfig(
-    filename=".quotexpy.log",
+    filename=log_file_path,
     format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s",
     level=logging.INFO,
 )

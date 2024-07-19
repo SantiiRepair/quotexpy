@@ -2,17 +2,17 @@
 
 import os
 import json
+import time
+import typing
 import random
 import logging
-import time
 import asyncio
 
 import websocket
 from quotexpy.http.user_agents import agents
-from quotexpy.utils import is_valid_json
+from quotexpy.utils import is_valid_json, log_file_path, sessions_file_path
 
 user_agent_list = agents.split("\n")
-logger = logging.getLogger(__name__)
 
 
 class WebsocketClient(object):
@@ -33,7 +33,6 @@ class WebsocketClient(object):
             ),
         }
 
-        websocket.enableTrace(self.api.trace_ws)
         self.wss = websocket.WebSocketApp(
             self.api.wss_url,
             on_message=self.on_message,
@@ -45,6 +44,16 @@ class WebsocketClient(object):
             header=self.headers,
             cookie=self.api.cookies,
         )
+
+        if self.api.trace_ws:
+
+            def on_trace(msg: typing.Union[bytes, str]):
+                with open(log_file_path, "a") as f:
+                    if isinstance(msg, bytes):
+                        msg = msg[1:].decode()
+                    f.write(f"{msg}\n")
+
+            self.wss.on_trace = on_trace
 
         self.logger = logging.getLogger(__name__)
 
@@ -58,8 +67,8 @@ class WebsocketClient(object):
         if current_time.tm_sec in [0, 20, 40]:
             self.wss.send('42["tick"]')
         if "authorization/reject" in wm:
-            if os.path.isfile(".session.pkl"):
-                os.remove(".session.pkl")
+            if os.path.isfile(sessions_file_path):
+                os.remove(sessions_file_path)
             self.api.SSID = None
             self.api.check_rejected_connection = 1
         elif "s_authorization" in wm:
