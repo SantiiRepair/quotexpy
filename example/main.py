@@ -80,13 +80,7 @@ def run(y):
     return z
 
 
-client = Quotex(
-    email="",
-    password="",
-    on_pin_code=pin_code_handler,
-    headless=False,
-)
-
+client = Quotex(email="", password="", on_pin_code=pin_code_handler)
 client.debug_ws_enable = False
 
 

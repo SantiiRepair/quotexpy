@@ -1,11 +1,12 @@
 import os
 import re
 import json
-import pickle
 import time
+import pickle
 import typing
 import random
 import psutil
+import random
 import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -46,7 +47,6 @@ class Browser(object):
 
             rb = self.browser.execute_script('return document.querySelector(".modal-sign__not-avalible") !== null;')
             if rb:
-                self.close()
                 raise ConnectionError("quotex is currently not available in your region")
 
             if "trade" not in self.browser.current_url:
@@ -71,7 +71,11 @@ class Browser(object):
                 self.browser.execute_script('document.querySelector("[name=code]").value = arguments[0];', code)
                 btn = self.browser.find_element(uc.By.XPATH, "//button[@type='submit']")
                 btn.click()
-                time.sleep(10)
+
+                time.sleep(random.randint(2, 4))
+                bc = self.browser.execute_script('return document.querySelector(".hint.hint--danger") !== null;')
+                if bc:
+                    raise QuotexAuthError("the pin code is incorrect")
 
             cookies = self.browser.get_cookies()
             self.api.cookies = cookies
