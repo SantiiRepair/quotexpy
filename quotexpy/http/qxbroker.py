@@ -2,6 +2,7 @@ import os
 import re
 import json
 import pickle
+import time
 import typing
 import random
 import psutil
@@ -18,7 +19,7 @@ from selenium.common.exceptions import JavascriptException
 class Browser(object):
     email = None
     password = None
-    on_ping_code = None
+    on_pin_code = None
     headless = None
 
     base_url = "qxbroker.com"
@@ -39,63 +40,72 @@ class Browser(object):
             self.browser = uc.Chrome(options=options, headless=self.headless, use_subprocess=False)
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
-        self.browser.get(f"{self.https_base_url}/en/sign-in")
-
-        if "trade" not in self.browser.current_url:
-            try:
-                self.browser.execute_script('document.getElementsByName("email")[1].value = arguments[0];', self.email)
-                self.browser.execute_script(
-                    'document.getElementsByName("password")[1].value = arguments[0];', self.password
-                )
-                self.browser.execute_script(
-                    """document.evaluate("//div[@id='tab-1']/form", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.submit();"""
-                )
-            except JavascriptException as exc:
-                raise ConnectionRefusedError("blocked by cloudflare, deactivate headless") from exc
 
         try:
-            code_input = self.browser.find_element(uc.By.NAME, "code")
-            if code_input.is_displayed():
-                code = self.on_ping_code()
-                code_input.send_keys(code)
+            self.browser.get(f"{self.https_base_url}/en/sign-in")
+
+            rb = self.browser.execute_script('return document.querySelector(".modal-sign__not-avalible") !== null;')
+            if rb:
+                self.close()
+                raise ConnectionError("quotex is currently not available in your region")
+
+            if "trade" not in self.browser.current_url:
+                try:
+                    self.browser.execute_script(
+                        'document.getElementsByName("email")[1].value = arguments[0];', self.email
+                    )
+                    self.browser.execute_script(
+                        'document.getElementsByName("password")[1].value = arguments[0];', self.password
+                    )
+                    self.browser.execute_script(
+                        """document.evaluate("//div[@id='tab-1']/form", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.submit();"""
+                    )
+                except JavascriptException as exc:
+                    raise ConnectionRefusedError("blocked by cloudflare, deactivate headless") from exc
+
+            code_input = self.browser.execute_script('return document.querySelector("[name=code]") !== null;')
+            if code_input:
+                if self.on_pin_code is None:
+                    raise ValueError("account has 2fa enabled but was not given a hook to manage it")
+                code = self.on_pin_code()
+                self.browser.execute_script('document.querySelector("[name=code]").value = arguments[0];', code)
                 btn = self.browser.find_element(uc.By.XPATH, "//button[@type='submit']")
                 btn.click()
-        except:
-            pass
+                time.sleep(10)
 
-        cookies = self.browser.get_cookies()
-        self.api.cookies = cookies
-        soup = BeautifulSoup(self.browser.page_source, "html.parser")
-        user_agent = self.browser.execute_script("return navigator.userAgent;")
-        self.api.user_agent = user_agent
+            cookies = self.browser.get_cookies()
+            self.api.cookies = cookies
+            soup = BeautifulSoup(self.browser.page_source, "html.parser")
+            user_agent = self.browser.execute_script("return navigator.userAgent;")
+            self.api.user_agent = user_agent
 
-        try:
-            script: str = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
-        except Exception as exc:
-            raise QuotexAuthError("incorrect username or password") from exc
+            try:
+                script: str = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
+            except Exception as exc:
+                raise QuotexAuthError("incorrect username or password") from exc
+
+            match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
+
+            dx: dict = json.loads(match)
+            ssid = dx.get("token")
+
+            cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
+            cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
+            output_file = Path(sessions_file_path)
+            output_file.parent.mkdir(exist_ok=True, parents=True)
+
+            data = {}
+            if output_file.is_file():
+                with output_file.open("rb") as file:
+                    data = pickle.load(file)
+
+            data[self.email] = [{"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}]
+            with output_file.open("wb") as file:
+                pickle.dump(data, file)
+
+            return ssid, cookie_string
         finally:
             self.close()
-
-        match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
-
-        dx: dict = json.loads(match)
-        ssid = dx.get("token")
-
-        cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
-        cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
-        output_file = Path(sessions_file_path)
-        output_file.parent.mkdir(exist_ok=True, parents=True)
-
-        data = {}
-        if output_file.is_file():
-            with output_file.open("rb") as file:
-                data = pickle.load(file)
-
-        data[self.email] = [{"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}]
-        with output_file.open("wb") as file:
-            pickle.dump(data, file)
-
-        return ssid, cookie_string
 
     def close(self):
         """
