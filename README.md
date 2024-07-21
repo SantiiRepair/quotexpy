@@ -41,44 +41,7 @@ For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main
 ## Donations
 If you feel like showing your love and/or appreciation for this project, then how about shouting us a coffee ;)
 
-<div style="display: inline-block !important;
-        white-space: nowrap;
-        min-width: 160px;" bis_skin_checked="1">
-    <a title="Support me on ko-fi.com" style="
-        background-color: rgb(41, 171, 224);
-        cursor: default;
-        box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
-        line-height: 36px !important;
-        min-width: 150px;
-        display: inline-block !important;
-        background-color: #29abe0;
-        padding: 2px 12px !important;
-        text-align: center !important;
-        border-radius: 12px;
-        color: #fff;
-        cursor: pointer;
-        overflow-wrap: break-word;
-        vertical-align: middle;
-        border: 0 none #fff !important;
-        font-family: 'Quicksand', Helvetica, Century Gothic, sans-serif !important;
-        text-decoration: none;
-        text-shadow: none;
-        font-weight: 700 !important;
-        font-size: 14px !important;" href="https://ko-fi.com/SantiiRepair">
-        <span style="color: #fff !important; letter-spacing: -0.15px !important;
-            text-wrap: none;
-            vertical-align: middle;
-            line-height: 33px !important;
-            padding: 0;
-            text-align: center;
-            text-decoration: none !important;
-            text-shadow: ">
-            <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" style="height: 15px !important; width: 22px !important;">
-            Support Me on Ko-fi
-        </span>
-    </a>
-</div>
-
+[![ko-fi](./.github/images/ko-fi.svg)](https://ko-fi.com/SantiiRepair)
 
 ## Acknowledgements
 - Thanks to [@cleitonleonel](https://github.com/cleitonleonel) for the initial base implementation of the project 🔥

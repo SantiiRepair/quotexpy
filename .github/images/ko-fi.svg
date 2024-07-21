@@ -1,0 +1,45 @@
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+    <foreignObject width="200" height="100">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <div style="
+                display: inline-block !important;
+                white-space: nowrap;
+                min-width: 160px;" bis_skin_checked="1">
+                <a title="Support me on ko-fi.com" style="
+                    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
+                    line-height: 36px !important;
+                    min-width: 150px;
+                    display: inline-block !important;
+                    background-color: #29abe0;
+                    padding: 2px 12px !important;
+                    text-align: center !important;
+                    border-radius: 12px;
+                    color: #fff;
+                    cursor: pointer;
+                    overflow-wrap: break-word;
+                    vertical-align: middle;
+                    border: 0 none #fff !important;
+                    font-family: 'Quicksand', Helvetica, Century Gothic, sans-serif !important;
+                    text-decoration: none;
+                    text-shadow: none;
+                    font-weight: 700 !important;
+                    font-size: 14px !important;">
+                    <span style="
+                        color: #fff !important;
+                        letter-spacing: -0.15px !important;
+                        text-wrap: none;
+                        vertical-align: middle;
+                        line-height: 33px !important;
+                        padding: 0;
+                        text-align: center;
+                        text-decoration: none !important;
+                        text-shadow: 0 1px 1px rgba(34, 34, 34, 0.05);
+                        ">
+                        <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" style="height: 15px !important; width: 22px !important;" />
+                        Support Me on Ko-fi
+                    </span>
+                </a>
+            </div>
+        </div>
+    </foreignObject>
+</svg>
