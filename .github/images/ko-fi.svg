@@ -1,5 +1,5 @@
-<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
-    <foreignObject width="200" height="100">
+<svg width="200" height="40" xmlns="http://www.w3.org/2000/svg">
+    <foreignObject width="200" height="40">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <div style="
                 display: inline-block !important;
@@ -35,7 +35,7 @@
                         text-decoration: none !important;
                         text-shadow: 0 1px 1px rgba(34, 34, 34, 0.05);
                         ">
-                        <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" style="height: 15px !important; width: 22px !important;" />
+                        <img src="https://storage.ko-fi.com/cdn/cup-border.png" style="height: 15px !important; width: 22px !important;" />
                         Support Me on Ko-fi
                     </span>
                 </a>

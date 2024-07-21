@@ -41,7 +41,7 @@ For examples check out [some](https://github.com/SantiiRepair/quotexpy/blob/main
 ## Donations
 If you feel like showing your love and/or appreciation for this project, then how about shouting us a coffee ;)
 
-[![ko-fi](./.github/images/ko-fi.svg)](https://ko-fi.com/SantiiRepair)
+[![ko-fi](.github/images/ko-fi.svg)](https://ko-fi.com/SantiiRepair)
 
 ## Acknowledgements
 - Thanks to [@cleitonleonel](https://github.com/cleitonleonel) for the initial base implementation of the project 🔥
