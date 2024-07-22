@@ -5,7 +5,6 @@ import json
 import time
 import random
 import logging
-import asyncio
 
 import websocket
 from quotexpy.http.user_agents import agents
