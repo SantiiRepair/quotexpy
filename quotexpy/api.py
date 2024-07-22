@@ -76,8 +76,8 @@ class QuotexAPI(object):
 
     def __init__(self, email: str, password: str, **kwargs):
         """
-        :param str email: The email of a Quotex server.
-        :param str password: The password of a Quotex server.
+        :param str email: The email of a Quotex account.
+        :param str password: The password of a Quotex account.
         """
         self.email = email
         self.password = password
@@ -108,28 +108,6 @@ class QuotexAPI(object):
         :returns: The instance of :class:`WebSocket <websocket.WebSocket>`.
         """
         return self.websocket_client.wss
-
-    def get_candle_v2(self):
-        payload = {"_placeholder": True, "num": 0}
-        data = f'451-["history/list/v2", {json.dumps(payload)}]'
-        return self.send_websocket_request(data)
-
-    def subscribe_realtime_candle(self, asset: str, period: int):
-        self.realtime_price[asset] = []
-        payload = {"asset": asset, "period": period}
-        data = f'42["instruments/update", {json.dumps(payload)}]'
-        self.send_websocket_request(data)
-        payload = {"asset": asset, "period": period}
-        data = f'42["depth/follow", "{asset}"]'
-        self.send_websocket_request(data)
-        payload = {"asset": asset, "version": "1.0.0"}
-        data = f'42["chart_notification/get", {json.dumps(payload)}]'
-        self.send_websocket_request(data)
-        return self.send_websocket_request('42["tick"]')
-
-    def unsubscribe_realtime_candle(self, asset):
-        data = f'42["subfor", {json.dumps(asset)}]'
-        return self.send_websocket_request(data)
 
     @property
     def logout(self):
@@ -176,16 +154,60 @@ class QuotexAPI(object):
         """
         return GetCandles(self)
 
+    async def connect(self) -> bool:
+        """Method for connection to Quotex API"""
+        self.ssl_Mutual_exclusion = False
+        self.ssl_Mutual_exclusion_write = False
+        if self.check_websocket_if_connect:
+            self.close()
+        ssid, self.cookies = await self.get_ssid()
+        check_websocket = self.start_websocket()
+        if not check_websocket:
+            return check_websocket
+        if not self.SSID:
+            self.SSID = ssid
+
+        return check_websocket
+
     def check_session(self) -> typing.Tuple[str, str]:
         data = {}
         if os.path.isfile(sessions_file_path):
             with open(sessions_file_path, "rb") as file:
-                data = pickle.load(file)
+                data: dict = pickle.load(file)
 
-            sessions = data.get(self.email, [])
+            sessions: list[dict] = data.get(self.email, [])
             for session in sessions:
                 return session.get("ssid", ""), session.get("cookies", "")
         return "", ""
+
+    async def get_ssid(self) -> typing.Tuple[str, str]:
+        ssid, cookies = self.check_session()
+        if not ssid:
+            self.logger.info("authenticating user")
+            ssid, cookies = self.login(self.email, self.password, **self.kwargs)
+        return ssid, cookies
+
+    def get_candle_v2(self) -> None:
+        payload = {"_placeholder": True, "num": 0}
+        data = f'451-["history/list/v2", {json.dumps(payload)}]'
+        self.send_websocket_request(data)
+
+    def subscribe_realtime_candle(self, asset: str, period: int) -> None:
+        self.realtime_price[asset] = []
+        payload = {"asset": asset, "period": period}
+        data = f'42["instruments/update", {json.dumps(payload)}]'
+        self.send_websocket_request(data)
+        payload = {"asset": asset, "period": period}
+        data = f'42["depth/follow", "{asset}"]'
+        self.send_websocket_request(data)
+        payload = {"asset": asset, "version": "1.0.0"}
+        data = f'42["chart_notification/get", {json.dumps(payload)}]'
+        self.send_websocket_request(data)
+        self.send_websocket_request('42["tick"]')
+
+    def unsubscribe_realtime_candle(self, asset) -> None:
+        data = f'42["subfor", {json.dumps(asset)}]'
+        self.send_websocket_request(data)
 
     def send_websocket_request(self, data, no_force_send=True) -> None:
         """Send websocket request to Quotex server.
@@ -214,14 +236,6 @@ class QuotexAPI(object):
     def edit_training_balance(self, amount) -> None:
         data = f'42["demo/refill",{json.dumps(amount)}]'
         self.send_websocket_request(data)
-
-    async def get_ssid(self) -> typing.Tuple[str, str]:
-        self.logger.info("authenticating user")
-        ssid, cookies = self.check_session()
-        if not ssid:
-            ssid, cookies = await self.login(self.email, self.password, **self.kwargs)
-            self.logger.info("login successful")
-        return ssid, cookies
 
     def start_websocket(self) -> bool:
         self.check_websocket_if_connect = None
@@ -268,7 +282,7 @@ class QuotexAPI(object):
         """
         self.profile.msg = None
         if not self.SSID:
-            if os.path.exists(os.path.join(sessions_file_path)):
+            if os.path.exists(sessions_file_path):
                 os.remove(sessions_file_path)
             return False
 
@@ -284,20 +298,6 @@ class QuotexAPI(object):
             if elapsed_time >= max_attemps:
                 raise QuotexTimeout(f"sending authorization with SSID {self.SSID} took too long to respond")
         return True
-
-    async def connect(self) -> bool:
-        """Method for connection to Quotex API"""
-        self.ssl_Mutual_exclusion = False
-        self.ssl_Mutual_exclusion_write = False
-        if self.check_websocket_if_connect:
-            self.close()
-        ssid, self.cookies = await self.get_ssid()
-        check_websocket = self.start_websocket()
-        if not check_websocket:
-            return check_websocket
-        if not self.SSID:
-            self.SSID = ssid
-        return check_websocket
 
     def close(self) -> None:
         if self.websocket_client:

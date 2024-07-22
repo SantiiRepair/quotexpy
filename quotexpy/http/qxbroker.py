@@ -1,6 +1,4 @@
 import os
-import re
-import json
 import time
 import pickle
 import typing
@@ -8,7 +6,6 @@ import psutil
 import random
 import requests
 from pathlib import Path
-from bs4 import BeautifulSoup
 import undetected_chromedriver as uc
 from quotexpy.http.user_agents import agents
 from quotexpy.utils import sessions_file_path
@@ -33,7 +30,7 @@ class Browser(object):
             self.api.user_agent if self.api.user_agent else user_agent_list[random.randint(0, len(user_agent_list) - 1)]
         )
 
-    def get_cookies_and_ssid(self) -> typing.Tuple[str, str]:
+    def get_ssid_and_cookies(self) -> typing.Tuple[str, str]:
         try:
             options = uc.ChromeOptions()
             options.add_argument(f"--user-agent={self.user_agent}")
@@ -76,22 +73,16 @@ class Browser(object):
                 if bc:
                     raise QuotexAuthError("the pin code is incorrect")
 
+            wsd: typing.Union[dict, None] = self.browser.execute_script("return window.settings;")
+            if wsd is None or "token" not in wsd:
+                raise QuotexAuthError("incorrect username or password")
+
             cookies = self.browser.get_cookies()
             self.api.cookies = cookies
-            soup = BeautifulSoup(self.browser.page_source, "html.parser")
             user_agent = self.browser.execute_script("return navigator.userAgent;")
             self.api.user_agent = user_agent
 
-            try:
-                script: str = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
-            except Exception as exc:
-                raise QuotexAuthError("incorrect username or password") from exc
-
-            match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
-
-            dx: dict = json.loads(match)
-            ssid = dx.get("token")
-
+            ssid = wsd.get("token")
             cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
             cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
             output_file = Path(sessions_file_path)

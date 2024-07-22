@@ -39,7 +39,7 @@ class Quotex(object):
         self.subscribe_mood = []
         self.websocket_client = None
         self.websocket_thread = None
-        self.debug_ws_enable = False
+        self.trace_ws = False
 
         self.logger = logging.getLogger(__name__)
 
@@ -51,8 +51,19 @@ class Quotex(object):
         """
         return self.websocket_client.wss
 
+    async def connect(self) -> bool:
+        self.api = QuotexAPI(self.email, self.password, **self.kwargs)
+        self.api.trace_ws = self.trace_ws
+        ok = await self.api.connect()
+        if ok:
+            self.api.send_ssid(max_attemps=10)
+            if self.api.check_accepted_connection == 0:
+                ok = await self.connect()
+
+        return ok
+
     def check_connect(self):
-        if self.api.check_websocket_if_connect == 1:
+        if isinstance(self.api, QuotexAPI) and self.api.check_websocket_if_connect == 1:
             return True
         return False
 
@@ -84,7 +95,6 @@ class Quotex(object):
                 while self.api.instruments is None and time.time() - start < 10:
                     await asyncio.sleep(0.1)
             except:
-                self.logger.error("api.get_instruments need reconnect")
                 await self.connect()
         return self.api.instruments
 
@@ -92,7 +102,7 @@ class Quotex(object):
         if self.api.instruments:
             return [instrument[2].replace("\n", "") for instrument in self.api.instruments]
 
-    def check_asset_open(self, asset: str) -> typing.Union[typing.Tuple[int, str, bool], None]:
+    def check_asset(self, asset: str) -> typing.Union[typing.Tuple[int, str, bool], None]:
         if isinstance(self.api, QuotexAPI) and self.api.instruments:
             for i in self.api.instruments:
                 if asset == i[2]:
@@ -113,7 +123,6 @@ class Quotex(object):
                 if self.api.candles.candles_data is not None:
                     break
             except:
-                self.logger.error("get_candles need reconnect")
                 await self.connect()
 
         return self.api.candles.candles_data
@@ -126,17 +135,6 @@ class Quotex(object):
             await asyncio.sleep(1)
 
         return self.api.candle_v2_data[asset]
-
-    async def connect(self) -> bool:
-        self.api = QuotexAPI(self.email, self.password, **self.kwargs)
-        self.api.trace_ws = self.debug_ws_enable
-        ok = await self.api.connect()
-        if ok:
-            self.api.send_ssid(max_attemps=10)
-            if self.api.check_accepted_connection == 0:
-                ok = await self.connect()
-
-        return ok
 
     def change_account(self, mode=AccountType.PRACTICE) -> None:
         """Change active account `real` or `practice`"""
@@ -321,7 +319,8 @@ class Quotex(object):
                 await asyncio.sleep(5)
 
     def close(self):
-        self.api.close()
+        if isinstance(self.api, QuotexAPI):
+            self.api.close()
 
 
 logging.basicConfig(

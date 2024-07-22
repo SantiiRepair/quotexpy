@@ -10,7 +10,7 @@ class Login(Browser):
     base_url = "qxbroker.com"
     https_base_url = f"https://{base_url}"
 
-    async def __call__(self, email: str, password: str, **kwargs):
+    def __call__(self, email: str, password: str, **kwargs):
         """
         Method to get Quotex API login http request.
         :param str username: The username of a Quotex server.
@@ -22,5 +22,5 @@ class Login(Browser):
         self.headless = kwargs.get("headless", True)
         self.on_pin_code = kwargs.get("on_pin_code", None)
 
-        self.ssid, self.cookies = self.get_cookies_and_ssid()
+        self.ssid, self.cookies = self.get_ssid_and_cookies()
         return self.ssid, self.cookies

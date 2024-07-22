@@ -9,7 +9,7 @@ import asyncio
 
 import websocket
 from quotexpy.http.user_agents import agents
-from quotexpy.utils import is_valid_json, sessions_file_path
+from quotexpy.utils import asrun, is_valid_json, sessions_file_path
 
 user_agent_list = agents.split("\n")
 
@@ -174,7 +174,7 @@ class WebsocketClient(object):
                 if str(self.api.wss_message) == "41":
                     self.logger.info("disconnection event triggered by the platform, running automatic reconnection")
                     self.api.check_websocket_if_connect = 0
-                    asyncio.run(self.api.reconnect())
+                    asrun(self.api.connect())
                 if "51-" in str(self.api.wss_message):
                     self.api._temp_status = str(self.api.wss_message)
                 elif self.api._temp_status == """451-["settings/list",{"_placeholder":true,"num":0}]""":
