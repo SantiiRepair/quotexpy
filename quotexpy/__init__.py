@@ -26,8 +26,10 @@ def truncate(f, n):
 
 
 class Quotex(object):
-    def __init__(self, email: str, password: str, **kwargs):
+    def __init__(self, email: str, password: str, asset_name: str, time_period: int = 60, **kwargs):
         self.api = None
+        self.asset_name = asset_name
+        self.time_period = time_period
         self.email = email
         self.password = password
         self.kwargs = kwargs
@@ -128,7 +130,7 @@ class Quotex(object):
         return self.api.candle_v2_data[asset]
 
     async def connect(self) -> bool:
-        self.api = QuotexAPI(self.email, self.password, **self.kwargs)
+        self.api = QuotexAPI(self.email, self.password, self.asset_name, self.time_period, **self.kwargs)
         self.api.trace_ws = self.debug_ws_enable
         ok = await self.api.connect()
         if ok:

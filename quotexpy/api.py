@@ -74,7 +74,7 @@ class QuotexAPI(object):
     websocket_error_reason = None
     balance_id = None
 
-    def __init__(self, email: str, password: str, **kwargs):
+    def __init__(self, email: str, password: str, asset_name: str, time_period: int = 60, **kwargs):
         """
         :param str email: The email of a Quotex server.
         :param str password: The password of a Quotex server.
@@ -82,6 +82,8 @@ class QuotexAPI(object):
         self.email = email
         self.password = password
         self.kwargs = kwargs
+        self.asset_name = asset_name
+        self.time_period = time_period
         self._temp_status = ""
         self.settings_list = {}
         self.signal_data = nested_dict(2, dict)
@@ -179,6 +181,7 @@ class QuotexAPI(object):
     def check_session(self) -> typing.Tuple[str, str]:
         data = {}
         if os.path.isfile(sessions_file_path):
+            print(f"sessions_file_path: {sessions_file_path}")
             with open(sessions_file_path, "rb") as file:
                 data = pickle.load(file)
 
@@ -204,12 +207,16 @@ class QuotexAPI(object):
         self.websocket.send('42["indicator/list"]')
         self.websocket.send('42["drawing/load"]')
         self.websocket.send('42["pending/list"]')
-        self.websocket.send('42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
+        self.websocket.send('42["instruments/update",{"asset":"%s","period":%d}]' % (self.asset_name, self.time_period))
         self.websocket.send('42["chart_notification/get"]')
-        self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
+        self.websocket.send('42["depth/follow","%s"]' % self.asset_name)
         self.websocket.send(data)
-        self.logger.debug(data)
+        # print(f"Calling: {self.asset_name}")
+        self.logger.info(data)
         self.ssl_Mutual_exclusion_write = False
+
+    def set_current_asset(self, asset_name):
+        self.current_asset=asset_name
 
     def edit_training_balance(self, amount) -> None:
         data = f'42["demo/refill",{json.dumps(amount)}]'

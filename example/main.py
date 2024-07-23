@@ -85,6 +85,7 @@ client = Quotex(
     password="",
     on_pin_code=pin_code_handler,
     headless=True,
+    asset_name=asset_current
 )
 
 client.debug_ws_enable = False
