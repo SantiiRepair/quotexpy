@@ -1,6 +1,8 @@
 import os
 import json
 import time
+import typing
+import asyncio
 
 
 def asset_parse(asset):
@@ -22,6 +24,13 @@ def is_valid_json(mj):
     except ValueError as _:
         return False
     return True
+
+
+def asrun(x: typing.Coroutine):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    r = loop.run_until_complete(x)
+    return r
 
 
 home_dir = os.path.expanduser("~")
