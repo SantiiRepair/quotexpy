@@ -1,5 +1,5 @@
+pytest==7.4.2
 black==23.9.1
 poetry==1.6.1
 pylint==2.17.5
-pytest==7.4.2
 termcolor==2.3.0

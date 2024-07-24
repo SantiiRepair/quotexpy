@@ -75,13 +75,11 @@ class Browser(object):
                 raise QuotexAuthError("incorrect username or password")
 
             cookies = self.browser.get_cookies()
-            self.api.cookies = cookies
-            user_agent = self.browser.execute_script("return navigator.userAgent;")
-            self.api.user_agent = user_agent
+            self.api.user_agent = self.browser.execute_script("return navigator.userAgent;")
 
             ssid = wsd.get("token")
             cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
-            cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
+            self.api.cookies = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
             output_file = Path(sessions_file_path)
             output_file.parent.mkdir(exist_ok=True, parents=True)
 
@@ -90,11 +88,11 @@ class Browser(object):
                 with output_file.open("rb") as file:
                     data = pickle.load(file)
 
-            data[self.email] = [{"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}]
+            data[self.email] = [{"cookies": self.api.cookies, "ssid": ssid, "user_agent": self.api.user_agent}]
             with output_file.open("wb") as file:
                 pickle.dump(data, file)
 
-            return ssid, cookie_string
+            return ssid, self.api.cookies
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
         finally:

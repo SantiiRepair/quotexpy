@@ -1,11 +1,10 @@
 psutil
-beautifulsoup4==4.11.2
-certifi>=2022.12.7
-greenlet>=3.0.3
-undetected-chromedriver>=3.5.5
 pytz>=2023.3
-requests>=2.32.3
-requests-toolbelt>=1.0.0
 urllib3>=2.2.2
-websocket-client>=1.8
 websockets>=12
+greenlet>=3.0.3
+requests>=2.32.3
+certifi>=2022.12.7
+websocket-client>=1.8
+requests-toolbelt>=1.0.0
+undetected-chromedriver>=3.5.5

@@ -14,6 +14,7 @@ import threading
 
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
+from quotexpy.http.refresh import Refresh
 from quotexpy.ws.channels.ssid import Ssid
 from quotexpy.ws.channels.trade import Trade
 from quotexpy.exceptions import QuotexTimeout
@@ -110,6 +111,14 @@ class QuotexAPI(object):
         return self.websocket_client.wss
 
     @property
+    def refresh(self):
+        """Property for Quotex http refresh ssid resource.
+        :returns: The instance of :class:`Refresh
+            <quotexpy.http.refresh.Refresh>`.
+        """
+        return Refresh(self)
+
+    @property
     def logout(self):
         """Property for get Quotex http login resource.
         :returns: The instance of :class:`Login
@@ -163,6 +172,7 @@ class QuotexAPI(object):
         if not self.SSID:
             self.SSID, self.cookies = await self.get_ssid()
         check_websocket = self.start_websocket()
+        print(self.refresh())
         return check_websocket
 
     async def get_ssid(self) -> typing.Tuple[str, str]:
@@ -193,7 +203,6 @@ class QuotexAPI(object):
         payload = {"asset": asset, "period": period}
         data = f'42["instruments/update", {json.dumps(payload)}]'
         self.send_websocket_request(data)
-        payload = {"asset": asset, "period": period}
         data = f'42["depth/follow", "{asset}"]'
         self.send_websocket_request(data)
         payload = {"asset": asset, "version": "1.0.0"}
