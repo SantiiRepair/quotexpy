@@ -139,9 +139,11 @@ class WebsocketClient(object):
                     self.api.timesync.server_timestamp = self.api.wss_message.get("closeTimestamp")
                 elif self.api.wss_message.get("ticket"):
                     self.api.sold_options_respond = self.api.wss_message
-                elif all(key in self.api.wss_message for key in ["asset", "candles"]):
+                elif all(key in self.api.wss_message for key in ["asset", "history", "candles"]):
                     asset = self.api.wss_message.get("asset")
+                    history = self.api.wss_message.get("history")
                     candles: list = self.api.wss_message.get("candles")
+                    self.api.history = history
                     self.api.candles.candles_data = candles
                     self.api.candle_v2_data[asset] = [
                         {
@@ -167,6 +169,8 @@ class WebsocketClient(object):
                     self.api.instruments = self.api.wss_message
                 if isinstance(self.api.wss_message, list):
                     for item in self.api.wss_message:
+                        if "settings" in item:
+                            self.api.settings = json.loads(item.get("settings"))
                         if "amount" in item and "profit" in item:
                             self.api.last_operation = self.api.wss_message[0]
                             break
@@ -195,9 +199,9 @@ class WebsocketClient(object):
 
         self.api.ssl_Mutual_exclusion = False
 
-    def on_error(self, _, error):
+    def on_error(self, _, err):
         """Method to process websocket errors."""
-        self.api.websocket_error_reason = str(error)
+        self.api.websocket_error_reason = str(err)
         self.api.check_websocket_if_error = True
 
     def on_open(self, _):

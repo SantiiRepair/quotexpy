@@ -1,17 +1,30 @@
 import os
 import json
 import time
+import random
+import string
 import typing
 import asyncio
+from collections import defaultdict
 
 
-def asset_parse(asset):
-    new_asset = asset[:3] + "/" + asset[3:]
+def nested_dict(n, type):
+    if n == 1:
+        return defaultdict(type)
+    return defaultdict(lambda: nested_dict(n - 1, type))
+
+
+def asset_parse(asset: str):
+    new_asset = f"{asset[:3]}/{asset[3:]}"
     if "_otc" in asset:
-        asset = new_asset.replace("_otc", " (OTC)")
-    else:
-        asset = new_asset
-    return asset
+        return new_asset.replace("_otc", " (OTC)")
+    return new_asset
+
+
+def request_id() -> str:
+    characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    random_string = "".join(random.choice(characters) for _ in range(20))
+    return random_string
 
 
 def unix_time() -> int:

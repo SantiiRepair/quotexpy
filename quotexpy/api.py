@@ -11,20 +11,20 @@ import logging
 import urllib3
 import threading
 
-from quotexpy.exceptions import QuotexTimeout
+
 from quotexpy.http.login import Login
 from quotexpy.http.logout import Logout
 from quotexpy.ws.channels.ssid import Ssid
 from quotexpy.ws.channels.trade import Trade
-from quotexpy.ws.channels.candles import GetCandles
-from quotexpy.ws.channels.sell_option import SellOption
-from quotexpy.ws.objects.timesync import TimeSync
+from quotexpy.exceptions import QuotexTimeout
+from quotexpy.ws.client import WebsocketClient
 from quotexpy.ws.objects.candles import Candles
 from quotexpy.ws.objects.profile import Profile
+from quotexpy.ws.objects.timesync import TimeSync
+from quotexpy.ws.channels.candles import GetCandles
+from quotexpy.ws.channels.sell_option import SellOption
 from quotexpy.ws.objects.listinfodata import ListInfoData
-from quotexpy.ws.client import WebsocketClient
-from quotexpy.utils import sessions_file_path
-from collections import defaultdict
+from quotexpy.utils import nested_dict, sessions_file_path
 
 urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
@@ -33,12 +33,6 @@ cert_path = certifi.where()
 os.environ["SSL_CERT_FILE"] = cert_path
 os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
 cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
-
-
-def nested_dict(n, type):
-    if n == 1:
-        return defaultdict(type)
-    return defaultdict(lambda: nested_dict(n - 1, type))
 
 
 class QuotexAPI(object):
@@ -61,6 +55,7 @@ class QuotexAPI(object):
     listinfodata = ListInfoData()
     timesync = TimeSync()
     candles = Candles()
+    history = []
 
     SSID = None
     wss_message = None
@@ -73,31 +68,35 @@ class QuotexAPI(object):
     check_websocket_if_error = False
     websocket_error_reason = None
     balance_id = None
+    settings = None
 
-    def __init__(self, email: str, password: str, **kwargs):
+    def __init__(self, email="", password="", **kwargs):
         """
-        :param str email: The email of a Quotex account.
-        :param str password: The password of a Quotex account.
+        :param email: The email of a Quotex account.
+        :param password: The password of a Quotex account.
         """
         self.email = email
         self.password = password
+
         self.kwargs = kwargs
         self._temp_status = ""
-        self.settings_list = {}
-        self.signal_data = nested_dict(2, dict)
-        self.get_candle_data = {}
-        self.candle_v2_data = {}
+
         self.cookies = None
         self.profile = None
+        self.settings_list = {}
+        self.candle_v2_data = {}
+        self.get_candle_data = {}
         self.websocket_thread = None
-        self.wss_url = "wss://ws2.qxbroker.com/socket.io/?EIO=3&transport=websocket"
         self.websocket_client = None
-        self.set_ssid = None
+        self.SSID = kwargs.get("ssid", None)
+        self.current_asset = kwargs.get("current_asset", None)
+        self.signal_data = nested_dict(2, dict)
+
         self.user_agent = None
-        self.token_login2fa = None
+        self.profile = Profile()
         self.realtime_price = {}
         self.realtime_sentiment = {}
-        self.profile = Profile()
+        self.wss_url = "wss://ws2.qxbroker.com/socket.io/?EIO=3&transport=websocket"
 
         self.logger = logging.getLogger(__name__)
 
@@ -160,14 +159,17 @@ class QuotexAPI(object):
         self.ssl_Mutual_exclusion_write = False
         if self.check_websocket_if_connect:
             self.close()
-        ssid, self.cookies = await self.get_ssid()
-        check_websocket = self.start_websocket()
-        if not check_websocket:
-            return check_websocket
         if not self.SSID:
-            self.SSID = ssid
-
+            self.SSID, self.cookies = await self.get_ssid()
+        check_websocket = self.start_websocket()
         return check_websocket
+
+    async def get_ssid(self) -> typing.Tuple[str, str]:
+        ssid, cookies = self.check_session()
+        if not ssid:
+            self.logger.info("authenticating user")
+            ssid, cookies = self.login(self.email, self.password, **self.kwargs)
+        return ssid, cookies
 
     def check_session(self) -> typing.Tuple[str, str]:
         data = {}
@@ -179,13 +181,6 @@ class QuotexAPI(object):
             for session in sessions:
                 return session.get("ssid", ""), session.get("cookies", "")
         return "", ""
-
-    async def get_ssid(self) -> typing.Tuple[str, str]:
-        ssid, cookies = self.check_session()
-        if not ssid:
-            self.logger.info("authenticating user")
-            ssid, cookies = self.login(self.email, self.password, **self.kwargs)
-        return ssid, cookies
 
     def get_candle_v2(self) -> None:
         payload = {"_placeholder": True, "num": 0}
@@ -209,10 +204,10 @@ class QuotexAPI(object):
         data = f'42["subfor", {json.dumps(asset)}]'
         self.send_websocket_request(data)
 
-    def send_websocket_request(self, data, no_force_send=True) -> None:
+    def send_websocket_request(self, data: str, no_force_send=True) -> None:
         """Send websocket request to Quotex server.
-        :param str data: The websocket request data.
-        :param bool no_force_send: Default None.
+        :param data: The websocket request data.
+        :param no_force_send: Default True.
         """
         if self.check_websocket_if_connect == 0:
             self.logger.info("websocket connection closed")
@@ -222,15 +217,20 @@ class QuotexAPI(object):
             pass
 
         self.ssl_Mutual_exclusion_write = True
+
+        self.logger.debug(data)
+        self.websocket.send(data)
         self.websocket.send('42["tick"]')
         self.websocket.send('42["indicator/list"]')
         self.websocket.send('42["drawing/load"]')
         self.websocket.send('42["pending/list"]')
-        self.websocket.send('42["instruments/update",{"asset":"%s","period":60}]' % self.current_asset)
         self.websocket.send('42["chart_notification/get"]')
-        self.websocket.send('42["depth/follow","%s"]' % self.current_asset)
-        self.websocket.send(data)
-        self.logger.debug(data)
+
+        if self.current_asset:
+            payload = json.dumps({"asset": self.current_asset, "period": 60})
+            self.websocket.send(f'42["instruments/update",{payload}]')
+            self.websocket.send(f'42["depth/follow","{self.current_asset}"]')
+
         self.ssl_Mutual_exclusion_write = False
 
     def edit_training_balance(self, amount) -> None:

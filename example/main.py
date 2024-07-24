@@ -43,8 +43,8 @@ def check_asset(asset):
 async def get_balance():
     check_connect = await client.connect()
     if check_connect:
-        client.change_account(AccountType.PRACTICE)  # "REAL"
-        print(colored("[INFO]: ", "blue"), "Balance: ", client.get_balance())
+        client.change_account(AccountType.PRACTICE)
+        print(colored("[INFO]: ", "blue"), "Balance: ", await client.get_balance())
         print(colored("[INFO]: ", "blue"), "Exiting...")
     client.close()
 
@@ -185,11 +185,11 @@ async def get_signal_data():
 
 
 async def main():
-    # await get_balance()
+    await get_balance()
     # await get_signal_data()
     # await get_payment()
     # await get_payments_payout_more_than()
-    await get_candle_v2()
+    # await get_candle_v2()
     # await get_realtime_candle()
     # await assets_open()
     # await trade_and_check_win()

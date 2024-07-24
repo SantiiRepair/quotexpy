@@ -35,10 +35,7 @@ class Browser(object):
             options = uc.ChromeOptions()
             options.add_argument(f"--user-agent={self.user_agent}")
             self.browser = uc.Chrome(options=options, headless=self.headless, use_subprocess=False)
-        except TypeError as exc:
-            raise SystemError("Chrome is not installed, did you forget?") from exc
 
-        try:
             self.browser.get(f"{self.https_base_url}/en/sign-in")
 
             rb = self.browser.execute_script('return document.querySelector(".modal-sign__not-avalible") !== null;')
@@ -98,6 +95,8 @@ class Browser(object):
                 pickle.dump(data, file)
 
             return ssid, cookie_string
+        except TypeError as exc:
+            raise SystemError("Chrome is not installed, did you forget?") from exc
         finally:
             self.close()
 

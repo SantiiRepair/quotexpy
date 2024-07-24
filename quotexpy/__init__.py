@@ -1,11 +1,9 @@
 """A python wrapper for Quotex API"""
 
 import time
-import math
 import typing
 import asyncio
 import logging
-from collections import defaultdict
 from datetime import datetime, timedelta
 
 from quotexpy import expiration
@@ -15,31 +13,23 @@ from quotexpy.constants import codes_asset
 from quotexpy.utils.account_type import AccountType
 
 
-def nested_dict(n, type):
-    if n == 1:
-        return defaultdict(type)
-    return defaultdict(lambda: nested_dict(n - 1, type))
-
-
-def truncate(f, n):
-    return math.floor(f * 10**n) / 10**n
-
-
 class Quotex(object):
-    def __init__(self, email: str, password: str, **kwargs):
+    def __init__(self, email="", password="", **kwargs):
         self.api = None
         self.email = email
         self.password = password
         self.kwargs = kwargs
-        self.set_ssid = None
-        self.duration = None
+
         self.suspend = 0.5
+        self.duration = None
+
+        self.subscribe_mood = []
         self.subscribe_candle = []
         self.subscribe_candle_all_size = []
-        self.subscribe_mood = []
+
+        self.trace_ws = False
         self.websocket_client = None
         self.websocket_thread = None
-        self.trace_ws = False
 
         self.logger = logging.getLogger(__name__)
 
