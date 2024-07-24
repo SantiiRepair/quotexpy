@@ -21,7 +21,6 @@ class Refresh(Navigator):
                     return data.get("token")
                 else:
                     raise KeyError("token not found in response data")
-            else:
-                raise ValueError("error refreshing ssid, maybe your client started without credentials?")
+            raise ValueError("error refreshing ssid, maybe your client started without credentials?")
         except Exception as err:
-            raise RuntimeError(f"unhandled error: {str(err)}")
+            raise RuntimeError(f"unhandled error: {str(err)}") from err

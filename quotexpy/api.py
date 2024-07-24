@@ -172,7 +172,6 @@ class QuotexAPI(object):
         if not self.SSID:
             self.SSID, self.cookies = await self.get_ssid()
         check_websocket = self.start_websocket()
-        print(self.refresh())
         return check_websocket
 
     async def get_ssid(self) -> typing.Tuple[str, str]:
