@@ -101,8 +101,8 @@ class Quotex(object):
         return None
 
     async def get_candles(self, asset: str, offset: int, period: int) -> typing.List[typing.Union[typing.List, None]]:
-        index = expiration.get_timestamp()
         self.api.current_asset = asset
+        index = expiration.get_timestamp()
         self.api.candles.candles_data = None
         while True:
             try:
@@ -166,8 +166,8 @@ class Quotex(object):
         status_trade = False
         self.api.trade_id = None
         self.duration = duration
-        request_id = expiration.get_timestamp()
         self.api.current_asset = asset
+        request_id = expiration.get_timestamp()
         self.api.subscribe_realtime_candle(asset, duration)
         self.api.trade(action, amount, asset, duration, request_id)
         while self.api.trade_id is None:

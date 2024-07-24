@@ -89,6 +89,7 @@ class QuotexAPI(object):
         self.websocket_thread = None
         self.websocket_client = None
         self.SSID = kwargs.get("ssid", None)
+        self.time_period = kwargs.get("time_period", 60)
         self.current_asset = kwargs.get("current_asset", None)
         self.signal_data = nested_dict(2, dict)
 
@@ -227,7 +228,7 @@ class QuotexAPI(object):
         self.websocket.send('42["chart_notification/get"]')
 
         if self.current_asset:
-            payload = json.dumps({"asset": self.current_asset, "period": 60})
+            payload = json.dumps({"asset": self.current_asset, "period": self.time_period})
             self.websocket.send(f'42["instruments/update",{payload}]')
             self.websocket.send(f'42["depth/follow","{self.current_asset}"]')
 
