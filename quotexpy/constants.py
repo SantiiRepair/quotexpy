@@ -65,5 +65,5 @@ codes_asset = {
     "XAGUSD_otc": 167,
     "XAUUSD": 2,
     "XAUUSD_otc": 169,
-    "USDMXN_otc": 343
+    "USDMXN_otc": 343,
 }
