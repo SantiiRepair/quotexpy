@@ -14,7 +14,8 @@ from quotexpy.utils.account_type import AccountType
 
 
 class Quotex(object):
-    def __init__(self, email="", password="", **kwargs):
+
+    def __init__(self, email="", password="", time_period: int = 60, **kwargs):
         self.api = None
         self.email = email
         self.password = password
@@ -31,6 +32,12 @@ class Quotex(object):
         self.websocket_client = None
         self.websocket_thread = None
 
+        # Validate User Credentials
+        if not self.email.strip():
+            self.email = input("Enter your email id: ")
+        if not self.password.strip():
+            self.password = input("Enter your password: ")
+
         self.logger = logging.getLogger(__name__)
 
     @property
@@ -42,7 +49,7 @@ class Quotex(object):
         return self.websocket_client.wss
 
     async def connect(self) -> bool:
-        self.api = QuotexAPI(self.email, self.password, **self.kwargs)
+        self.api = QuotexAPI(self.email, self.password, self.time_period, **self.kwargs)
         self.api.trace_ws = self.trace_ws
         ok = await self.api.connect()
         if ok:

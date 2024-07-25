@@ -71,7 +71,7 @@ class QuotexAPI(object):
     balance_id = None
     settings = None
 
-    def __init__(self, email="", password="", **kwargs):
+    def __init__(self, email="", password="", time_period: int = 60, **kwargs):
         """
         :param email: The email of a Quotex account.
         :param password: The password of a Quotex account.
@@ -80,6 +80,7 @@ class QuotexAPI(object):
         self.password = password
 
         self.kwargs = kwargs
+        self.time_period = time_period
         self._temp_status = ""
 
         self.cookies = None
