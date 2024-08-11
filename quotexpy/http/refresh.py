@@ -19,7 +19,7 @@ class Refresh(Navigator):
                 data: dict = response_json.get("data")
                 if data and data.get("token"):
                     return data.get("token")
-                raise KeyError("token not found in response data")
+                raise KeyError("ssid not found in response data")
             raise ValueError("error refreshing ssid, maybe your client started without credentials?")
         except Exception as err:
             raise RuntimeError(f"unhandled error: {str(err)}") from err

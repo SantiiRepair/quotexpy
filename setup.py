@@ -25,6 +25,7 @@ install_requires = [
     "urllib3>=2.0.5",
     "websocket-client==1.6.3",
     "websockets==11.0.3",
+    "psutil>=5.9.8",
 ]
 
 setup_kwargs = {
@@ -40,7 +41,7 @@ setup_kwargs = {
     "packages": packages,
     "package_data": package_data,
     "install_requires": install_requires,
-    "python_requires": ">=3.10,<3.13",
+    "python_requires": ">=3.8,<3.13",
 }
 
 
