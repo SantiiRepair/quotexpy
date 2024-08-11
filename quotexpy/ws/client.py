@@ -3,6 +3,7 @@
 import os
 import json
 import time
+import base64
 import random
 import logging
 
@@ -16,6 +17,11 @@ user_agent_list = agents.split("\n")
 class WebsocketClient(object):
     """Class for work with Quotex API websocket."""
 
+    def generate_websocket_key(self):
+        random_bytes = os.urandom(16)
+        websocket_key = base64.b64encode(random_bytes).decode("utf-8")
+        return websocket_key
+
     def __init__(self, api):
         """
         :param api: The instance of :class:`QuotexAPI
@@ -23,7 +29,19 @@ class WebsocketClient(object):
         :trace_ws: Enables and disable `enableTrace` in WebSocket Client.
         """
         self.api = api
+
         self.headers = {
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "en-US,en;q=0.9,es-ES;q=0.8,es;q=0.7",
+            "Cache-Control": "no-cache",
+            "Connection": "Upgrade",
+            "Host": "ws2.qxbroker.com",
+            "Origin": "https://qxbroker.com",
+            "Pragma": "no-cache",
+            "Sec-WebSocket-Extensions": "permessage-deflate; client_max_window_bits",
+            "Sec-WebSocket-Version": "13",
+            "Upgrade": "websocket",
+            "Sec-WebSocket-Key": self.generate_websocket_key(),
             "User-Agent": (
                 self.api.user_agent
                 if self.api.user_agent
