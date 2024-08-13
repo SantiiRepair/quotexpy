@@ -5,6 +5,7 @@ websockets>=12
 greenlet>=3.0.3
 requests>=2.32.3
 certifi>=2022.12.7
+setuptools>=70.0.0
 websocket-client>=1.8
 requests-toolbelt>=1.0.0
 undetected-chromedriver>=3.5.5

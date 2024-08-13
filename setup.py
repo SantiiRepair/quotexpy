@@ -26,6 +26,7 @@ install_requires = [
     "websocket-client==1.6.3",
     "websockets==11.0.3",
     "psutil>=5.9.8",
+    "setuptools>=70.0.0",
 ]
 
 setup_kwargs = {

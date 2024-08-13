@@ -29,6 +29,7 @@ urllib3 = ">=2.0.5"
 websocket-client = ">=1.6.3"
 websockets = ">=11.0.3"
 psutil = ">=5.9.8"
+setuptools = ">=70.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.9.1"
