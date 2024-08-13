@@ -52,9 +52,10 @@ class Quotex(object):
 
         return ok
 
-    def check_connect(self):
-        if isinstance(self.api, QuotexAPI) and self.api.check_websocket_if_connect == 1:
-            return True
+    @property
+    def is_connected(self):
+        if isinstance(self.api, QuotexAPI):
+            return self.api.check_websocket_if_connect == 1
         return False
 
     async def re_subscribe_stream(self):
@@ -108,7 +109,7 @@ class Quotex(object):
             try:
                 tm = expiration.get_timestamp()
                 self.api.get_candles(asset, index, offset, period, tm)
-                while self.check_connect and self.api.candles.candles_data is None:
+                while self.is_connected and self.api.candles.candles_data is None:
                     await asyncio.sleep(0.1)
                 if self.api.candles.candles_data is not None:
                     break

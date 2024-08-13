@@ -213,7 +213,7 @@ class QuotexAPI(object):
         data = f'42["subfor", {json.dumps(asset)}]'
         self.send_websocket_request(data)
 
-    def send_websocket_request(self, data: str, no_force_send=True) -> None:
+    def send_websocket_request(self, data: str, sync=True, no_force_send=True) -> None:
         """Send websocket request to Quotex server.
         :param data: The websocket request data.
         :param no_force_send: Default True.
@@ -229,16 +229,18 @@ class QuotexAPI(object):
 
         self.logger.debug(data)
         self.websocket.send(data)
-        self.websocket.send('42["tick"]')
-        self.websocket.send('42["indicator/list"]')
-        self.websocket.send('42["drawing/load"]')
-        self.websocket.send('42["pending/list"]')
-        self.websocket.send('42["chart_notification/get"]')
 
-        if self.current_asset:
-            payload = json.dumps({"asset": self.current_asset, "period": self.time_period})
-            self.websocket.send(f'42["instruments/update",{payload}]')
-            self.websocket.send(f'42["depth/follow","{self.current_asset}"]')
+        if sync:
+            self.websocket.send('42["tick"]')
+            self.websocket.send('42["indicator/list"]')
+            self.websocket.send('42["drawing/load"]')
+            self.websocket.send('42["pending/list"]')
+            self.websocket.send('42["chart_notification/get"]')
+
+            if self.current_asset:
+                payload = json.dumps({"asset": self.current_asset, "period": self.time_period})
+                self.websocket.send(f'42["instruments/update",{payload}]')
+                self.websocket.send(f'42["depth/follow","{self.current_asset}"]')
 
         self.ssl_Mutual_exclusion_write = False
 
