@@ -9,6 +9,7 @@ import typing
 import certifi
 import logging
 import urllib3
+import platform
 import requests
 import threading
 
@@ -270,21 +271,27 @@ class QuotexAPI(object):
         self.check_websocket_if_error = False
         self.websocket_error_reason = None
         self.websocket_client = WebsocketClient(self)
+
+        payload = {
+            "ping_interval": 25000,
+            "ping_timeout": 5000,
+            "ping_payload": "2",
+            "origin": "https://qxbroker.com",
+            "host": "ws2.qxbroker.com",
+            "sslopt": {
+                "check_hostname": False,
+                "cert_reqs": ssl.CERT_NONE,
+                "ca_certs": cacert,
+                "context": ssl_context,
+            },
+        }
+
+        if platform.system() == "Linux":
+            payload["sslopt"]["ssl_version"] = ssl.PROTOCOL_TLS
+
         self.websocket_thread = threading.Thread(
             target=self.websocket.run_forever,
-            kwargs={
-                "ping_interval": 25000,
-                "ping_timeout": 5000,
-                "ping_payload": "2",
-                "origin": "https://qxbroker.com",
-                "host": "ws2.qxbroker.com",
-                "sslopt": {
-                    "check_hostname": False,
-                    "cert_reqs": ssl.CERT_NONE,
-                    "ca_certs": cacert,
-                    "context": ssl_context,
-                },
-            },
+            kwargs=payload,
         )
 
         self.websocket_thread.daemon = True
