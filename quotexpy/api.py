@@ -9,6 +9,7 @@ import typing
 import certifi
 import logging
 import urllib3
+import requests
 import threading
 
 
@@ -25,15 +26,31 @@ from quotexpy.ws.objects.timesync import TimeSync
 from quotexpy.ws.channels.candles import GetCandles
 from quotexpy.ws.channels.sell_option import SellOption
 from quotexpy.ws.objects.listinfodata import ListInfoData
-from quotexpy.utils import nested_dict, sessions_file_path
+from quotexpy.utils import (
+    nested_dict,
+    sessions_file_path,
+    cert_path,
+)
 
 urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
-cert_path = certifi.where()
+if not os.path.exists(cert_path):
+    url = "https://raw.githubusercontent.com/SantiiRepair/quotexpy/main/.github/fs/cacert.pem"
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(cert_path, "wb") as f:
+            f.write(response.content)
+
 os.environ["SSL_CERT_FILE"] = cert_path
 os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
 cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
+
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+ssl_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2
+ssl_context.minimum_version = ssl.TLSVersion.TLSv1_3
+
+ssl_context.load_verify_locations(certifi.where())
 
 
 class QuotexAPI(object):
@@ -262,9 +279,10 @@ class QuotexAPI(object):
                 "origin": "https://qxbroker.com",
                 "host": "ws2.qxbroker.com",
                 "sslopt": {
+                    "check_hostname": False,
                     "cert_reqs": ssl.CERT_NONE,
                     "ca_certs": cacert,
-                    "ssl_version": ssl.PROTOCOL_TLSv1_2,
+                    "context": ssl_context,
                 },
             },
         )

@@ -47,5 +47,6 @@ def asrun(x: typing.Coroutine):
 
 
 home_dir = os.path.expanduser("~")
+cert_path = os.path.join(home_dir, "cacert.pem")
 log_file_path = os.path.join(home_dir, ".quotexpy.log")
 sessions_file_path = os.path.join(home_dir, ".sessions.pkl")
