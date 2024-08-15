@@ -6,10 +6,8 @@ import time
 import json
 import pickle
 import typing
-import certifi
 import logging
 import urllib3
-import platform
 import requests
 import threading
 
@@ -46,12 +44,6 @@ if not os.path.exists(cert_path):
 os.environ["SSL_CERT_FILE"] = cert_path
 os.environ["WEBSOCKET_CLIENT_CA_BUNDLE"] = cert_path
 cacert = os.environ.get("WEBSOCKET_CLIENT_CA_BUNDLE")
-
-ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-ssl_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2
-ssl_context.minimum_version = ssl.TLSVersion.TLSv1_3
-
-ssl_context.load_verify_locations(certifi.where())
 
 
 class QuotexAPI(object):
@@ -272,26 +264,20 @@ class QuotexAPI(object):
         self.websocket_error_reason = None
         self.websocket_client = WebsocketClient(self)
 
-        payload = {
-            "ping_interval": 25000,
-            "ping_timeout": 5000,
-            "ping_payload": "2",
-            "origin": "https://qxbroker.com",
-            "host": "ws2.qxbroker.com",
-            "sslopt": {
-                "check_hostname": False,
-                "cert_reqs": ssl.CERT_NONE,
-                "ca_certs": cacert,
-                "context": ssl_context,
-            },
-        }
-
-        if platform.system() == "Linux":
-            payload["sslopt"]["ssl_version"] = ssl.PROTOCOL_TLS
-
         self.websocket_thread = threading.Thread(
             target=self.websocket.run_forever,
-            kwargs=payload,
+            kwargs={
+                "ping_interval": 25000,
+                "ping_timeout": 5000,
+                "ping_payload": "2",
+                "origin": "https://qxbroker.com",
+                "host": "ws2.qxbroker.com",
+                "sslopt": {
+                    "cert_reqs": ssl.CERT_NONE,
+                    "ca_certs": cacert,
+                    "ssl_version": ssl.PROTOCOL_TLSv1_2,
+                },
+            },
         )
 
         self.websocket_thread.daemon = True
