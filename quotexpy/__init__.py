@@ -10,6 +10,8 @@ from quotexpy import expiration
 from quotexpy.api import QuotexAPI
 from quotexpy.utils import log_file_path
 from quotexpy.constants import codes_asset
+
+from quotexpy.utils import parse_dict
 from quotexpy.utils.account_type import AccountType
 
 
@@ -162,9 +164,19 @@ class Quotex(object):
 
     async def trade(
         self, action: str, amount, asset: str, duration
-    ) -> typing.Tuple[bool, typing.Union[typing.Dict, None]]:
-        """Trade Binary option"""
-        status_trade = False
+    ) -> typing.Tuple[bool, typing.Union[typing.Any, None]]:
+        """Execute a binary option trade.
+
+        Args:
+            action (str): The action to perform ('CALL' or 'PUT').
+            amount (float): The amount to trade.
+            asset (str): The asset to trade.
+            duration (int): The duration of the trade in seconds.
+
+        Returns:
+            Tuple[bool, Union[Any, None]]: A tuple containing the status of the trade
+            and the trade information if successful.
+        """
         self.api.trade_id = None
         self.duration = duration
         self.api.current_asset = asset
@@ -176,8 +188,7 @@ class Quotex(object):
             if self.api.check_websocket_if_error:
                 return False, self.api.websocket_error_reason
 
-        status_trade = True
-        return status_trade, self.api.trade_successful
+        return True, parse_dict(self.api.trade_successful)
 
     async def sell_option(self, options_ids):
         """Sell asset Quotex"""

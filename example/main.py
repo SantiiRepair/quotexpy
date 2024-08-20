@@ -62,7 +62,7 @@ async def trade():
     if check_connect:
         client.change_account(AccountType.PRACTICE)
         amount = 1
-        action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
+        action = random.choice([OperationType.CALL, OperationType.PUT])
         global asset_current
         asset, asset_open = check_asset(asset_current)
         if asset_open[2]:
@@ -96,11 +96,11 @@ async def trade_and_check_win():
         await wait_for_input_exceeding_x_seconds_limit(30)  # waiting for seconds
         if asset_open[2]:
             print(colored("[INFO]: ", "blue"), "Asset is open.")
-            action = random.choice([OperationType.CALL_GREEN, OperationType.PUT_RED])
+            action = random.choice([OperationType.CALL, OperationType.PUT])
             status, trade_info = await client.trade(action, amount, asset, 60)
             if status:
                 print(colored("[INFO]: ", "blue"), "Waiting for result...")
-                if await client.check_win(trade_info.get("id")):
+                if await client.check_win(trade_info.id):
                     print(colored("[INFO]: ", "green"), f"Win -> Profit: {client.get_profit()}")
                 else:
                     print(colored("[INFO]: ", "light_red"), f"Loss -> Loss: {client.get_profit()}")
@@ -120,7 +120,7 @@ async def sell_option():
         amount = 30
         global asset_current
         asset, asset_open = check_asset(asset_current)
-        direction = OperationType.PUT_RED
+        direction = OperationType.PUT
         duration = 1000  # in seconds
         status, buy_info = await client.trade(amount, asset, direction, duration)
         await client.sell_option(buy_info["id"])
@@ -185,14 +185,14 @@ async def get_signal_data():
 
 
 async def main():
-    await get_balance()
+    # await get_balance()
     # await get_signal_data()
     # await get_payment()
     # await get_payments_payout_more_than()
     # await get_candle_v2()
     # await get_realtime_candle()
     # await assets_open()
-    # await trade_and_check_win()
+    await trade_and_check_win()
     # await balance_refill()
 
 

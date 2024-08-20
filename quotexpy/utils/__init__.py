@@ -8,6 +8,12 @@ import asyncio
 from collections import defaultdict
 
 
+class __MParser:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
 def nested_dict(n, type):
     if n == 1:
         return defaultdict(type)
@@ -31,12 +37,27 @@ def unix_time() -> int:
     return int(time.time())
 
 
-def is_valid_json(mj):
+def is_valid_json(x: typing.Any):
     try:
-        json.loads(mj)
+        json.loads(x)
     except ValueError as _:
         return False
     return True
+
+
+def parse_dict(data: typing.Any) -> typing.Optional[__MParser]:
+    """Parse a dictionary into an instance of __MParser.
+
+    Args:
+        data (Any): The input data to parse.
+
+    Returns:
+        Optional[__MParser]: An instance of __MParser if the input is a dictionary,
+        otherwise None.
+    """
+    if isinstance(data, dict):
+        return __MParser(**data)
+    return None
 
 
 def asrun(x: typing.Coroutine):
